@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hand Skills Learning Platform</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<!-- Load Firebase SDKs from CDN -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 <style>
 /* --- CSS REMAINS THE SAME AS IN YOUR ORIGINAL FILE --- */
 /* Paste the entire CSS block from your original file here */
@@ -513,44 +517,21 @@ Logout
 </div>
 </div>
 </div>
-
-<!-- Main JavaScript -->
-<script type="module">
+<script>
 // --- Firebase Initialization ---
-// Import Firebase SDK modules
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import {
-getAuth,
-signInWithEmailAndPassword,
-signOut,
-onAuthStateChanged // To check login status on page load
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import {
-getFirestore,
-collection,
-getDocs,
-addDoc,
-updateDoc,
-deleteDoc,
-doc,
-setDoc
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-// Your Firebase configuration (paste the object from Phase 2, Step 5 here)
+// Initialize Firebase using the global variables exposed by the CDN scripts
 const firebaseConfig = {
-apiKey: "AIzaSyA6ZdINHlRF583T3HL5RsA4q2fmHeBcB_g",
-authDomain: "hand-skills-platform.firebaseapp.com",
-projectId: "hand-skills-platform",
-storageBucket: "hand-skills-platform.firebasestorage.app",
-messagingSenderId: "1021058690748",
-appId: "1:1021058690748:web:40fd86d1060d90bbe1eab9",
-measurementId: "G-R2J40EVW18"
+    apiKey: "AIzaSyA6ZdINHlRF583T3HL5RsA4q2fmHeBcB_g",
+    authDomain: "hand-skills-platform.firebaseapp.com",
+    projectId: "hand-skills-platform",
+    storageBucket: "hand-skills-platform.firebasestorage.app",
+    messagingSenderId: "1021058690748",
+    appId: "1:1021058690748:web:40fd86d1060d90bbe1eab9",
+    measurementId: "G-R2J40EVW18"
 };
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+const app = firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth(app);
+const db = firebase.firestore(app);
 
 // Global variable to hold skills data fetched from Firestore
 let skillsData = [];
@@ -561,7 +542,7 @@ let currentViewedSkillId = null; // Keeps track of skill being viewed in user in
 // Fetch all skills from Firestore
 async function loadSkillsFromFirestore() {
     try {
-        const querySnapshot = await getDocs(collection(db, "skills"));
+        const querySnapshot = await db.collection("skills").get();
         skillsData = [];
         querySnapshot.forEach((doc) => {
             skillsData.push({ id: doc.id, ...doc.data() }); // Include Firestore document ID
@@ -577,7 +558,7 @@ async function loadSkillsFromFirestore() {
 // --- Updated Application Logic ---
 // Check if user is logged in using Firebase Auth state persistence
 function checkLoginStatus() {
-    onAuthStateChanged(auth, (user) => {
+    firebase.auth().onAuthStateChanged((user) => {
         if (user) {
             // User is signed in, see docs for a list of available properties
             // https://firebase.google.com/docs/reference/js/auth.user
@@ -617,8 +598,7 @@ async function login() {
     try {
         // Attempt to sign in with Firebase Auth
         // Note: You need to create this user in the Firebase Console first under "Authentication > Users"
-        // For now, let's assume you have an admin user: admin@yoursite.com / MySuperSecretPassword123!
-        const userCredential = await signInWithEmailAndPassword(auth, username, password);
+        const userCredential = await firebase.auth().signInWithEmailAndPassword(username, password);
         const user = userCredential.user;
         console.log("Login successful:", user.email);
         // onAuthStateChanged will handle showing the dashboard
@@ -638,7 +618,7 @@ async function login() {
 
 // Logout function using Firebase Auth
 function logout() {
-    signOut(auth).then(() => {
+    firebase.auth().signOut().then(() => {
         console.log("User logged out successfully.");
         // onAuthStateChanged will handle hiding the dashboard
     }).catch((error) => {
@@ -888,7 +868,7 @@ function addQuizQuestion() {
         options: ['', '', '', ''],
         answer: 0
     });
-    addQuizQuestionToForm(); // Pass undefined index to indicate it's new question
+    addQuizQuestionToForm(); // Pass undefined index to indicate it's a new question
 }
 
 // Update quiz field (unchanged)
@@ -936,14 +916,14 @@ async function saveSkill() {
         // Determine if it's a new skill or updating an existing one
         if (!currentEditingSkill.id) {
             // It's a new skill - add to Firestore collection
-            const docRef = await addDoc(collection(db, "skills"), currentEditingSkill);
+            const docRef = await db.collection("skills").add(currentEditingSkill);
             console.log("New skill added with ID: ", docRef.id);
             currentEditingSkill.id = docRef.id; // Assign the generated ID
             skillsData.push(currentEditingSkill); // Update local cache
         } else {
             // It's an existing skill - update the specific document
-            const skillDocRef = doc(db, "skills", currentEditingSkill.id);
-            await updateDoc(skillDocRef, currentEditingSkill);
+            const skillDocRef = db.collection("skills").doc(currentEditingSkill.id);
+            await skillDocRef.update(currentEditingSkill);
             console.log("Skill updated with ID: ", currentEditingSkill.id);
             // Update local cache
             const index = skillsData.findIndex(s => s.id === currentEditingSkill.id);
@@ -977,7 +957,7 @@ async function deleteSkill(skillId) {
 
     try {
         // Delete the document from Firestore
-        await deleteDoc(doc(db, "skills", skillId));
+        await db.collection("skills").doc(skillId).delete();
         console.log("Skill deleted with ID: ", skillId);
 
         // Update local cache
@@ -1224,4 +1204,3 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 </body>
 </html>
-
