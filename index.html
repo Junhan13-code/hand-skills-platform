@@ -585,9 +585,13 @@ function checkLoginStatus() {
 }
 
 // Login function using Firebase Auth
+// Login function using Firebase Auth
 async function login() {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
+
+    // Clear any previous error messages
+    showError('');
 
     // Basic validation
     if (!username || !password) {
@@ -595,12 +599,18 @@ async function login() {
         return;
     }
 
+    // Show a temporary message while attempting login
+    showError('Logging in...');
+
     try {
         // Attempt to sign in with Firebase Auth
         // Note: You need to create this user in the Firebase Console first under "Authentication > Users"
         const userCredential = await firebase.auth().signInWithEmailAndPassword(username, password);
         const user = userCredential.user;
         console.log("Login successful:", user.email);
+        // Clear any messages (success is indicated by the dashboard appearing)
+        showError('');
+        alert("Login successful! Welcome, " + user.email); // <-- Added success prompt
         // onAuthStateChanged will handle showing the dashboard
     } catch (error) {
         console.error("Login error:", error);
@@ -612,7 +622,10 @@ async function login() {
         } else if (error.code === 'auth/too-many-requests') {
             errorMessage = 'Too many failed attempts. Try again later.';
         }
+        // Display the error message in the designated area
         showError(errorMessage);
+        // Also show an alert for immediate feedback
+        alert("Login failed: " + errorMessage); // <-- Added failure prompt
     }
 }
 
@@ -1204,3 +1217,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 </body>
 </html>
+
