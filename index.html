@@ -1,1701 +1,1358 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hand Skills Learning Platform - Admin & User System</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        :root {
-            --primary: #4361ee;
-            --secondary: #3f37c9;
-            --accent: #4cc9f0;
-            --light: #f8f9fa;
-            --dark: #212529;
-            --gray: #6c757d;
-            --success: #4ade80;
-            --warning: #facc15;
-            --danger: #f87171;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
-        }
-
-        body {
-            background-color: #f5f7fb;
-            color: var(--dark);
-            line-height: 1.6;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* Admin Login Button */
-        .admin-login {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 100;
-        }
-
-        .admin-btn {
-            background: rgba(0,0,0,0.3);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: var(--transition);
-        }
-
-        .admin-btn:hover {
-            background: rgba(0,0,0,0.5);
-        }
-
-        /* Login/Register Forms */
-        .auth-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-        }
-
-        .auth-box {
-            background: white;
-            padding: 2.5rem;
-            border-radius: 10px;
-            box-shadow: var(--shadow);
-            width: 100%;
-            max-width: 450px;
-            text-align: center;
-        }
-
-        .auth-box h2 {
-            margin-bottom: 1.5rem;
-            color: var(--primary);
-        }
-
-        .form-group {
-            margin-bottom: 1.2rem;
-            text-align: left;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 0.8rem;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1rem;
-        }
-
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 0.8rem;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .btn:hover {
-            background: var(--secondary);
-        }
-
-        .btn-secondary {
-            background: var(--gray);
-        }
-
-        .btn-secondary:hover {
-            background: #5a6268;
-        }
-
-        .btn-success {
-            background: var(--success);
-        }
-
-        .btn-success:hover {
-            background: #22c55e;
-        }
-
-        .error-message {
-            color: var(--danger);
-            margin-top: 0.5rem;
-            font-size: 0.9rem;
-        }
-
-        .auth-toggle {
-            margin-top: 1rem;
-            color: var(--gray);
-        }
-
-        .auth-toggle a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        /* Admin Dashboard */
-        .admin-dashboard {
-            display: none;
-            padding: 2rem 0;
-        }
-
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--light);
-        }
-
-        .admin-header h1 {
-            color: var(--primary);
-        }
-
-        .logout-btn {
-            background: var(--danger);
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .admin-content {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 2rem;
-        }
-
-        /* Navigation Panel */
-        .nav-panel {
-            background: white;
-            border-radius: 10px;
-            padding: 1.5rem;
-            box-shadow: var(--shadow);
-        }
-
-        .nav-panel h3 {
-            margin-bottom: 1.2rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--light);
-        }
-
-        .nav-item {
-            padding: 0.8rem;
-            margin-bottom: 0.5rem;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .nav-item:hover, .nav-item.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        /* Main Content Area */
-        .main-content-area {
-            background: white;
-            border-radius: 10px;
-            padding: 2rem;
-            box-shadow: var(--shadow);
-        }
-
-        .section-title {
-            font-size: 1.5rem;
-            color: var(--primary);
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--light);
-        }
-
-        .skill-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .skill-card {
-            border: 1px solid var(--light);
-            border-radius: 8px;
-            padding: 1.2rem;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .skill-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        }
-
-        .skill-card h4 {
-            margin-bottom: 0.5rem;
-            color: var(--primary);
-        }
-
-        .skill-actions {
-            margin-top: 1rem;
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .action-btn {
-            padding: 0.4rem 0.8rem;
-            border-radius: 4px;
-            border: none;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        .edit-btn {
-            background: var(--warning);
-            color: white;
-        }
-
-        .delete-btn {
-            background: var(--danger);
-            color: white;
-        }
-
-        /* Edit Form */
-        .edit-form {
-            display: none;
-        }
-
-        .form-row {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.2rem;
-        }
-
-        .form-col {
-            flex: 1;
-        }
-
-        textarea {
-            width: 100%;
-            padding: 0.8rem;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .form-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        /* Steps Editor */
-        .steps-editor {
-            margin-top: 1.5rem;
-        }
-
-        .step-item {
-            border: 1px solid var(--light);
-            border-radius: 5px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .step-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.8rem;
-        }
-
-        .step-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .add-step-btn {
-            margin-top: 1rem;
-            background: var(--success);
-            color: white;
-        }
-
-        /* Quiz Editor */
-        .quiz-editor {
-            margin-top: 1.5rem;
-        }
-
-        .quiz-question {
-            border: 1px solid var(--light);
-            border-radius: 5px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .quiz-options {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-
-        .add-quiz-btn {
-            margin-top: 1rem;
-            background: var(--success);
-            color: white;
-        }
-
-        /* User Interface */
-        .user-interface {
-            display: none;
-            padding: 2rem 0;
-        }
-
-        /* Header Styles */
-        header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 2rem 0;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        /* Skill Grid */
-        .skill-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-top: 2rem;
-        }
-
-        .skill-card-ui {
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-            cursor: pointer;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .skill-card-ui:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .skill-icon {
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            color: white;
-            font-size: 3rem;
-            height: 150px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .skill-content {
-            padding: 1.5rem;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .skill-name {
-            font-size: 1.5rem;
-            margin-bottom: 0.75rem;
-            color: var(--primary);
-        }
-
-        .skill-desc {
-            color: var(--gray);
-            flex-grow: 1;
-        }
-
-        .skill-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 0.75rem;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-            margin-top: 1rem;
-            transition: var(--transition);
-        }
-
-        .skill-btn:hover {
-            background: var(--secondary);
-        }
-
-        /* Skill Detail */
-        .skill-detail {
-            background: white;
-            border-radius: 10px;
-            padding: 2rem;
-            box-shadow: var(--shadow);
-            margin-top: 1.5rem;
-            display: none;
-        }
-
-        .skill-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid var(--light);
-        }
-
-        .skill-header i {
-            font-size: 2.5rem;
-            margin-right: 1rem;
-            color: var(--primary);
-        }
-
-        .skill-header h2 {
-            font-size: 2rem;
-            color: var(--dark);
-        }
-
-        .skill-section {
-            margin-bottom: 2.5rem;
-        }
-
-        .section-title-ui {
-            font-size: 1.5rem;
-            color: var(--primary);
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--light);
-        }
-
-        /* Tools Section */
-        .tools-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-
-        .tool-item {
-            background: var(--light);
-            border-radius: 8px;
-            padding: 1rem;
-            text-align: center;
-            transition: var(--transition);
-        }
-
-        .tool-item:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        .tool-item i {
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
-            color: var(--primary);
-        }
-
-        .tool-item:hover i {
-            color: white;
-        }
-
-        /* Steps Section */
-        .steps-container {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .step-card {
-            display: flex;
-            gap: 1.5rem;
-            background: var(--light);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .step-image {
-            width: 200px;
-            height: 150px;
-            object-fit: cover;
-        }
-
-        .step-content {
-            padding: 1.2rem;
-            flex-grow: 1;
-        }
-
-        .step-title {
-            font-size: 1.2rem;
-            margin-bottom: 0.5rem;
-            color: var(--primary);
-        }
-
-        /* Theory Section */
-        .theory-content {
-            background: var(--light);
-            padding: 1.5rem;
-            border-radius: 8px;
-            line-height: 1.8;
-        }
-
-        /* Quiz Section */
-        .quiz-container {
-            background: var(--light);
-            padding: 1.5rem;
-            border-radius: 8px;
-        }
-
-        .question {
-            margin-bottom: 1.5rem;
-        }
-
-        .question-text {
-            font-weight: 600;
-            margin-bottom: 0.75rem;
-        }
-
-        .options {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .option {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem;
-            background: white;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .option:hover {
-            background: #e9ecef;
-        }
-
-        .option.selected {
-            background: var(--primary);
-            color: white;
-        }
-
-        .quiz-result {
-            margin-top: 1.5rem;
-            padding: 1rem;
-            border-radius: 5px;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .quiz-result.correct {
-            background: var(--success);
-            color: white;
-        }
-
-        .quiz-result.incorrect {
-            background: var(--danger);
-            color: white;
-        }
-
-        .quiz-nav {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 1.5rem;
-        }
-
-        .back-btn {
-            background: var(--gray);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        /* User Profile */
-        .user-profile {
-            background: white;
-            border-radius: 10px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow);
-        }
-
-        .profile-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .profile-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 2rem;
-            margin-right: 1rem;
-        }
-
-        .profile-info h3 {
-            margin-bottom: 0.25rem;
-        }
-
-        .profile-info p {
-            color: var(--gray);
-        }
-
-        /* Footer */
-        footer {
-            background: var(--dark);
-            color: white;
-            text-align: center;
-            padding: 1.5rem 0;
-            margin-top: 3rem;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 992px) {
-            .admin-content {
-                grid-template-columns: 1fr;
-            }
-            .nav-panel {
-                margin-bottom: 2rem;
-            }
-        }
-        @media (max-width: 768px) {
-            .step-card {
-                flex-direction: column;
-            }
-            
-            .step-image {
-                width: 100%;
-                height: 200px;
-            }
-            
-            .skill-header {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .skill-header i {
-                margin-right: 0;
-                margin-bottom: 1rem;
-            }
-            
-            .form-row {
-                flex-direction: column;
-                gap: 0;
-            }
-            
-            .admin-login {
-                position: static;
-                text-align: center;
-                margin-top: 1rem;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hand Skills Learning Platform - Admin & User System</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+<style>
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+:root {
+--primary: #4361ee;
+--secondary: #3f37c9;
+--accent: #4cc9f0;
+--light: #f8f9fa;
+--dark: #212529;
+--gray: #6c757d;
+--success: #4ade80;
+--warning: #facc15;
+--danger: #f87171;
+--shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+--transition: all 0.3s ease;
+}
+body {
+background-color: #f5f7fb;
+color: var(--dark);
+line-height: 1.6;
+}
+.container {
+width: 100%;
+max-width: 1200px;
+margin: 0 auto;
+padding: 0 20px;
+}
+/* Admin Login Button */
+.admin-login {
+position: absolute;
+top: 20px;
+right: 20px;
+z-index: 100;
+}
+.admin-btn {
+background: rgba(0,0,0,0.3);
+color: white;
+border: none;
+padding: 0.75rem 1.5rem;
+border-radius: 5px;
+cursor: pointer;
+font-weight: 600;
+transition: var(--transition);
+}
+.admin-btn:hover {
+background: rgba(0,0,0,0.5);
+}
+/* Login Popup */
+.login-popup {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0,0,0,0.7);
+display: flex;
+justify-content: center;
+align-items: center;
+z-index: 2000;
+display: none;
+}
+.login-box {
+background: white;
+padding: 2.5rem;
+border-radius: 10px;
+box-shadow: var(--shadow);
+width: 100%;
+max-width: 450px;
+text-align: center;
+}
+.login-box h2 {
+margin-bottom: 1.5rem;
+color: var(--primary);
+}
+.form-group {
+margin-bottom: 1.2rem;
+text-align: left;
+}
+.form-group label {
+display: block;
+margin-bottom: 0.5rem;
+font-weight: 500;
+}
+.form-group input, .form-group select {
+width: 100%;
+padding: 0.8rem;
+border: 1px solid #ddd;
+border-radius: 5px;
+font-size: 1rem;
+}
+.btn {
+display: block;
+width: 100%;
+padding: 0.8rem;
+background: var(--primary);
+color: white;
+border: none;
+border-radius: 5px;
+font-size: 1rem;
+font-weight: 600;
+cursor: pointer;
+transition: var(--transition);
+}
+.btn:hover {
+background: var(--secondary);
+}
+.btn-secondary {
+background: var(--gray);
+}
+.btn-secondary:hover {
+background: #5a6268;
+}
+.btn-success {
+background: var(--success);
+}
+.btn-success:hover {
+background: #22c55e;
+}
+.error-message {
+color: var(--danger);
+margin-top: 0.5rem;
+font-size: 0.9rem;
+}
+.auth-toggle {
+margin-top: 1rem;
+color: var(--gray);
+}
+.auth-toggle a {
+color: var(--primary);
+text-decoration: none;
+font-weight: 600;
+}
+/* Admin Dashboard */
+.admin-dashboard {
+display: none;
+padding: 2rem 0;
+}
+.admin-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 2rem;
+padding-bottom: 1rem;
+border-bottom: 1px solid var(--light);
+}
+.admin-header h1 {
+color: var(--primary);
+}
+.logout-btn {
+background: var(--danger);
+color: white;
+border: none;
+padding: 0.5rem 1rem;
+border-radius: 5px;
+cursor: pointer;
+}
+.admin-content {
+display: grid;
+grid-template-columns: 1fr 2fr;
+gap: 2rem;
+}
+/* Navigation Panel */
+.nav-panel {
+background: white;
+border-radius: 10px;
+padding: 1.5rem;
+box-shadow: var(--shadow);
+}
+.nav-panel h3 {
+margin-bottom: 1.2rem;
+padding-bottom: 0.5rem;
+border-bottom: 1px solid var(--light);
+}
+.nav-item {
+padding: 0.8rem;
+margin-bottom: 0.5rem;
+border-radius: 5px;
+cursor: pointer;
+transition: var(--transition);
+}
+.nav-item:hover, .nav-item.active {
+background: var(--primary);
+color: white;
+}
+/* Main Content Area */
+.main-content-area {
+background: white;
+border-radius: 10px;
+padding: 2rem;
+box-shadow: var(--shadow);
+}
+.section-title {
+font-size: 1.5rem;
+color: var(--primary);
+margin-bottom: 1.5rem;
+padding-bottom: 0.5rem;
+border-bottom: 1px solid var(--light);
+}
+.skill-list {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+gap: 1.5rem;
+}
+.skill-card {
+border: 1px solid var(--light);
+border-radius: 8px;
+padding: 1.2rem;
+cursor: pointer;
+transition: var(--transition);
+}
+.skill-card:hover {
+border-color: var(--primary);
+transform: translateY(-3px);
+box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+.skill-card h4 {
+margin-bottom: 0.5rem;
+color: var(--primary);
+}
+.skill-actions {
+margin-top: 1rem;
+display: flex;
+gap: 0.5rem;
+}
+.action-btn {
+padding: 0.4rem 0.8rem;
+border-radius: 4px;
+border: none;
+cursor: pointer;
+font-size: 0.9rem;
+}
+.edit-btn {
+background: var(--warning);
+color: white;
+}
+.delete-btn {
+background: var(--danger);
+color: white;
+}
+/* Edit Form */
+.edit-form {
+display: none;
+}
+.form-row {
+display: flex;
+gap: 1rem;
+margin-bottom: 1.2rem;
+}
+.form-col {
+flex: 1;
+}
+textarea {
+width: 100%;
+padding: 0.8rem;
+border: 1px solid #ddd;
+border-radius: 5px;
+resize: vertical;
+min-height: 100px;
+}
+.form-actions {
+display: flex;
+justify-content: flex-end;
+gap: 1rem;
+margin-top: 1.5rem;
+}
+/* Steps Editor */
+.steps-editor {
+margin-top: 1.5rem;
+}
+.step-item {
+border: 1px solid var(--light);
+border-radius: 5px;
+padding: 1rem;
+margin-bottom: 1rem;
+}
+.step-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 0.8rem;
+}
+.step-content {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 1rem;
+}
+.add-step-btn {
+margin-top: 1rem;
+background: var(--success);
+color: white;
+}
+/* Quiz Editor */
+.quiz-editor {
+margin-top: 1.5rem;
+}
+.quiz-question {
+border: 1px solid var(--light);
+border-radius: 5px;
+padding: 1rem;
+margin-bottom: 1rem;
+}
+.quiz-options {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+gap: 1rem;
+}
+.add-quiz-btn {
+margin-top: 1rem;
+background: var(--success);
+color: white;
+}
+/* User Interface */
+.user-interface {
+display: none;
+padding: 2rem 0;
+}
+/* Header Styles */
+header {
+background: linear-gradient(135deg, var(--primary), var(--secondary));
+color: white;
+padding: 2rem 0;
+text-align: center;
+margin-bottom: 2rem;
+}
+header h1 {
+font-size: 2.5rem;
+margin-bottom: 0.5rem;
+}
+header p {
+font-size: 1.1rem;
+opacity: 0.9;
+}
+/* Skill Grid */
+.skill-grid {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+gap: 1.5rem;
+margin-top: 2rem;
+}
+.skill-card-ui {
+background: white;
+border-radius: 10px;
+overflow: hidden;
+box-shadow: var(--shadow);
+transition: var(--transition);
+cursor: pointer;
+height: 100%;
+display: flex;
+flex-direction: column;
+}
+.skill-card-ui:hover {
+transform: translateY(-5px);
+box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+.skill-icon {
+background: linear-gradient(135deg, var(--primary), var(--accent));
+color: white;
+font-size: 3rem;
+height: 150px;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+.skill-content {
+padding: 1.5rem;
+flex-grow: 1;
+display: flex;
+flex-direction: column;
+}
+.skill-name {
+font-size: 1.5rem;
+margin-bottom: 0.75rem;
+color: var(--primary);
+}
+.skill-desc {
+color: var(--gray);
+flex-grow: 1;
+}
+.skill-btn {
+background: var(--primary);
+color: white;
+border: none;
+padding: 0.75rem;
+border-radius: 5px;
+cursor: pointer;
+font-weight: 600;
+margin-top: 1rem;
+transition: var(--transition);
+}
+.skill-btn:hover {
+background: var(--secondary);
+}
+/* Skill Detail */
+.skill-detail {
+background: white;
+border-radius: 10px;
+padding: 2rem;
+box-shadow: var(--shadow);
+margin-top: 1.5rem;
+display: none;
+}
+.skill-header {
+display: flex;
+align-items: center;
+margin-bottom: 2rem;
+padding-bottom: 1rem;
+border-bottom: 2px solid var(--light);
+}
+.skill-header i {
+font-size: 2.5rem;
+margin-right: 1rem;
+color: var(--primary);
+}
+.skill-header h2 {
+font-size: 2rem;
+color: var(--dark);
+}
+.skill-section {
+margin-bottom: 2.5rem;
+}
+.section-title-ui {
+font-size: 1.5rem;
+color: var(--primary);
+margin-bottom: 1rem;
+padding-bottom: 0.5rem;
+border-bottom: 1px solid var(--light);
+}
+/* Tools Section */
+.tools-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+gap: 1rem;
+}
+.tool-item {
+background: var(--light);
+border-radius: 8px;
+padding: 1rem;
+text-align: center;
+transition: var(--transition);
+}
+.tool-item:hover {
+background: var(--primary);
+color: white;
+}
+.tool-item i {
+font-size: 1.8rem;
+margin-bottom: 0.5rem;
+color: var(--primary);
+}
+.tool-item:hover i {
+color: white;
+}
+/* Steps Section */
+.steps-container {
+display: flex;
+flex-direction: column;
+gap: 1.5rem;
+}
+.step-card {
+display: flex;
+gap: 1.5rem;
+background: var(--light);
+border-radius: 8px;
+overflow: hidden;
+}
+.step-image {
+width: 200px;
+height: 150px;
+object-fit: cover;
+}
+.step-content {
+padding: 1.2rem;
+flex-grow: 1;
+}
+.step-title {
+font-size: 1.2rem;
+margin-bottom: 0.5rem;
+color: var(--primary);
+}
+/* Theory Section */
+.theory-content {
+background: var(--light);
+padding: 1.5rem;
+border-radius: 8px;
+line-height: 1.8;
+}
+/* Quiz Section */
+.quiz-container {
+background: var(--light);
+padding: 1.5rem;
+border-radius: 8px;
+}
+.question {
+margin-bottom: 1.5rem;
+}
+.question-text {
+font-weight: 600;
+margin-bottom: 0.75rem;
+}
+.options {
+display: flex;
+flex-direction: column;
+gap: 0.5rem;
+}
+.option {
+display: flex;
+align-items: center;
+padding: 0.75rem;
+background: white;
+border-radius: 5px;
+cursor: pointer;
+transition: var(--transition);
+}
+.option:hover {
+background: #e9ecef;
+}
+.option.selected {
+background: var(--primary);
+color: white;
+}
+.quiz-result {
+margin-top: 1.5rem;
+padding: 1rem;
+border-radius: 5px;
+text-align: center;
+font-weight: 600;
+}
+.quiz-result.correct {
+background: var(--success);
+color: white;
+}
+.quiz-result.incorrect {
+background: var(--danger);
+color: white;
+}
+.quiz-nav {
+display: flex;
+justify-content: space-between;
+margin-top: 1.5rem;
+}
+.back-btn {
+background: var(--gray);
+color: white;
+border: none;
+padding: 0.75rem 1.5rem;
+border-radius: 5px;
+cursor: pointer;
+font-weight: 600;
+}
+/* Footer */
+footer {
+background: var(--dark);
+color: white;
+text-align: center;
+padding: 1.5rem 0;
+margin-top: 3rem;
+}
+/* Responsive Design */
+@media (max-width: 992px) {
+.admin-content {
+grid-template-columns: 1fr;
+}
+.nav-panel {
+margin-bottom: 2rem;
+}
+}
+@media (max-width: 768px) {
+.step-card {
+flex-direction: column;
+}
+.step-image {
+width: 100%;
+height: 200px;
+}
+.skill-header {
+flex-direction: column;
+text-align: center;
+}
+.skill-header i {
+margin-right: 0;
+margin-bottom: 1rem;
+}
+.form-row {
+flex-direction: column;
+gap: 0;
+}
+.admin-login {
+position: static;
+text-align: center;
+margin-top: 1rem;
+}
+}
+</style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <h1><i class="fas fa-tools"></i> Hand Skills Learning Platform</h1>
-            <p>Master essential hands-on skills with step-by-step guidance</p>
-        </div>
-        <div class="admin-login">
-            <button class="admin-btn" id="adminLoginBtn"><i class="fas fa-lock"></i> Admin Login</button>
-        </div>
-    </header>
-
-    <!-- Login Form -->
-    <div class="auth-container" id="loginForm" style="display: none;">
-        <div class="auth-box">
-            <h2><i class="fas fa-lock"></i> Admin Login</h2>
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" placeholder="Enter username">
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Enter password">
-            </div>
-            <button class="btn" onclick="login()">Login</button>
-            <div class="error-message" id="login-error"></div>
-            <div class="auth-toggle">
-                <p>Not an admin? <a href="#" onclick="showUserAuth()">Student Login/Registration</a></p>
-            </div>
-        </div>
-    </div>
-
-    <!-- User Registration/Login Form -->
-    <div class="auth-container" id="userAuth" style="display: none;">
-        <div class="auth-box">
-            <h2><i class="fas fa-user"></i> Student Registration</h2>
-            <div class="form-group">
-                <label for="user-email">Email Address</label>
-                <input type="email" id="user-email" placeholder="Enter your email">
-            </div>
-            <div class="form-group">
-                <label for="user-rank">Rank</label>
-                <select id="user-rank">
-                    <option value="">Select Rank</option>
-                    <option value="Private">Private</option>
-                    <option value="Corporal">Corporal</option>
-                    <option value="Sergeant">Sergeant</option>
-                    <option value="Lieutenant">Lieutenant</option>
-                    <option value="Captain">Captain</option>
-                    <option value="Major">Major</option>
-                    <option value="Colonel">Colonel</option>
-                    <option value="General">General</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="user-name">Full Name</label>
-                <input type="text" id="user-name" placeholder="Enter your full name">
-            </div>
-            <div class="form-group">
-                <label for="user-course">Course</label>
-                <input type="text" id="user-course" placeholder="Enter course (e.g., 56th Mech)">
-            </div>
-            <button class="btn btn-success" onclick="registerUser()">Register & Login</button>
-            <div class="error-message" id="user-error"></div>
-            <div class="auth-toggle">
-                <p>Already registered? <a href="#" onclick="showLoginForm()">Admin Login</a></p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Admin Dashboard -->
-    <div class="admin-dashboard" id="adminDashboard">
-        <div class="container">
-            <div class="admin-header">
-                <h1><i class="fas fa-tools"></i> Hand Skills Learning Platform - Admin Panel</h1>
-                <button class="logout-btn" onclick="logout()">Logout</button>
-            </div>
-            <div class="admin-content">
-                <div class="nav-panel">
-                    <h3>Navigation</h3>
-                    <div class="nav-item active" onclick="showSection('dashboard')">Dashboard</div>
-                    <div class="nav-item" onclick="showSection('skills')">Manage Skills</div>
-                    <div class="nav-item" onclick="showSection('users')">Manage Users</div>
-                    <div class="nav-item" onclick="showSection('settings')">Settings</div>
-                </div>
-                <div class="main-content-area">
-                    <!-- Dashboard Section -->
-                    <div id="dashboard-section" class="section">
-                        <h2 class="section-title">Dashboard Overview</h2>
-                        <p>Welcome to the Hand Skills Learning Platform Admin Panel. From here you can manage skills, content, and user access.</p>
-                        <div style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
-                            <div style="background: var(--light); padding: 1.5rem; border-radius: 8px; text-align: center;">
-                                <i class="fas fa-tools" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem;"></i>
-                                <h3 id="total-skills">0</h3>
-                                <p>Total skills in the system</p>
-                            </div>
-                            <div style="background: var(--light); padding: 1.5rem; border-radius: 8px; text-align: center;">
-                                <i class="fas fa-users" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem;"></i>
-                                <h3 id="user-count">0</h3>
-                                <p>Registered students</p>
-                            </div>
-                            <div style="background: var(--light); padding: 1.5rem; border-radius: 8px; text-align: center;">
-                                <i class="fas fa-file-alt" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem;"></i>
-                                <h3 id="completion-count">0</h3>
-                                <p>Completed lessons</p>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Skills Management Section -->
-                    <div id="skills-section" class="section" style="display: none;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                            <h2 class="section-title">Manage Skills</h2>
-                            <button class="btn" onclick="addNewSkill()" style="background: var(--success);">Add New Skill</button>
-                        </div>
-                        <div class="skill-list" id="skillsList">
-                            <!-- Skills will be loaded here -->
-                        </div>
-                    </div>
-                    <!-- Edit Skill Form -->
-                    <div id="edit-skill-form" class="edit-form">
-                        <h2 class="section-title">Edit Skill</h2>
-                        <div class="form-row">
-                            <div class="form-col">
-                                <label for="edit-skill-name">Skill Name</label>
-                                <input type="text" id="edit-skill-name" placeholder="Enter skill name">
-                            </div>
-                            <div class="form-col">
-                                <label for="edit-skill-icon">Icon Class</label>
-                                <input type="text" id="edit-skill-icon" placeholder="e.g., fas fa-hammer">
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-col">
-                                <label for="edit-skill-description">Description</label>
-                                <textarea id="edit-skill-description" placeholder="Enter skill description"></textarea>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-col">
-                                <label for="edit-tools">Tools Required (comma separated)</label>
-                                <textarea id="edit-tools" placeholder="Enter required tools"></textarea>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-col">
-                                <label for="edit-theory">Theory Section</label>
-                                <textarea id="edit-theory" placeholder="Enter theoretical content"></textarea>
-                            </div>
-                        </div>
-                        <div class="steps-editor">
-                            <h3>Steps</h3>
-                            <div id="steps-container">
-                                <!-- Steps will be added here -->
-                            </div>
-                            <button class="btn add-step-btn" onclick="addStep()">Add Step</button>
-                        </div>
-                        <div class="quiz-editor">
-                            <h3>Quiz Questions</h3>
-                            <div id="quiz-container">
-                                <!-- Quiz questions will be added here -->
-                            </div>
-                            <button class="btn add-quiz-btn" onclick="addQuizQuestion()">Add Question</button>
-                        </div>
-                        <div class="form-actions">
-                            <button class="btn btn-secondary" onclick="showSection('skills')">Cancel</button>
-                            <button class="btn" onclick="saveSkill()">Save Changes</button>
-                        </div>
-                    </div>
-                    <!-- Users Management Section -->
-                    <div id="users-section" class="section" style="display: none;">
-                        <h2 class="section-title">Manage Students</h2>
-                        <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
-                            <thead>
-                                <tr style="background: var(--light);">
-                                    <th style="padding: 0.75rem; text-align: left;">Name</th>
-                                    <th style="padding: 0.75rem; text-align: left;">Rank</th>
-                                    <th style="padding: 0.75rem; text-align: left;">Course</th>
-                                    <th style="padding: 0.75rem; text-align: left;">Email</th>
-                                    <th style="padding: 0.75rem; text-align: left;">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="users-table-body">
-                                <!-- Users will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-                    <!-- Settings Section -->
-                    <div id="settings-section" class="section" style="display: none;">
-                        <h2 class="section-title">System Settings</h2>
-                        <p>System configuration options would go here in a full implementation.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- User Interface -->
-    <div class="user-interface" id="userInterface">
-        <main class="container">
-            <div class="user-profile">
-                <div class="profile-header">
-                    <div class="profile-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div class="profile-info">
-                        <h3 id="profile-name">Guest User</h3>
-                        <p id="profile-rank">Rank: Guest</p>
-                        <p id="profile-course">Course: Not Enrolled</p>
-                    </div>
-                </div>
-            </div>
-            <div id="main-content">
-                <div class="skill-grid" id="skill-grid">
-                    <!-- Skills will be loaded here -->
-                </div>
-                <div id="skill-detail" class="skill-detail">
-                    <!-- Skill details will be loaded here -->
-                </div>
-            </div>
-        </main>
-        <footer>
-            <div class="container">
-                <p>&copy; 2026 Hand Skills Learning Platform | Master Essential Hands-On Skills</p>
-            </div>
-        </footer>
-    </div>
-
-    <script>
-        // Initialize Firebase
-        const firebaseConfig = {
-            // ADD YOUR FIREBASE CONFIG HERE
-            apiKey: "AIzaSyA6ZdINHlRF583T3HL5RsA4q2fmHeBcB_g",
-            authDomain: "hand-skills-platform.firebaseapp.com",
-            projectId: "hand-skills-platform",
-            storageBucket: "hand-skills-platform.firebasestorage.app",
-            messagingSenderId: "1021058690748",
-            appId: "1:1021058690748:web:40fd86d1060d90bbe1eab9",
-            measurementId: "G-R2J40EVW18"
-        };
-        
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        // Global variables
-        let skillsData = [];
-        let usersData = [];
-        let currentEditingSkill = null;
-        let currentUser = null;
-
-        // Initialize the app
-        window.onload = function() {
-            // Show user interface by default
-            document.getElementById('userInterface').style.display = 'block';
-            loadSkillsFromFirebase();
-            setupAdminButton();
-        };
-
-        // Setup admin login button
-        function setupAdminButton() {
-            document.getElementById('adminLoginBtn').addEventListener('click', function() {
-                document.getElementById('userInterface').style.display = 'none';
-                document.getElementById('loginForm').style.display = 'flex';
+<header>
+<div class="container">
+<h1><i class="fas fa-tools"></i> Hand Skills Learning Platform</h1>
+<p>Master essential hands-on skills with step-by-step guidance</p>
+</div>
+<div class="admin-login">
+<button class="admin-btn" id="adminLoginBtn"><i class="fas fa-lock"></i> Admin Login</button>
+</div>
+</header>
+<!-- Login Popup -->
+<div class="login-popup" id="loginPopup">
+<div class="login-box">
+<h2><i class="fas fa-lock"></i> Admin Login</h2>
+<div class="form-group">
+<label for="username">Username</label>
+<input type="text" id="username" placeholder="Enter username">
+</div>
+<div class="form-group">
+<label for="password">Password</label>
+<input type="password" id="password" placeholder="Enter password">
+</div>
+<button class="btn" onclick="login()">Login</button>
+<div class="error-message" id="login-error"></div>
+</div>
+</div>
+<!-- Admin Dashboard -->
+<div class="admin-dashboard" id="adminDashboard">
+<div class="container">
+<div class="admin-header">
+<h1><i class="fas fa-tools"></i> Hand Skills Learning Platform - Admin Panel</h1>
+<button class="logout-btn" onclick="logout()">Logout</button>
+</div>
+<div class="admin-content">
+<div class="nav-panel">
+<h3>Navigation</h3>
+<div class="nav-item active" onclick="showSection('dashboard')">Dashboard</div>
+<div class="nav-item" onclick="showSection('skills')">Manage Skills</div>
+<div class="nav-item" onclick="showSection('settings')">Settings</div>
+</div>
+<div class="main-content-area">
+<!-- Dashboard Section -->
+<div id="dashboard-section" class="section">
+<h2 class="section-title">Dashboard Overview</h2>
+<p>Welcome to the Hand Skills Learning Platform Admin Panel. From here you can manage skills, content, and user access.</p>
+<div style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+<div style="background: var(--light); padding: 1.5rem; border-radius: 8px; text-align: center;">
+<i class="fas fa-tools" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem;"></i>
+<h3 id="total-skills">0</h3>
+<p>Total skills in the system</p>
+</div>
+</div>
+</div>
+<!-- Skills Management Section -->
+<div id="skills-section" class="section" style="display: none;">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+<h2 class="section-title">Manage Skills</h2>
+<button class="btn" onclick="addNewSkill()" style="background: var(--success);">Add New Skill</button>
+</div>
+<div class="skill-list" id="skillsList">
+<!-- Skills will be loaded here -->
+</div>
+</div>
+<!-- Edit Skill Form -->
+<div id="edit-skill-form" class="edit-form">
+<h2 class="section-title">Edit Skill</h2>
+<div class="form-row">
+<div class="form-col">
+<label for="edit-skill-name">Skill Name</label>
+<input type="text" id="edit-skill-name" placeholder="Enter skill name">
+</div>
+<div class="form-col">
+<label for="edit-skill-icon">Icon Class</label>
+<input type="text" id="edit-skill-icon" placeholder="e.g., fas fa-hammer">
+</div>
+</div>
+<div class="form-row">
+<div class="form-col">
+<label for="edit-skill-description">Description</label>
+<textarea id="edit-skill-description" placeholder="Enter skill description"></textarea>
+</div>
+</div>
+<div class="form-row">
+<div class="form-col">
+<label for="edit-tools">Tools Required (comma separated)</label>
+<textarea id="edit-tools" placeholder="Enter required tools"></textarea>
+</div>
+</div>
+<div class="form-row">
+<div class="form-col">
+<label for="edit-theory">Theory Section</label>
+<textarea id="edit-theory" placeholder="Enter theoretical content"></textarea>
+</div>
+</div>
+<div class="steps-editor">
+<h3>Steps</h3>
+<div id="steps-container">
+<!-- Steps will be added here -->
+</div>
+<button class="btn add-step-btn" onclick="addStep()">Add Step</button>
+</div>
+<div class="quiz-editor">
+<h3>Quiz Questions</h3>
+<div id="quiz-container">
+<!-- Quiz questions will be added here -->
+</div>
+<button class="btn add-quiz-btn" onclick="addQuizQuestion()">Add Question</button>
+</div>
+<div class="form-actions">
+<button class="btn btn-secondary" onclick="showSection('skills')">Cancel</button>
+<button class="btn" onclick="saveSkill()">Save Changes</button>
+</div>
+</div>
+<!-- Settings Section -->
+<div id="settings-section" class="section" style="display: none;">
+<h2 class="section-title">System Settings</h2>
+<p>System configuration options would go here in a full implementation.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- User Interface -->
+<div class="user-interface" id="userInterface">
+<main class="container">
+<div id="main-content">
+<div class="skill-grid" id="skill-grid">
+<!-- Skills will be loaded here -->
+</div>
+<div id="skill-detail" class="skill-detail">
+<!-- Skill details will be loaded here -->
+</div>
+</div>
+</main>
+<footer>
+<div class="container">
+<p>&copy; 2026 Hand Skills Learning Platform | Master Essential Hands-On Skills</p>
+</div>
+</footer>
+</div>
+<script>
+// Initialize Firebase
+const firebaseConfig = {
+// ADD YOUR FIREBASE CONFIG HERE
+apiKey: "AIzaSyA6ZdINHlRF583T3HL5RsA4q2fmHeBcB_g",
+authDomain: "hand-skills-platform.firebaseapp.com",
+projectId: "hand-skills-platform",
+storageBucket: "hand-skills-platform.firebasestorage.app",
+messagingSenderId: "1021058690748",
+appId: "1:1021058690748:web:40fd86d1060d90bbe1eab9",
+measurementId: "G-R2J40EVW18"
+};
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+// Global variables
+let skillsData = [];
+let usersData = [];
+let currentEditingSkill = null;
+let currentUser = null;
+// Initialize the app
+window.onload = function() {
+// Show user interface by default
+document.getElementById('userInterface').style.display = 'block';
+loadSkillsFromFirebase();
+setupAdminButton();
+};
+// Setup admin login button
+function setupAdminButton() {
+document.getElementById('adminLoginBtn').addEventListener('click', function() {
+document.getElementById('loginPopup').style.display = 'flex';
+});
+}
+// Load skills from Firebase
+async function loadSkillsFromFirebase() {
+try {
+const snapshot = await db.collection("skills").get();
+skillsData = [];
+snapshot.forEach(doc => {
+skillsData.push({ id: doc.id, ...doc.data() });
+});
+loadSkillGrid();
+} catch (error) {
+console.error("Error loading skills: ", error);
+}
+}
+// Admin login function
+function login() {
+const username = document.getElementById('username').value;
+const password = document.getElementById('password').value;
+// In a real app, this would validate against a server
+if (username === 'admin' && password === 'password') {
+localStorage.setItem('adminLoggedIn', 'true');
+document.getElementById('loginPopup').style.display = 'none';
+document.getElementById('adminDashboard').style.display = 'block';
+document.getElementById('userInterface').style.display = 'none';
+setupFirestoreListeners();
+} else {
+document.getElementById('login-error').textContent = 'Invalid credentials';
+}
+}
+// Setup Firestore listeners to sync data in real-time
+function setupFirestoreListeners() {
+    console.log("Setting up Firestore listener...");
+    db.collection("skills").onSnapshot(
+        (snapshot) => {
+            console.log("Received snapshot with", snapshot.size, "documents");
+            skillsData = [];
+            snapshot.forEach(doc => {
+                let data = doc.data();
+                
+                // Remove any 'id' field from the document data to avoid conflicts
+                if (data.hasOwnProperty('id')) {
+                    delete data.id;
+                }
+                
+                // Now merge the document ID with the cleaned data
+                const skillWithId = { id: doc.id, ...data };
+                console.log("Processed skill:", skillWithId);
+                skillsData.push(skillWithId);
             });
-        }
-
-        // Load skills from Firebase
-        async function loadSkillsFromFirebase() {
-            try {
-                const snapshot = await db.collection("skills").get();
-                skillsData = [];
-                snapshot.forEach(doc => {
-                    skillsData.push({ id: doc.id, ...doc.data() });
-                });
+            
+            console.log("Final skillsData array:", skillsData);
+            updateCounters();
+            
+            // Update admin list if it's visible
+            if (document.getElementById('skills-section').style.display === 'block') {
+                console.log("Loading skills list in admin panel...");
+                loadSkillsList();
+            }
+            // Update user grid if user interface is active
+            if (document.getElementById('userInterface').style.display === 'block') {
                 loadSkillGrid();
-            } catch (error) {
-                console.error("Error loading skills: ", error);
             }
+        },
+        (error) => {
+            console.error("Error listening to skills: ", error);
         }
+    );
+}
 
-        // Admin login function
-        function login() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            // In a real app, this would validate against a server
-            if (username === 'admin' && password === 'password') {
-                localStorage.setItem('adminLoggedIn', 'true');
-                document.getElementById('loginForm').style.display = 'none';
-                document.getElementById('adminDashboard').style.display = 'block';
-                document.getElementById('userInterface').style.display = 'none';
-                setupFirestoreListeners();
-            } else {
-                document.getElementById('login-error').textContent = 'Invalid credentials';
-            }
-        }
+// Logout function
+function logout() {
+localStorage.removeItem('adminLoggedIn');
+localStorage.removeItem('userLoggedIn');
+localStorage.removeItem('currentUser');
+currentUser = null;
+document.getElementById('adminDashboard').style.display = 'none';
+document.getElementById('userInterface').style.display = 'block';
+loadSkillsFromFirebase();
+}
+// Show different sections in admin panel
+// Show different sections in admin panel
+function showSection(section) {
+    // Hide all sections
+    document.querySelectorAll('.section').forEach(el => el.style.display = 'none');
+    document.getElementById('edit-skill-form').style.display = 'none';
+    
+    // Remove active class from all nav items
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    
+    // Show selected section and highlight nav item
+    document.getElementById(`${section}-section`).style.display = 'block';
+    document.querySelector(`.nav-item[onclick="showSection('${section}')"]`).classList.add('active');
+    
+    if (section === 'dashboard') {
+        updateCounters();
+    }
 
-        // Setup Firestore listeners to sync data in real-time
-        function setupFirestoreListeners() {
-            // Listen for changes in skills collection
-            db.collection("skills").onSnapshot((snapshot) => {
-                skillsData = [];
-                snapshot.forEach(doc => {
-                    skillsData.push({ id: doc.id, ...doc.data() });
-                });
-                updateCounters();
-                if (document.getElementById('skills-section').style.display === 'block') {
-                    loadSkillsList();
-                }
-                if (document.getElementById('userInterface').style.display === 'block') {
-                    loadSkillGrid();
-                }
-            });
+    // Force refresh skills list when accessing the skills section
+    if (section === 'skills') {
+        loadSkillsList();
+    }
+}
 
-            // Listen for changes in users collection
-            db.collection("users").onSnapshot((snapshot) => {
-                usersData = [];
-                snapshot.forEach(doc => {
-                    usersData.push({ id: doc.id, ...doc.data() });
-                });
-                updateCounters();
-                if (document.getElementById('users-section').style.display === 'block') {
-                    loadUsersList();
-                }
-            });
-        }
+// Load skills list in admin panel
+// Replace your loadSkillsList function with this:
+function loadSkillsList() {
+    const skillsList = document.getElementById('skillsList');
+    skillsList.innerHTML = '';
 
-        // User registration
-        function registerUser() {
-            const email = document.getElementById('user-email').value;
-            const rank = document.getElementById('user-rank').value;
-            const name = document.getElementById('user-name').value;
-            const course = document.getElementById('user-course').value;
-            
-            if (!email || !rank || !name || !course) {
-                document.getElementById('user-error').textContent = 'Please fill in all fields';
-                return;
-            }
-            
-            // Create new user object
-            const newUser = {
-                email: email,
-                rank: rank,
-                name: name,
-                course: course,
-                completedSkills: []
-            };
-            
-            // Add to Firestore
-            db.collection("users").add(newUser)
-                .then((docRef) => {
-                    // Add generated ID to the user object
-                    newUser.id = docRef.id;
-                    
-                    // Store user data in localStorage
-                    localStorage.setItem('currentUser', JSON.stringify(newUser));
-                    localStorage.setItem('userLoggedIn', 'true');
-                    
-                    // Switch to user interface
-                    document.getElementById('userAuth').style.display = 'none';
-                    document.getElementById('adminDashboard').style.display = 'none';
-                    document.getElementById('userInterface').style.display = 'block';
-                    
-                    // Set current user
-                    currentUser = newUser;
-                    loadUserProfile();
-                    loadSkillGrid();
-                })
-                .catch((error) => {
-                    console.error("Error adding user: ", error);
-                    document.getElementById('user-error').textContent = 'Error registering user';
-                });
-        }
+    console.log("Current skillsData:", skillsData);
 
-        // Load user profile
-        function loadUserProfile() {
-            if (currentUser) {
-                document.getElementById('profile-name').textContent = currentUser.name;
-                document.getElementById('profile-rank').textContent = `Rank: ${currentUser.rank}`;
-                document.getElementById('profile-course').textContent = `Course: ${currentUser.course}`;
-            }
-        }
+    // Only include skills that have a valid ID
+    const validSkills = skillsData.filter(skill => 
+        skill.id && typeof skill.id === 'string' && skill.id.trim() !== ''
+    );
 
-        // Logout function
-        function logout() {
-            localStorage.removeItem('adminLoggedIn');
-            localStorage.removeItem('userLoggedIn');
-            localStorage.removeItem('currentUser');
-            currentUser = null;
-            document.getElementById('adminDashboard').style.display = 'none';
-            document.getElementById('userInterface').style.display = 'block';
-            loadSkillsFromFirebase();
-        }
+    console.log("Valid skills found:", validSkills.length);
 
-        // Show different sections in admin panel
-        function showSection(section) {
-            // Hide all sections
-            document.querySelectorAll('.section').forEach(el => el.style.display = 'none');
+    if (validSkills.length === 0) {
+        skillsList.innerHTML = '<p>No valid skills available.</p>';
+        return;
+    }
+
+    validSkills.forEach(skill => {
+        console.log("Adding skill to list:", skill.name, "with ID:", skill.id);
+        const skillCard = document.createElement('div');
+        skillCard.className = 'skill-card';
+        skillCard.innerHTML = `
+            <h4>${skill.name || 'Unnamed Skill'}</h4>
+            <p>${(skill.description || '').substring(0, 100)}...</p>
+            <div class="skill-actions">
+                <button class="action-btn edit-btn" onclick="editSkill('${skill.id}')">Edit</button>
+                <button class="action-btn delete-btn" onclick="deleteSkill('${skill.id}')">Delete</button>
+            </div>
+        `;
+        skillsList.appendChild(skillCard);
+    });
+}
+
+
+// Update dashboard counters
+function updateCounters() {
+document.getElementById('total-skills').textContent = skillsData.length;
+}
+// Add new skill
+function addNewSkill() {
+currentEditingSkill = {
+id: '',
+name: '',
+icon: '',
+description: '',
+tools: [],
+steps: [],
+theory: '',
+quiz: []
+};
+showEditForm();
+}
+// Edit existing skill
+function editSkill(skillId) {
+currentEditingSkill = skillsData.find(skill => skill.id === skillId);
+if (currentEditingSkill) {
+showEditForm();
+}
+}
+// Show edit form
+function showEditForm() {
+document.getElementById('edit-skill-name').value = currentEditingSkill.name;
+document.getElementById('edit-skill-icon').value = currentEditingSkill.icon;
+document.getElementById('edit-skill-description').value = currentEditingSkill.description;
+document.getElementById('edit-tools').value = currentEditingSkill.tools.join(', ');
+document.getElementById('edit-theory').value = currentEditingSkill.theory;
+// Populate steps
+const stepsContainer = document.getElementById('steps-container');
+stepsContainer.innerHTML = '';
+currentEditingSkill.steps.forEach((step, index) => {
+addStepToForm(index, step);
+});
+// Populate quiz
+const quizContainer = document.getElementById('quiz-container');
+quizContainer.innerHTML = '';
+currentEditingSkill.quiz.forEach((question, index) => {
+addQuizQuestionToForm(index, question);
+});
+// Show form
+document.getElementById('skills-section').style.display = 'none';
+document.getElementById('edit-skill-form').style.display = 'block';
+}
+// Add step to form
+function addStepToForm(index, step = null) {
+const stepsContainer = document.getElementById('steps-container');
+const stepId = index !== undefined ? index : currentEditingSkill.steps.length;
+const stepObj = step || {
+title: '',
+description: '',
+image: ''
+};
+const stepElement = document.createElement('div');
+stepElement.className = 'step-item';
+stepElement.id = `step-${stepId}`;
+stepElement.innerHTML = `
+<div class="step-header">
+<h4>Step ${stepId + 1}</h4>
+<button class="action-btn delete-btn" onclick="removeStep(${stepId})">Remove</button>
+</div>
+<div class="step-content">
+<div>
+<label>Title</label>
+<input type="text" value="${stepObj.title}" onchange="updateStepField(${stepId}, 'title', this.value)" placeholder="Step title">
+</div>
+<div>
+<label>Description</label>
+<textarea onchange="updateStepField(${stepId}, 'description', this.value)" placeholder="Step description">${stepObj.description}</textarea>
+</div>
+<div>
+<label>Image URL</label>
+<input type="text" value="${stepObj.image}" onchange="updateStepField(${stepId}, 'image', this.value)" placeholder="Image URL">
+</div>
+</div>
+`;
+stepsContainer.appendChild(stepElement);
+}
+// Add new step
+function addStep() {
+if (!currentEditingSkill.steps) currentEditingSkill.steps = [];
+currentEditingSkill.steps.push({
+title: '',
+description: '',
+image: ''
+});
+addStepToForm();
+}
+// Update step field
+function updateStepField(index, field, value) {
+if (currentEditingSkill.steps[index]) {
+currentEditingSkill.steps[index][field] = value;
+}
+}
+// Remove step
+function removeStep(index) {
+if (currentEditingSkill.steps && currentEditingSkill.steps[index]) {
+currentEditingSkill.steps.splice(index, 1);
+// Re-render all steps
+const stepsContainer = document.getElementById('steps-container');
+stepsContainer.innerHTML = '';
+currentEditingSkill.steps.forEach((step, idx) => {
+addStepToForm(idx, step);
+});
+}
+}
+// Add quiz question to form
+function addQuizQuestionToForm(index, question = null) {
+const quizContainer = document.getElementById('quiz-container');
+const questionId = index !== undefined ? index : currentEditingSkill.quiz.length;
+const q = question || {
+question: '',
+options: ['', '', '', ''],
+answer: 0
+};
+const questionElement = document.createElement('div');
+questionElement.className = 'quiz-question';
+questionElement.id = `question-${questionId}`;
+questionElement.innerHTML = `
+<div class="step-header">
+<h4>Question ${questionId + 1}</h4>
+<button class="action-btn delete-btn" onclick="removeQuizQuestion(${questionId})">Remove</button>
+</div>
+<div>
+<label>Question</label>
+<input type="text" value="${q.question}" onchange="updateQuizField(${questionId}, 'question', this.value)" placeholder="Question text">
+</div>
+<div class="quiz-options">
+<div>
+<label>Option A</label>
+<input type="text" value="${q.options[0]}" onchange="updateQuizOption(${questionId}, 0, this.value)" placeholder="Option A">
+</div>
+<div>
+<label>Option B</label>
+<input type="text" value="${q.options[1]}" onchange="updateQuizOption(${questionId}, 1, this.value)" placeholder="Option B">
+</div>
+<div>
+<label>Option C</label>
+<input type="text" value="${q.options[2]}" onchange="updateQuizOption(${questionId}, 2, this.value)" placeholder="Option C">
+</div>
+<div>
+<label>Option D</label>
+<input type="text" value="${q.options[3]}" onchange="updateQuizOption(${questionId}, 3, this.value)" placeholder="Option D">
+</div>
+</div>
+<div>
+<label>Correct Answer (0=A, 1=B, 2=C, 3=D)</label>
+<input type="number" min="0" max="3" value="${q.answer}" onchange="updateQuizField(${questionId}, 'answer', parseInt(this.value))">
+</div>
+`;
+quizContainer.appendChild(questionElement);
+}
+// Add new quiz question
+function addQuizQuestion() {
+if (!currentEditingSkill.quiz) currentEditingSkill.quiz = [];
+currentEditingSkill.quiz.push({
+question: '',
+options: ['', '', '', ''],
+answer: 0
+});
+addQuizQuestionToForm();
+}
+// Update quiz field
+function updateQuizField(questionId, field, value) {
+if (currentEditingSkill.quiz[questionId]) {
+currentEditingSkill.quiz[questionId][field] = value;
+}
+}
+// Update quiz option
+function updateQuizOption(questionId, optionIndex, value) {
+if (currentEditingSkill.quiz[questionId] && currentEditingSkill.quiz[questionId].options[optionIndex] !== undefined) {
+currentEditingSkill.quiz[questionId].options[optionIndex] = value;
+}
+}
+// Remove quiz question
+function removeQuizQuestion(index) {
+if (currentEditingSkill.quiz && currentEditingSkill.quiz[index]) {
+currentEditingSkill.quiz.splice(index, 1);
+// Re-render all questions
+const quizContainer = document.getElementById('quiz-container');
+quizContainer.innerHTML = '';
+currentEditingSkill.quiz.forEach((question, idx) => {
+addQuizQuestionToForm(idx, question);
+});
+}
+}
+// Save skill
+// Replace your saveSkill function with this:
+// Replace your saveSkill function with this:
+function saveSkill() {
+    // Update current skill with form values
+    currentEditingSkill.name = document.getElementById('edit-skill-name').value;
+    currentEditingSkill.icon = document.getElementById('edit-skill-icon').value;
+    currentEditingSkill.description = document.getElementById('edit-skill-description').value;
+    currentEditingSkill.tools = document.getElementById('edit-tools').value.split(',').map(t => t.trim()).filter(t => t);
+    currentEditingSkill.theory = document.getElementById('edit-theory').value;
+
+    // If it's a new skill, add to Firestore
+    if (!currentEditingSkill.id || currentEditingSkill.id.trim() === '') {
+        db.collection("skills").add(currentEditingSkill)
+        .then(() => {
+            alert('Skill saved successfully!');
+            // Reset form and return to skills list
             document.getElementById('edit-skill-form').style.display = 'none';
-            // Remove active class from all nav items
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            // Show selected section and highlight nav item
-            document.getElementById(`${section}-section`).style.display = 'block';
-            document.querySelector(`.nav-item[onclick="showSection('${section}')"]`).classList.add('active');
-            // Load users if on users section
-            if (section === 'users') {
-                loadUsersList();
-            }
-            if (section === 'dashboard') {
-                updateCounters();
-            }
-        }
+            document.getElementById('skills-section').style.display = 'block';
+            // Manually trigger a reload of the skills list
+            setTimeout(loadSkillsList, 100); // Small delay to ensure update completes
+        })
+        .catch((error) => {
+            console.error("Error adding skill: ", error);
+            alert('Error saving skill');
+        });
+    } else {
+        // Update existing skill in Firestore
+        db.collection("skills").doc(currentEditingSkill.id).set(currentEditingSkill)
+        .then(() => {
+            alert('Skill updated successfully!');
+            // Reset form and return to skills list
+            document.getElementById('edit-skill-form').style.display = 'none';
+            document.getElementById('skills-section').style.display = 'block';
+            // Manually trigger a reload of the skills list
+            setTimeout(loadSkillsList, 100); // Small delay to ensure update completes
+        })
+        .catch((error) => {
+            console.error("Error updating skill: ", error);
+            alert('Error saving skill');
+        });
+    }
+}
+// Delete skill
+function deleteSkill(skillId) {
+    // Check if skillId is valid
+    if (!skillId) {
+        console.warn("Attempted to delete a skill with an invalid or empty ID:", skillId);
+        alert("Cannot delete skill: Invalid ID.");
+        return; // Exit the function if ID is invalid
+    }
 
-        // Load skills list in admin panel
-        function loadSkillsList() {
-            const skillsList = document.getElementById('skillsList');
-            skillsList.innerHTML = '';
-            skillsData.forEach(skill => {
-                const skillCard = document.createElement('div');
-                skillCard.className = 'skill-card';
-                skillCard.innerHTML = `
-                    <h4>${skill.name}</h4>
-                    <p>${skill.description.substring(0, 100)}...</p>
-                    <div class="skill-actions">
-                        <button class="action-btn edit-btn" onclick="editSkill('${skill.id}')">Edit</button>
-                        <button class="action-btn delete-btn" onclick="deleteSkill('${skill.id}')">Delete</button>
-                    </div>
-                `;
-                skillsList.appendChild(skillCard);
-            });
-        }
-
-        // Load users list in admin panel
-        function loadUsersList() {
-            const usersTableBody = document.getElementById('users-table-body');
-            usersTableBody.innerHTML = '';
-            usersData.forEach(user => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">${user.name}</td>
-                    <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">${user.rank}</td>
-                    <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">${user.course}</td>
-                    <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">${user.email}</td>
-                    <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">
-                        <button class="action-btn delete-btn" onclick="deleteUser('${user.id}')">Delete</button>
-                    </td>
-                `;
-                usersTableBody.appendChild(row);
-            });
-        }
-
-        // Update dashboard counters
-        function updateCounters() {
-            document.getElementById('total-skills').textContent = skillsData.length;
-            document.getElementById('user-count').textContent = usersData.length;
-            
-            // Calculate completed lessons
-            let completedCount = 0;
-            usersData.forEach(user => {
-                completedCount += user.completedSkills ? user.completedSkills.length : 0;
-            });
-            document.getElementById('completion-count').textContent = completedCount;
-        }
-
-        // Add new skill
-        function addNewSkill() {
-            currentEditingSkill = {
-                id: '',
-                name: '',
-                icon: '',
-                description: '',
-                tools: [],
-                steps: [],
-                theory: '',
-                quiz: []
-            };
-            showEditForm();
-        }
-
-        // Edit existing skill
-        function editSkill(skillId) {
-            currentEditingSkill = skillsData.find(skill => skill.id === skillId);
-            if (currentEditingSkill) {
-                showEditForm();
-            }
-        }
-
-        // Show edit form
-        function showEditForm() {
-            document.getElementById('edit-skill-name').value = currentEditingSkill.name;
-            document.getElementById('edit-skill-icon').value = currentEditingSkill.icon;
-            document.getElementById('edit-skill-description').value = currentEditingSkill.description;
-            document.getElementById('edit-tools').value = currentEditingSkill.tools.join(', ');
-            document.getElementById('edit-theory').value = currentEditingSkill.theory;
-            
-            // Populate steps
-            const stepsContainer = document.getElementById('steps-container');
-            stepsContainer.innerHTML = '';
-            currentEditingSkill.steps.forEach((step, index) => {
-                addStepToForm(index, step);
-            });
-            
-            // Populate quiz
-            const quizContainer = document.getElementById('quiz-container');
-            quizContainer.innerHTML = '';
-            currentEditingSkill.quiz.forEach((question, index) => {
-                addQuizQuestionToForm(index, question);
-            });
-            
-            // Show form
-            document.getElementById('skills-section').style.display = 'none';
-            document.getElementById('edit-skill-form').style.display = 'block';
-        }
-
-        // Add step to form
-        function addStepToForm(index, step = null) {
-            const stepsContainer = document.getElementById('steps-container');
-            const stepId = index !== undefined ? index : currentEditingSkill.steps.length;
-            const stepObj = step || {
-                title: '',
-                description: '',
-                image: ''
-            };
-
-            const stepElement = document.createElement('div');
-            stepElement.className = 'step-item';
-            stepElement.id = `step-${stepId}`;
-            stepElement.innerHTML = `
-                <div class="step-header">
-                    <h4>Step ${stepId + 1}</h4>
-                    <button class="action-btn delete-btn" onclick="removeStep(${stepId})">Remove</button>
-                </div>
-                <div class="step-content">
-                    <div>
-                        <label>Title</label>
-                        <input type="text" value="${stepObj.title}" onchange="updateStepField(${stepId}, 'title', this.value)" placeholder="Step title">
-                    </div>
-                    <div>
-                        <label>Description</label>
-                        <textarea onchange="updateStepField(${stepId}, 'description', this.value)" placeholder="Step description">${stepObj.description}</textarea>
-                    </div>
-                    <div>
-                        <label>Image URL</label>
-                        <input type="text" value="${stepObj.image}" onchange="updateStepField(${stepId}, 'image', this.value)" placeholder="Image URL">
-                    </div>
-                </div>
-            `;
-            stepsContainer.appendChild(stepElement);
-        }
-
-        // Add new step
-        function addStep() {
-            if (!currentEditingSkill.steps) currentEditingSkill.steps = [];
-            currentEditingSkill.steps.push({
-                title: '',
-                description: '',
-                image: ''
-            });
-            addStepToForm();
-        }
-
-        // Update step field
-        function updateStepField(index, field, value) {
-            if (currentEditingSkill.steps[index]) {
-                currentEditingSkill.steps[index][field] = value;
-            }
-        }
-
-        // Remove step
-        function removeStep(index) {
-            if (currentEditingSkill.steps && currentEditingSkill.steps[index]) {
-                currentEditingSkill.steps.splice(index, 1);
-                // Re-render all steps
-                const stepsContainer = document.getElementById('steps-container');
-                stepsContainer.innerHTML = '';
-                currentEditingSkill.steps.forEach((step, idx) => {
-                    addStepToForm(idx, step);
-                });
-            }
-        }
-
-        // Add quiz question to form
-        function addQuizQuestionToForm(index, question = null) {
-            const quizContainer = document.getElementById('quiz-container');
-            const questionId = index !== undefined ? index : currentEditingSkill.quiz.length;
-            const q = question || {
-                question: '',
-                options: ['', '', '', ''],
-                answer: 0
-            };
-
-            const questionElement = document.createElement('div');
-            questionElement.className = 'quiz-question';
-            questionElement.id = `question-${questionId}`;
-            questionElement.innerHTML = `
-                <div class="step-header">
-                    <h4>Question ${questionId + 1}</h4>
-                    <button class="action-btn delete-btn" onclick="removeQuizQuestion(${questionId})">Remove</button>
-                </div>
-                <div>
-                    <label>Question</label>
-                    <input type="text" value="${q.question}" onchange="updateQuizField(${questionId}, 'question', this.value)" placeholder="Question text">
-                </div>
-                <div class="quiz-options">
-                    <div>
-                        <label>Option A</label>
-                        <input type="text" value="${q.options[0]}" onchange="updateQuizOption(${questionId}, 0, this.value)" placeholder="Option A">
-                    </div>
-                    <div>
-                        <label>Option B</label>
-                        <input type="text" value="${q.options[1]}" onchange="updateQuizOption(${questionId}, 1, this.value)" placeholder="Option B">
-                    </div>
-                    <div>
-                        <label>Option C</label>
-                        <input type="text" value="${q.options[2]}" onchange="updateQuizOption(${questionId}, 2, this.value)" placeholder="Option C">
-                    </div>
-                    <div>
-                        <label>Option D</label>
-                        <input type="text" value="${q.options[3]}" onchange="updateQuizOption(${questionId}, 3, this.value)" placeholder="Option D">
-                    </div>
-                </div>
-                <div>
-                    <label>Correct Answer (0=A, 1=B, 2=C, 3=D)</label>
-                    <input type="number" min="0" max="3" value="${q.answer}" onchange="updateQuizField(${questionId}, 'answer', parseInt(this.value))">
-                </div>
-            `;
-            quizContainer.appendChild(questionElement);
-        }
-
-        // Add new quiz question
-        function addQuizQuestion() {
-            if (!currentEditingSkill.quiz) currentEditingSkill.quiz = [];
-            currentEditingSkill.quiz.push({
-                question: '',
-                options: ['', '', '', ''],
-                answer: 0
-            });
-            addQuizQuestionToForm();
-        }
-
-        // Update quiz field
-        function updateQuizField(questionId, field, value) {
-            if (currentEditingSkill.quiz[questionId]) {
-                currentEditingSkill.quiz[questionId][field] = value;
-            }
-        }
-
-        // Update quiz option
-        function updateQuizOption(questionId, optionIndex, value) {
-            if (currentEditingSkill.quiz[questionId] && currentEditingSkill.quiz[questionId].options[optionIndex] !== undefined) {
-                currentEditingSkill.quiz[questionId].options[optionIndex] = value;
-            }
-        }
-
-        // Remove quiz question
-        function removeQuizQuestion(index) {
-            if (currentEditingSkill.quiz && currentEditingSkill.quiz[index]) {
-                currentEditingSkill.quiz.splice(index, 1);
-                // Re-render all questions
-                const quizContainer = document.getElementById('quiz-container');
-                quizContainer.innerHTML = '';
-                currentEditingSkill.quiz.forEach((question, idx) => {
-                    addQuizQuestionToForm(idx, question);
-                });
-            }
-        }
-
-        // Save skill
-        function saveSkill() {
-            // Update current skill with form values
-            currentEditingSkill.name = document.getElementById('edit-skill-name').value;
-            currentEditingSkill.icon = document.getElementById('edit-skill-icon').value;
-            currentEditingSkill.description = document.getElementById('edit-skill-description').value;
-            currentEditingSkill.tools = document.getElementById('edit-tools').value.split(',').map(t => t.trim()).filter(t => t);
-            currentEditingSkill.theory = document.getElementById('edit-theory').value;
-
-            // If it's a new skill, add to Firestore
-            if (!currentEditingSkill.id) {
-                db.collection("skills").add(currentEditingSkill)
-                    .then(() => {
-                        alert('Skill saved successfully!');
-                        // Reset form and return to skills list
-                        document.getElementById('edit-skill-form').style.display = 'none';
-                        document.getElementById('skills-section').style.display = 'block';
-                        // Reload skills list handled by listener
-                    })
-                    .catch((error) => {
-                        console.error("Error adding skill: ", error);
-                        alert('Error saving skill');
-                    });
-            } else {
-                // Update existing skill in Firestore
-                db.collection("skills").doc(currentEditingSkill.id).set(currentEditingSkill)
-                    .then(() => {
-                        alert('Skill updated successfully!');
-                        // Reset form and return to skills list
-                        document.getElementById('edit-skill-form').style.display = 'none';
-                        document.getElementById('skills-section').style.display = 'block';
-                        // Reload skills list handled by listener
-                    })
-                    .catch((error) => {
-                        console.error("Error updating skill: ", error);
-                        alert('Error saving skill');
-                    });
-            }
-        }
-
-        // Delete skill
-        function deleteSkill(skillId) {
-            if (confirm('Are you sure you want to delete this skill?')) {
-                db.collection("skills").doc(skillId).delete()
-                    .then(() => {
-                        console.log("Skill deleted successfully");
-                        // Reload handled by listener
-                    })
-                    .catch((error) => {
-                        console.error("Error removing skill: ", error);
-                    });
-            }
-        }
-
-        // Delete user
-        function deleteUser(userId) {
-            if (confirm('Are you sure you want to delete this user?')) {
-                db.collection("users").doc(userId).delete()
-                    .then(() => {
-                        console.log("User deleted successfully");
-                        // Reload handled by listener
-                    })
-                    .catch((error) => {
-                        console.error("Error removing user: ", error);
-                    });
-            }
-        }
-
-        // Show user auth form
-        function showUserAuth() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('userAuth').style.display = 'flex';
-        }
-
-        // Show login form
-        function showLoginForm() {
-            document.getElementById('userAuth').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'flex';
-        }
-
-        // User Interface Functions
-        // Load skill grid for user interface
-        function loadSkillGrid() {
-            const gridElement = document.getElementById('skill-grid');
-            let html = '';
-            
-            skillsData.forEach(skill => {
-                // Check if user has completed this skill
-                const isCompleted = currentUser && currentUser.completedSkills && currentUser.completedSkills.includes(skill.id);
-                html += `
-                    <div class="skill-card-ui" onclick="loadSkillDetail('${skill.id}')">
-                        <div class="skill-icon">
-                            <i class="${skill.icon}"></i>
-                        </div>
-                        <div class="skill-content">
-                            <h3 class="skill-name">${skill.name}</h3>
-                            <p class="skill-desc">${skill.description}</p>
-                            <button class="skill-btn">
-                                ${isCompleted ? 'Review' : 'Start'} Learning
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            gridElement.innerHTML = html;
-        }
-
-        // Load detail view for a specific skill
-        function loadSkillDetail(skillId) {
-            document.getElementById('skill-grid').style.display = 'none';
-            document.getElementById('skill-detail').style.display = 'block';
-            
-            const skill = skillsData.find(s => s.id === skillId);
-            if (!skill) return;
-            
-            let html = `
-                <div class="skill-header">
-                    <i class="${skill.icon}"></i>
-                    <h2>${skill.name}</h2>
-                </div>
-                
-                <div class="skill-section">
-                    <h3 class="section-title-ui">Required Tools</h3>
-                    <div class="tools-grid">
-            `;
-            
-            skill.tools.forEach(tool => {
-                html += `
-                    <div class="tool-item">
-                        <i class="fas fa-toolbox"></i>
-                        <div>${tool}</div>
-                    </div>
-                `;
-            });
-            
-            html += `
-                    </div>
-                </div>
-                
-                <div class="skill-section">
-                    <h3 class="section-title-ui">Step-by-Step Guide</h3>
-                    <div class="steps-container">
-            `;
-            
-            skill.steps.forEach(step => {
-                html += `
-                    <div class="step-card">
-                        <img src="${step.image}" alt="${step.title}" class="step-image">
-                        <div class="step-content">
-                            <h4 class="step-title">${step.title}</h4>
-                            <p>${step.description}</p>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            html += `
-                    </div>
-                </div>
-                
-                <div class="skill-section">
-                    <h3 class="section-title-ui">Theory & Principles</h3>
-                    <div class="theory-content">
-                        <p>${skill.theory}</p>
-                    </div>
-                </div>
-                
-                <div class="skill-section">
-                    <h3 class="section-title-ui">Knowledge Check</h3>
-                    <div class="quiz-container" id="quiz-container">
-            `;
-            
-            skill.quiz.forEach((q, index) => {
-                html += `
-                    <div class="question">
-                        <div class="question-text">${q.question}</div>
-                        <div class="options">
-                `;
-                
-                q.options.forEach((opt, optIndex) => {
-                    html += `
-                        <div class="option" data-question="${index}" data-option="${optIndex}">
-                            <input type="radio" name="q${index}" id="q${index}o${optIndex}">
-                            <label for="q${index}o${optIndex}">${String.fromCharCode(65 + optIndex)}. ${opt}</label>
-                        </div>
-                    `;
-                });
-                
-                html += `
-                        </div>
-                        <div class="quiz-result" id="result-${index}" style="display:none;"></div>
-                    </div>
-                `;
-            });
-            
-            html += `
-                    </div>
-                    <div class="quiz-nav">
-                        <button class="back-btn" onclick="goBackToGrid()">← Back to Skills</button>
-                        <button class="skill-btn" onclick="checkQuiz('${skillId}')">Check Answers</button>
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById('skill-detail').innerHTML = html;
-            
-            // Add event listeners for quiz options
-            document.querySelectorAll('.option').forEach(option => {
-                option.addEventListener('click', function() {
-                    const questionIndex = this.dataset.question;
-                    const optionIndex = this.dataset.option;
-                    
-                    // Remove selected class from all options in this question
-                    document.querySelectorAll(`.option[data-question="${questionIndex}"]`).forEach(opt => {
-                        opt.classList.remove('selected');
-                    });
-                    
-                    // Add selected class to clicked option
-                    this.classList.add('selected');
-                });
-            });
-        }
-
-        // Check quiz answers
-        function checkQuiz(skillId) {
-            const skill = skillsData.find(s => s.id === skillId);
-            if (!skill) return;
-            
-            let score = 0;
-            let allAnswered = true;
-            
-            skill.quiz.forEach((q, index) => {
-                const selectedOption = document.querySelector(`.option[data-question="${index}"].selected`);
-                if (!selectedOption) {
-                    allAnswered = false;
-                    return;
-                }
-                
-                const selectedValue = parseInt(selectedOption.dataset.option);
-                const resultDiv = document.getElementById(`result-${index}`);
-                
-                if (selectedValue === q.answer) {
-                    resultDiv.textContent = 'Correct!';
-                    resultDiv.className = 'quiz-result correct';
-                    score++;
-                } else {
-                    resultDiv.textContent = `Incorrect. Correct answer: ${String.fromCharCode(65 + q.answer)}`;
-                    resultDiv.className = 'quiz-result incorrect';
-                }
-                
-                resultDiv.style.display = 'block';
-            });
-            
-            if (!allAnswered) {
-                alert('Please answer all questions before checking your answers.');
-                return;
-            }
-            
-            // Show overall score
-            const totalQuestions = skill.quiz.length;
-            const percentage = Math.round((score / totalQuestions) * 100);
-            
-            // Mark skill as completed if passed
-            if (percentage >= 70 && currentUser) {
-                if (!currentUser.completedSkills.includes(skillId)) {
-                    // Update user's completed skills in Firestore
-                    currentUser.completedSkills.push(skillId);
-                    db.collection("users").doc(currentUser.id).update({
-                        completedSkills: firebase.firestore.FieldValue.arrayUnion(skillId)
-                    }).then(() => {
-                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                        alert(`Quiz completed!
+    if (confirm('Are you sure you want to delete this skill?')) {
+        db.collection("skills").doc(skillId).delete()
+        .then(() => {
+            console.log("Skill deleted successfully with ID:", skillId);
+            // The UI will update via the Firestore listener (handled in setupFirestoreListeners)
+            // No need to manually remove from DOM anymore
+        })
+        .catch((error) => {
+            console.error("Error removing skill with ID '" + skillId + "': ", error);
+        });
+    }
+}
+// User Interface Functions
+// Load skill grid for user interface
+function loadSkillGrid() {
+const gridElement = document.getElementById('skill-grid');
+let html = '';
+skillsData.forEach(skill => {
+// Check if user has completed this skill
+const isCompleted = currentUser && currentUser.completedSkills && currentUser.completedSkills.includes(skill.id);
+html += `
+<div class="skill-card-ui" onclick="loadSkillDetail('${skill.id}')">
+<div class="skill-icon">
+<i class="${skill.icon}"></i>
+</div>
+<div class="skill-content">
+<h3 class="skill-name">${skill.name}</h3>
+<p class="skill-desc">${skill.description}</p>
+<button class="skill-btn">
+${isCompleted ? 'Review' : 'Start'} Learning
+</button>
+</div>
+</div>
+`;
+});
+gridElement.innerHTML = html;
+}
+// Load detail view for a specific skill
+function loadSkillDetail(skillId) {
+document.getElementById('skill-grid').style.display = 'none';
+document.getElementById('skill-detail').style.display = 'block';
+const skill = skillsData.find(s => s.id === skillId);
+if (!skill) return;
+let html = `
+<div class="skill-header">
+<i class="${skill.icon}"></i>
+<h2>${skill.name}</h2>
+</div>
+<div class="skill-section">
+<h3 class="section-title-ui">Required Tools</h3>
+<div class="tools-grid">
+`;
+skill.tools.forEach(tool => {
+html += `
+<div class="tool-item">
+<i class="fas fa-toolbox"></i>
+<div>${tool}</div>
+</div>
+`;
+});
+html += `
+</div>
+</div>
+<div class="skill-section">
+<h3 class="section-title-ui">Step-by-Step Guide</h3>
+<div class="steps-container">
+`;
+skill.steps.forEach(step => {
+html += `
+<div class="step-card">
+<img src="${step.image}" alt="${step.title}" class="step-image">
+<div class="step-content">
+<h4 class="step-title">${step.title}</h4>
+<p>${step.description}</p>
+</div>
+</div>
+`;
+});
+html += `
+</div>
+</div>
+<div class="skill-section">
+<h3 class="section-title-ui">Theory & Principles</h3>
+<div class="theory-content">
+<p>${skill.theory}</p>
+</div>
+</div>
+<div class="skill-section">
+<h3 class="section-title-ui">Knowledge Check</h3>
+<div class="quiz-container" id="quiz-container">
+`;
+skill.quiz.forEach((q, index) => {
+html += `
+<div class="question">
+<div class="question-text">${q.question}</div>
+<div class="options">
+`;
+q.options.forEach((opt, optIndex) => {
+html += `
+<div class="option" data-question="${index}" data-option="${optIndex}">
+<input type="radio" name="q${index}" id="q${index}o${optIndex}">
+<label for="q${index}o${optIndex}">${String.fromCharCode(65 + optIndex)}. ${opt}</label>
+</div>
+`;
+});
+html += `
+</div>
+<div class="quiz-result" id="result-${index}" style="display:none;"></div>
+</div>
+`;
+});
+html += `
+</div>
+<div class="quiz-nav">
+<button class="back-btn" onclick="goBackToGrid()">← Back to Skills</button>
+<button class="skill-btn" onclick="checkQuiz('${skillId}')">Check Answers</button>
+</div>
+</div>
+`;
+document.getElementById('skill-detail').innerHTML = html;
+// Add event listeners for quiz options
+document.querySelectorAll('.option').forEach(option => {
+option.addEventListener('click', function() {
+const questionIndex = this.dataset.question;
+const optionIndex = this.dataset.option;
+// Remove selected class from all options in this question
+document.querySelectorAll(`.option[data-question="${questionIndex}"]`).forEach(opt => {
+opt.classList.remove('selected');
+});
+// Add selected class to clicked option
+this.classList.add('selected');
+});
+});
+}
+// Check quiz answers
+function checkQuiz(skillId) {
+const skill = skillsData.find(s => s.id === skillId);
+if (!skill) return;
+let score = 0;
+let allAnswered = true;
+skill.quiz.forEach((q, index) => {
+const selectedOption = document.querySelector(`.option[data-question="${index}"].selected`);
+if (!selectedOption) {
+allAnswered = false;
+return;
+}
+const selectedValue = parseInt(selectedOption.dataset.option);
+const resultDiv = document.getElementById(`result-${index}`);
+if (selectedValue === q.answer) {
+resultDiv.textContent = 'Correct!';
+resultDiv.className = 'quiz-result correct';
+score++;
+} else {
+resultDiv.textContent = `Incorrect. Correct answer: ${String.fromCharCode(65 + q.answer)}`;
+resultDiv.className = 'quiz-result incorrect';
+}
+resultDiv.style.display = 'block';
+});
+if (!allAnswered) {
+alert('Please answer all questions before checking your answers.');
+return;
+}
+// Show overall score
+const totalQuestions = skill.quiz.length;
+const percentage = Math.round((score / totalQuestions) * 100);
+// Mark skill as completed if passed
+if (percentage >= 70 && currentUser) {
+if (!currentUser.completedSkills.includes(skillId)) {
+// Update user's completed skills in Firestore
+currentUser.completedSkills.push(skillId);
+db.collection("users").doc(currentUser.id).update({
+completedSkills: firebase.firestore.FieldValue.arrayUnion(skillId)
+}).then(() => {
+localStorage.setItem('currentUser', JSON.stringify(currentUser));
+alert(`Quiz completed!
 Score: ${score}/${totalQuestions} (${percentage}%)
 Congratulations! You've completed this skill.`);
-                    });
-                } else {
-                    alert(`Quiz completed!
+});
+} else {
+alert(`Quiz completed!
 Score: ${score}/${totalQuestions} (${percentage}%)`);
-                }
-            } else {
-                alert(`Quiz completed!
+}
+} else {
+alert(`Quiz completed!
 Score: ${score}/${totalQuestions} (${percentage}%)
 You need at least 70% to pass. Try again!`);
-            }
-        }
-
-        // Go back to skill grid
-        function goBackToGrid() {
-            document.getElementById('skill-grid').style.display = 'grid';
-            document.getElementById('skill-detail').style.display = 'none';
-        }
-    </script>
+}
+}
+// Go back to skill grid
+function goBackToGrid() {
+document.getElementById('skill-grid').style.display = 'grid';
+document.getElementById('skill-detail').style.display = 'none';
+}
+</script>
 </body>
 </html>
