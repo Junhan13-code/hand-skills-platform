@@ -124,65 +124,240 @@
             cursor: pointer;
         }
 
-        .admin-section {
-            margin-bottom: 2rem;
-        }
-
-        .admin-section h3 {
-            margin-bottom: 1rem;
-            color: var(--primary);
-        }
-
-        .skill-editor {
-            background: var(--light);
-            padding: 1rem;
-            border-radius: 5px;
-            margin-bottom: 1rem;
-        }
-
-        .editor-row {
-            display: flex;
-            margin-bottom: 0.5rem;
+        /* NEW STYLING FOR ADMIN PANEL */
+        .admin-dashboard {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
             align-items: center;
         }
 
-        .editor-label {
-            min-width: 120px;
-            font-weight: bold;
+        .admin-content-new {
+            background: white;
+            width: 90%;
+            max-width: 1200px;
+            max-height: 90vh;
+            border-radius: 10px;
+            padding: 2rem;
+            overflow-y: auto;
         }
 
-        .editor-input {
-            flex-grow: 1;
-            padding: 0.5rem;
-            border: 1px solid #ddd;
-            border-radius: 3px;
+        .admin-header-new {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--light);
         }
 
-        .editor-textarea {
-            width: 100%;
-            height: 100px;
-            padding: 0.5rem;
-            border: 1px solid #ddd;
-            border-radius: 3px;
-        }
-
-        .save-btn {
-            background: var(--success);
+        .logout-btn {
+            background: var(--danger);
             color: white;
             border: none;
-            padding: 0.75rem 1.5rem;
+            padding: 0.5rem 1rem;
             border-radius: 5px;
             cursor: pointer;
-            font-weight: 600;
-            margin-top: 1rem;
         }
 
-        /* Main Content */
+        .admin-content-new-inner {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+        }
+
+        /* Navigation Panel */
+        .nav-panel {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .nav-panel h3 {
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--light);
+        }
+
+        .nav-item {
+            padding: 0.8rem;
+            margin-bottom: 0.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Main Content Area */
+        .main-content-area {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--light);
+        }
+
+        .skill-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .skill-card {
+            border: 1px solid var(--light);
+            border-radius: 8px;
+            padding: 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .skill-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .skill-card h4 {
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .skill-actions {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .edit-btn {
+            background: var(--warning);
+            color: white;
+        }
+
+        .delete-btn {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Edit Form */
+        .edit-form {
+            display: none;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        /* Steps Editor */
+        .steps-editor {
+            margin-top: 1.5rem;
+        }
+
+        .step-item {
+            border: 1px solid var(--light);
+            border-radius: 5px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .step-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+
+        .step-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .add-step-btn {
+            margin-top: 1rem;
+            background: var(--success);
+            color: white;
+        }
+
+        /* Quiz Editor */
+        .quiz-editor {
+            margin-top: 1.5rem;
+        }
+
+        .quiz-question {
+            border: 1px solid var(--light);
+            border-radius: 5px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .quiz-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .add-quiz-btn {
+            margin-top: 1rem;
+            background: var(--success);
+            color: white;
+        }
+
+        /* Original User Interface Styles */
         main {
             margin-bottom: 3rem;
         }
 
-        /* Skill Grid */
         .skill-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -190,7 +365,7 @@
             margin-top: 2rem;
         }
 
-        .skill-card {
+        .skill-card-ui {
             background: white;
             border-radius: 10px;
             overflow: hidden;
@@ -202,7 +377,7 @@
             flex-direction: column;
         }
 
-        .skill-card:hover {
+        .skill-card-ui:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
         }
@@ -251,7 +426,6 @@
             background: var(--secondary);
         }
 
-        /* Skill Detail */
         .skill-detail {
             background: white;
             border-radius: 10px;
@@ -284,7 +458,7 @@
             margin-bottom: 2.5rem;
         }
 
-        .section-title {
+        .section-title-ui {
             font-size: 1.5rem;
             color: var(--primary);
             margin-bottom: 1rem;
@@ -292,7 +466,6 @@
             border-bottom: 1px solid var(--light);
         }
 
-        /* Tools Section */
         .tools-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -322,7 +495,6 @@
             color: white;
         }
 
-        /* Steps Section */
         .steps-container {
             display: flex;
             flex-direction: column;
@@ -354,7 +526,6 @@
             color: var(--primary);
         }
 
-        /* Theory Section */
         .theory-content {
             background: var(--light);
             padding: 1.5rem;
@@ -362,7 +533,6 @@
             line-height: 1.8;
         }
 
-        /* Quiz Section */
         .quiz-container {
             background: var(--light);
             padding: 1.5rem;
@@ -437,7 +607,6 @@
             font-weight: 600;
         }
 
-        /* Footer */
         footer {
             background: var(--dark);
             color: white;
@@ -446,7 +615,6 @@
             margin-top: 3rem;
         }
 
-        /* Loading */
         .loading {
             text-align: center;
             padding: 2rem;
@@ -455,6 +623,14 @@
         }
 
         /* Responsive Design */
+        @media (max-width: 992px) {
+            .admin-content-new-inner {
+                grid-template-columns: 1fr;
+            }
+            .nav-panel {
+                margin-bottom: 2rem;
+            }
+        }
         @media (max-width: 768px) {
             .step-card {
                 flex-direction: column;
@@ -480,6 +656,11 @@
                 text-align: center;
                 margin-top: 1rem;
             }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
         }
     </style>
 </head>
@@ -494,7 +675,134 @@
         </div>
     </header>
 
-    <main class="container">
+    <!-- NEW ADMIN PANEL STRUCTURE -->
+    <div class="admin-dashboard" id="adminDashboard">
+        <div class="admin-content-new">
+            <div class="admin-header-new">
+                <h1><i class="fas fa-tools"></i> Hand Skills Learning Platform - Admin Panel</h1>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+            <div class="admin-content-new-inner">
+                <div class="nav-panel">
+                    <h3>Navigation</h3>
+                    <div class="nav-item active" onclick="showSection('dashboard')">Dashboard</div>
+                    <div class="nav-item" onclick="showSection('skills')">Manage Skills</div>
+                    <div class="nav-item" onclick="showSection('users')">Manage Users</div>
+                    <div class="nav-item" onclick="showSection('settings')">Settings</div>
+                </div>
+                <div class="main-content-area">
+                    <!-- Dashboard Section -->
+                    <div id="dashboard-section" class="section">
+                        <h2 class="section-title">Dashboard Overview</h2>
+                        <p>Welcome to the Hand Skills Learning Platform Admin Panel. From here you can manage skills, content, and user access.</p>
+                        <div style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                            <div style="background: var(--light); padding: 1.5rem; border-radius: 8px; text-align: center;">
+                                <i class="fas fa-tools" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem;"></i>
+                                <h3>5 Skills</h3>
+                                <p>Total skills in the system</p>
+                            </div>
+                            <div style="background: var(--light); padding: 1.5rem; border-radius: 8px; text-align: center;">
+                                <i class="fas fa-users" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem;"></i>
+                                <h3 id="user-count">0</h3>
+                                <p>Registered students</p>
+                            </div>
+                            <div style="background: var(--light); padding: 1.5rem; border-radius: 8px; text-align: center;">
+                                <i class="fas fa-file-alt" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem;"></i>
+                                <h3 id="completion-count">0</h3>
+                                <p>Completed lessons</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Skills Management Section -->
+                    <div id="skills-section" class="section" style="display: none;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                            <h2 class="section-title">Manage Skills</h2>
+                            <button class="action-btn" onclick="addNewSkill()" style="background: var(--success);">Add New Skill</button>
+                        </div>
+                        <div class="skill-list" id="skillsList">
+                            <!-- Skills will be loaded here -->
+                        </div>
+                    </div>
+                    <!-- Edit Skill Form -->
+                    <div id="edit-skill-form" class="edit-form">
+                        <h2 class="section-title">Edit Skill</h2>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="edit-skill-name">Skill Name</label>
+                                <input type="text" id="edit-skill-name" placeholder="Enter skill name">
+                            </div>
+                            <div class="form-col">
+                                <label for="edit-skill-icon">Icon Class</label>
+                                <input type="text" id="edit-skill-icon" placeholder="e.g., fas fa-hammer">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="edit-skill-description">Description</label>
+                                <textarea id="edit-skill-description" placeholder="Enter skill description"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="edit-tools">Tools Required (comma separated)</label>
+                                <textarea id="edit-tools" placeholder="Enter required tools"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="edit-theory">Theory Section</label>
+                                <textarea id="edit-theory" placeholder="Enter theoretical content"></textarea>
+                            </div>
+                        </div>
+                        <div class="steps-editor">
+                            <h3>Steps</h3>
+                            <div id="steps-container">
+                                <!-- Steps will be added here -->
+                            </div>
+                            <button class="action-btn add-step-btn" onclick="addStep()">Add Step</button>
+                        </div>
+                        <div class="quiz-editor">
+                            <h3>Quiz Questions</h3>
+                            <div id="quiz-container">
+                                <!-- Quiz questions will be added here -->
+                            </div>
+                            <button class="action-btn add-quiz-btn" onclick="addQuizQuestion()">Add Question</button>
+                        </div>
+                        <div class="form-actions">
+                            <button class="action-btn" onclick="showSection('skills')" style="background: var(--gray);">Cancel</button>
+                            <button class="action-btn" onclick="saveSkill()" style="background: var(--primary);">Save Changes</button>
+                        </div>
+                    </div>
+                    <!-- Users Management Section -->
+                    <div id="users-section" class="section" style="display: none;">
+                        <h2 class="section-title">Manage Students</h2>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+                            <thead>
+                                <tr style="background: var(--light);">
+                                    <th style="padding: 0.75rem; text-align: left;">Name</th>
+                                    <th style="padding: 0.75rem; text-align: left;">Rank</th>
+                                    <th style="padding: 0.75rem; text-align: left;">Course</th>
+                                    <th style="padding: 0.75rem; text-align: left;">Email</th>
+                                    <th style="padding: 0.75rem; text-align: left;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table-body">
+                                <!-- Users will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Settings Section -->
+                    <div id="settings-section" class="section" style="display: none;">
+                        <h2 class="section-title">System Settings</h2>
+                        <p>System configuration options would go here in a full implementation.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ORIGINAL USER INTERFACE -->
+    <main class="container" id="mainContent">
         <div id="main-content">
             <div class="skill-grid" id="skill-grid">
                 <!-- Skills will be loaded here -->
@@ -512,12 +820,12 @@
         </div>
     </footer>
 
-    <!-- Admin Panel -->
-    <div class="admin-panel" id="adminPanel">
+    <!-- ORIGINAL ADMIN PANEL (Kept for fallback if needed) -->
+    <div class="admin-panel" id="adminPanelOld">
         <div class="admin-content">
             <div class="admin-header">
-                <h2>Admin Panel - Edit Skills</h2>
-                <button class="close-admin" id="closeAdminBtn">Close</button>
+                <h2>Admin Panel - Edit Skills (Fallback)</h2>
+                <button class="close-admin" id="closeAdminBtnOld">Close</button>
             </div>
             
             <div class="admin-section">
@@ -573,9 +881,11 @@
 
     <script>
         // Data for the 5 common hand skills
-        const skillsData = {
-            "carpentry": {
+        let skillsData = [
+            {
+                id: "carpentry",
                 name: "Carpentry",
+                icon: "fas fa-hammer",
                 description: "The art of cutting, shaping, and installing building materials during construction.",
                 tools: [
                     "Chisel Set",
@@ -631,8 +941,10 @@
                     }
                 ]
             },
-            "welding": {
+            {
+                id: "welding",
                 name: "Welding",
+                icon: "fas fa-fire",
                 description: "A fabrication process that joins materials by causing fusion, often using heat.",
                 tools: [
                     "Welding Helmet",
@@ -688,8 +1000,10 @@
                     }
                 ]
             },
-            "sewing": {
+            {
+                id: "sewing",
                 name: "Sewing",
+                icon: "fas fa-cut",
                 description: "The craft of joining fabric pieces together with thread and needle.",
                 tools: [
                     "Sewing Machine",
@@ -745,8 +1059,10 @@
                     }
                 ]
             },
-            "plumbing": {
+            {
+                id: "plumbing",
                 name: "Plumbing",
+                icon: "fas fa-wrench",
                 description: "The system of pipes, fixtures, and apparatus for conveying fluids.",
                 tools: [
                     "Pipe Wrench",
@@ -802,8 +1118,10 @@
                     }
                 ]
             },
-            "electronics": {
+            {
+                id: "electronics",
                 name: "Electronics",
+                icon: "fas fa-bolt",
                 description: "The branch of physics dealing with electron flow in circuits.",
                 tools: [
                     "Soldering Iron",
@@ -859,120 +1177,440 @@
                     }
                 ]
             }
-        };
+        ];
 
-        // Global variable to track current skill
+        // Sample users data
+        let usersData = [
+            {
+                id: 1,
+                email: "john.doe@example.com",
+                rank: "Sergeant",
+                name: "John Doe",
+                course: "56th Mechanized Battalion",
+                completedSkills: ["carpentry"]
+            },
+            {
+                id: 2,
+                email: "jane.smith@example.com",
+                rank: "Corporal",
+                name: "Jane Smith",
+                course: "42nd Engineering Corps",
+                completedSkills: ["welding", "electronics"]
+            },
+            {
+                id: 3,
+                email: "mike.jones@example.com",
+                rank: "Private",
+                name: "Mike Jones",
+                course: "56th Mechanized Battalion",
+                completedSkills: []
+            }
+        ];
+
+        // Global variables
         let currentSkill = null;
+        let currentEditingSkill = null;
+        let currentUser = null;
 
         // Initialize the app when the page loads
         document.addEventListener('DOMContentLoaded', function() {
-            loadSkillGrid();
-            setupAdminPanel();
+            // Always show main content first
+            document.getElementById('mainContent').style.display = 'block';
+            document.getElementById('adminLoginBtn').style.display = 'block';
+            
+            // Check if admin is logged in
+            const adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
+            if (adminLoggedIn) {
+                showAdminDashboard();
+            } else {
+                // Show main content for non-admins
+                loadSkillGrid();
+            }
         });
+
+        // Show admin dashboard
+        function showAdminDashboard() {
+            document.getElementById('adminDashboard').style.display = 'flex';
+            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('adminLoginBtn').style.display = 'none';
+            loadSkillsList();
+            loadUsersList();
+            updateUserCounts();
+            showSection('dashboard'); // Default to dashboard
+        }
+
+        // Show user interface
+        function showUserInterface() {
+            document.getElementById('adminDashboard').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            document.getElementById('adminLoginBtn').style.display = 'block';
+            loadSkillGrid();
+        }
 
         // Setup admin panel functionality
         function setupAdminPanel() {
             const adminLoginBtn = document.getElementById('adminLoginBtn');
-            const adminPanel = document.getElementById('adminPanel');
-            const closeAdminBtn = document.getElementById('closeAdminBtn');
-            const skillSelector = document.getElementById('skillSelector');
+            const closeAdminBtnOld = document.getElementById('closeAdminBtnOld');
             const saveChangesBtn = document.getElementById('saveChangesBtn');
 
             adminLoginBtn.addEventListener('click', function() {
                 const password = prompt("Enter admin password:");
                 if (password === "admin123") { // Change this to your preferred password
-                    adminPanel.style.display = 'flex';
-                    loadSkillForEditing(skillSelector.value);
+                    // Simulate successful login
+                    localStorage.setItem('adminLoggedIn', 'true');
+                    showAdminDashboard();
                 } else {
                     alert("Incorrect password!");
                 }
             });
 
-            closeAdminBtn.addEventListener('click', function() {
-                adminPanel.style.display = 'none';
-            });
-
-            skillSelector.addEventListener('change', function() {
-                loadSkillForEditing(this.value);
+            closeAdminBtnOld.addEventListener('click', function() {
+                document.getElementById('adminPanelOld').style.display = 'none';
             });
 
             saveChangesBtn.addEventListener('click', function() {
-                saveSkillChanges(skillSelector.value);
+                saveSkillChangesOld();
             });
         }
 
-        // Load skill data into editor
-        function loadSkillForEditing(skillId) {
-            const skill = skillsData[skillId];
-            if (!skill) return;
+        // Admin logout
+        function logout() {
+            localStorage.removeItem('adminLoggedIn');
+            localStorage.removeItem('userLoggedIn');
+            localStorage.removeItem('currentUser');
+            currentUser = null;
+            document.getElementById('adminDashboard').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            document.getElementById('adminLoginBtn').style.display = 'block';
+            loadSkillGrid(); // Reload main content
+        }
 
-            document.getElementById('skillName').value = skill.name;
-            document.getElementById('skillDesc').value = skill.description;
-            document.getElementById('skillTools').value = skill.tools.join(', ');
-            document.getElementById('skillTheory').value = skill.theory;
+        // Show different sections in admin panel
+        function showSection(section) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(el => el.style.display = 'none');
+            document.getElementById('edit-skill-form').style.display = 'none';
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            // Show selected section and highlight nav item
+            document.getElementById(`${section}-section`).style.display = 'block';
+            document.querySelector(`.nav-item[onclick="showSection('${section}')"]`).classList.add('active');
+            // Load users if on users section
+            if (section === 'users') {
+                loadUsersList();
+            }
+        }
 
-            // Load steps
-            const stepsContainer = document.getElementById('stepsEditorContainer');
+        // Load skills list in admin panel
+        function loadSkillsList() {
+            const skillsList = document.getElementById('skillsList');
+            skillsList.innerHTML = '';
+            skillsData.forEach(skill => {
+                const skillCard = document.createElement('div');
+                skillCard.className = 'skill-card';
+                skillCard.innerHTML = `
+                    <h4>${skill.name}</h4>
+                    <p>${skill.description.substring(0, 100)}...</p>
+                    <div class="skill-actions">
+                        <button class="action-btn edit-btn" onclick="editSkill('${skill.id}')">Edit</button>
+                        <button class="action-btn delete-btn" onclick="deleteSkill('${skill.id}')">Delete</button>
+                    </div>
+                `;
+                skillsList.appendChild(skillCard);
+            });
+        }
+
+        // Load users list in admin panel
+        function loadUsersList() {
+            const usersTableBody = document.getElementById('users-table-body');
+            usersTableBody.innerHTML = '';
+            usersData.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">${user.name}</td>
+                    <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">${user.rank}</td>
+                    <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">${user.course}</td>
+                    <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">${user.email}</td>
+                    <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">
+                        <button class="action-btn delete-btn" onclick="deleteUser(${user.id})">Delete</button>
+                    </td>
+                `;
+                usersTableBody.appendChild(row);
+            });
+        }
+
+        // Update dashboard counters
+        function updateUserCounts() {
+            document.getElementById('user-count').textContent = usersData.length;
+            // Calculate completed lessons
+            let completedCount = 0;
+            usersData.forEach(user => {
+                completedCount += user.completedSkills.length;
+            });
+            document.getElementById('completion-count').textContent = completedCount;
+        }
+
+        // Add new skill
+        function addNewSkill() {
+            currentEditingSkill = {
+                id: '',
+                name: '',
+                icon: 'fas fa-tools',
+                description: '',
+                tools: [],
+                steps: [],
+                theory: '',
+                quiz: []
+            };
+            showEditForm();
+        }
+
+        // Edit existing skill
+        function editSkill(skillId) {
+            currentEditingSkill = skillsData.find(skill => skill.id === skillId);
+            if (currentEditingSkill) {
+                showEditForm();
+            }
+        }
+
+        // Show edit form
+        function showEditForm() {
+            document.getElementById('edit-skill-name').value = currentEditingSkill.name;
+            document.getElementById('edit-skill-icon').value = currentEditingSkill.icon;
+            document.getElementById('edit-skill-description').value = currentEditingSkill.description;
+            document.getElementById('edit-tools').value = currentEditingSkill.tools.join(', ');
+            document.getElementById('edit-theory').value = currentEditingSkill.theory;
+            
+            // Populate steps
+            const stepsContainer = document.getElementById('steps-container');
             stepsContainer.innerHTML = '';
-            skill.steps.forEach((step, index) => {
-                const stepElement = document.createElement('div');
-                stepElement.className = 'skill-editor';
-                stepElement.innerHTML = `
-                    <div class="editor-row">
-                        <span class="editor-label">Step ${index + 1} Title:</span>
-                        <input type="text" class="editor-input step-title" value="${step.title}">
-                    </div>
-                    <div class="editor-row">
-                        <span class="editor-label">Step ${index + 1} Description:</span>
-                        <textarea class="editor-textarea step-desc">${step.description}</textarea>
-                    </div>
-                    <div class="editor-row">
-                        <span class="editor-label">Step ${index + 1} Image URL:</span>
-                        <input type="text" class="editor-input step-image" value="${step.image}">
-                    </div>
-                `;
-                stepsContainer.appendChild(stepElement);
+            currentEditingSkill.steps.forEach((step, index) => {
+                addStepToForm(index, step);
             });
-
-            // Load quiz
-            const quizContainer = document.getElementById('quizEditorContainer');
+            
+            // Populate quiz
+            const quizContainer = document.getElementById('quiz-container');
             quizContainer.innerHTML = '';
-            skill.quiz.forEach((q, index) => {
-                const quizElement = document.createElement('div');
-                quizElement.className = 'skill-editor';
-                quizElement.innerHTML = `
-                    <div class="editor-row">
-                        <span class="editor-label">Question ${index + 1}:</span>
-                        <textarea class="editor-textarea quiz-question">${q.question}</textarea>
-                    </div>
-                    <div class="editor-row">
-                        <span class="editor-label">Option A:</span>
-                        <input type="text" class="editor-input quiz-option" value="${q.options[0]}">
-                    </div>
-                    <div class="editor-row">
-                        <span class="editor-label">Option B:</span>
-                        <input type="text" class="editor-input quiz-option" value="${q.options[1]}">
-                    </div>
-                    <div class="editor-row">
-                        <span class="editor-label">Option C:</span>
-                        <input type="text" class="editor-input quiz-option" value="${q.options[2]}">
-                    </div>
-                    <div class="editor-row">
-                        <span class="editor-label">Option D:</span>
-                        <input type="text" class="editor-input quiz-option" value="${q.options[3]}">
-                    </div>
-                    <div class="editor-row">
-                        <span class="editor-label">Correct Answer (0-3):</span>
-                        <input type="number" class="editor-input quiz-answer" value="${q.answer}" min="0" max="3">
-                    </div>
-                `;
-                quizContainer.appendChild(quizElement);
+            currentEditingSkill.quiz.forEach((question, index) => {
+                addQuizQuestionToForm(index, question);
             });
+            
+            // Show form
+            document.getElementById('skills-section').style.display = 'none';
+            document.getElementById('edit-skill-form').style.display = 'block';
         }
 
-        // Save changes back to skill data
-        function saveSkillChanges(skillId) {
-            const skill = skillsData[skillId];
+        // Add step to form
+        function addStepToForm(index, step = null) {
+            const stepsContainer = document.getElementById('steps-container');
+            const stepId = index !== undefined ? index : currentEditingSkill.steps.length;
+            const stepObj = step || {
+                title: '',
+                description: '',
+                image: ''
+            };
+
+            const stepElement = document.createElement('div');
+            stepElement.className = 'step-item';
+            stepElement.id = `step-${stepId}`;
+            stepElement.innerHTML = `
+                <div class="step-header">
+                    <h4>Step ${stepId + 1}</h4>
+                    <button class="action-btn delete-btn" onclick="removeStep(${stepId})">Remove</button>
+                </div>
+                <div class="step-content">
+                    <div>
+                        <label>Title</label>
+                        <input type="text" value="${stepObj.title}" onchange="updateStepField(${stepId}, 'title', this.value)" placeholder="Step title">
+                    </div>
+                    <div>
+                        <label>Description</label>
+                        <textarea onchange="updateStepField(${stepId}, 'description', this.value)" placeholder="Step description">${stepObj.description}</textarea>
+                    </div>
+                    <div>
+                        <label>Image URL</label>
+                        <input type="text" value="${stepObj.image}" onchange="updateStepField(${stepId}, 'image', this.value)" placeholder="Image URL">
+                    </div>
+                </div>
+            `;
+            stepsContainer.appendChild(stepElement);
+        }
+
+        // Add new step
+        function addStep() {
+            if (!currentEditingSkill.steps) currentEditingSkill.steps = [];
+            currentEditingSkill.steps.push({
+                title: '',
+                description: '',
+                image: ''
+            });
+            addStepToForm();
+        }
+
+        // Update step field
+        function updateStepField(index, field, value) {
+            if (currentEditingSkill.steps[index]) {
+                currentEditingSkill.steps[index][field] = value;
+            }
+        }
+
+        // Remove step
+        function removeStep(index) {
+            if (currentEditingSkill.steps && currentEditingSkill.steps[index]) {
+                currentEditingSkill.steps.splice(index, 1);
+                // Re-render all steps
+                const stepsContainer = document.getElementById('steps-container');
+                stepsContainer.innerHTML = '';
+                currentEditingSkill.steps.forEach((step, idx) => {
+                    addStepToForm(idx, step);
+                });
+            }
+        }
+
+        // Add quiz question to form
+        function addQuizQuestionToForm(index, question = null) {
+            const quizContainer = document.getElementById('quiz-container');
+            const questionId = index !== undefined ? index : currentEditingSkill.quiz.length;
+            const q = question || {
+                question: '',
+                options: ['', '', '', ''],
+                answer: 0
+            };
+
+            const questionElement = document.createElement('div');
+            questionElement.className = 'quiz-question';
+            questionElement.id = `question-${questionId}`;
+            questionElement.innerHTML = `
+                <div class="step-header">
+                    <h4>Question ${questionId + 1}</h4>
+                    <button class="action-btn delete-btn" onclick="removeQuizQuestion(${questionId})">Remove</button>
+                </div>
+                <div>
+                    <label>Question</label>
+                    <input type="text" value="${q.question}" onchange="updateQuizField(${questionId}, 'question', this.value)" placeholder="Question text">
+                </div>
+                <div class="quiz-options">
+                    <div>
+                        <label>Option A</label>
+                        <input type="text" value="${q.options[0]}" onchange="updateQuizOption(${questionId}, 0, this.value)" placeholder="Option A">
+                    </div>
+                    <div>
+                        <label>Option B</label>
+                        <input type="text" value="${q.options[1]}" onchange="updateQuizOption(${questionId}, 1, this.value)" placeholder="Option B">
+                    </div>
+                    <div>
+                        <label>Option C</label>
+                        <input type="text" value="${q.options[2]}" onchange="updateQuizOption(${questionId}, 2, this.value)" placeholder="Option C">
+                    </div>
+                    <div>
+                        <label>Option D</label>
+                        <input type="text" value="${q.options[3]}" onchange="updateQuizOption(${questionId}, 3, this.value)" placeholder="Option D">
+                    </div>
+                </div>
+                <div>
+                    <label>Correct Answer (0=A, 1=B, 2=C, 3=D)</label>
+                    <input type="number" min="0" max="3" value="${q.answer}" onchange="updateQuizField(${questionId}, 'answer', parseInt(this.value))">
+                </div>
+            `;
+            quizContainer.appendChild(questionElement);
+        }
+
+        // Add new quiz question
+        function addQuizQuestion() {
+            if (!currentEditingSkill.quiz) currentEditingSkill.quiz = [];
+            currentEditingSkill.quiz.push({
+                question: '',
+                options: ['', '', '', ''],
+                answer: 0
+            });
+            addQuizQuestionToForm();
+        }
+
+        // Update quiz field
+        function updateQuizField(questionId, field, value) {
+            if (currentEditingSkill.quiz[questionId]) {
+                currentEditingSkill.quiz[questionId][field] = value;
+            }
+        }
+
+        // Update quiz option
+        function updateQuizOption(questionId, optionIndex, value) {
+            if (currentEditingSkill.quiz[questionId] && currentEditingSkill.quiz[questionId].options[optionIndex] !== undefined) {
+                currentEditingSkill.quiz[questionId].options[optionIndex] = value;
+            }
+        }
+
+        // Remove quiz question
+        function removeQuizQuestion(index) {
+            if (currentEditingSkill.quiz && currentEditingSkill.quiz[index]) {
+                currentEditingSkill.quiz.splice(index, 1);
+                // Re-render all questions
+                const quizContainer = document.getElementById('quiz-container');
+                quizContainer.innerHTML = '';
+                currentEditingSkill.quiz.forEach((question, idx) => {
+                    addQuizQuestionToForm(idx, question);
+                });
+            }
+        }
+
+        // Save skill
+        function saveSkill() {
+            // Update current skill with form values
+            currentEditingSkill.name = document.getElementById('edit-skill-name').value;
+            currentEditingSkill.icon = document.getElementById('edit-skill-icon').value;
+            currentEditingSkill.description = document.getElementById('edit-skill-description').value;
+            currentEditingSkill.tools = document.getElementById('edit-tools').value.split(',').map(t => t.trim()).filter(t => t);
+            currentEditingSkill.theory = document.getElementById('edit-theory').value;
+
+            // If it's a new skill, generate ID
+            if (!currentEditingSkill.id) {
+                currentEditingSkill.id = currentEditingSkill.name.toLowerCase().replace(/\s+/g, '-');
+            }
+
+            // Find if skill already exists
+            const existingIndex = skillsData.findIndex(s => s.id === currentEditingSkill.id);
+            if (existingIndex !== -1) {
+                // Update existing skill
+                skillsData[existingIndex] = currentEditingSkill;
+            } else {
+                // Add new skill
+                skillsData.push(currentEditingSkill);
+            }
+
+            // Show success message
+            alert('Skill saved successfully!');
+
+            // Go back to skills list
+            document.getElementById('edit-skill-form').style.display = 'none';
+            document.getElementById('skills-section').style.display = 'block';
+
+            // Reload skills list
+            loadSkillsList();
+        }
+
+        // Delete skill
+        function deleteSkill(skillId) {
+            if (confirm('Are you sure you want to delete this skill?')) {
+                skillsData = skillsData.filter(skill => skill.id !== skillId);
+                loadSkillsList();
+            }
+        }
+
+        // Delete user
+        function deleteUser(userId) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                usersData = usersData.filter(user => user.id !== userId);
+                loadUsersList();
+                updateUserCounts();
+            }
+        }
+
+        // --- OLD ADMIN FUNCTIONALITY (for fallback) ---
+        function saveSkillChangesOld() {
+            // Get skill ID from selector
+            const skillId = document.getElementById('skillSelector').value;
+            const skill = skillsData.find(s => s.id === skillId);
+            
             if (!skill) return;
 
             // Update basic info
@@ -981,40 +1619,9 @@
             skill.tools = document.getElementById('skillTools').value.split(',').map(t => t.trim());
             skill.theory = document.getElementById('skillTheory').value;
 
-            // Update steps
-            const stepElements = document.querySelectorAll('#stepsEditorContainer .skill-editor');
-            skill.steps = [];
-            stepElements.forEach((el, index) => {
-                const title = el.querySelector('.step-title').value;
-                const desc = el.querySelector('.step-desc').value;
-                const image = el.querySelector('.step-image').value;
-                skill.steps.push({
-                    title: title,
-                    description: desc,
-                    image: image
-                });
-            });
-
-            // Update quiz
-            const quizElements = document.querySelectorAll('#quizEditorContainer .skill-editor');
-            skill.quiz = [];
-            quizElements.forEach((el, index) => {
-                const question = el.querySelector('.quiz-question').value;
-                const options = [
-                    el.querySelector('.quiz-option:nth-child(2)').value,
-                    el.querySelector('.quiz-option:nth-child(4)').value,
-                    el.querySelector('.quiz-option:nth-child(6)').value,
-                    el.querySelector('.quiz-option:nth-child(8)').value
-                ];
-                const answer = parseInt(el.querySelector('.quiz-answer').value);
-                skill.quiz.push({
-                    question: question,
-                    options: options,
-                    answer: answer
-                });
-            });
-
-            // Reload the skill grid to show changes
+            // Update steps - simplified for old panel
+            // (In a real implementation, you would need to handle steps similarly)
+            // For now, we'll just reload the grid
             loadSkillGrid();
             alert("Changes saved successfully!");
         }
@@ -1022,23 +1629,17 @@
         // Load the main skill grid
         function loadSkillGrid() {
             const gridElement = document.getElementById('skill-grid');
-            const skills = Object.keys(skillsData).map(id => ({
-                id: id,
-                name: skillsData[id].name,
-                icon: getIconForSkill(id)
-            }));
-            
             let html = '';
             
-            skills.forEach(skill => {
+            skillsData.forEach(skill => {
                 html += `
-                    <div class="skill-card" onclick="loadSkillDetail('${skill.id}')">
+                    <div class="skill-card-ui" onclick="loadSkillDetail('${skill.id}')">
                         <div class="skill-icon">
                             <i class="${skill.icon}"></i>
                         </div>
                         <div class="skill-content">
                             <h3 class="skill-name">${skill.name}</h3>
-                            <p class="skill-desc">${skillsData[skill.id].description}</p>
+                            <p class="skill-desc">${skill.description}</p>
                             <button class="skill-btn">Learn Now</button>
                         </div>
                     </div>
@@ -1048,24 +1649,12 @@
             gridElement.innerHTML = html;
         }
 
-        // Get appropriate icon for skill
-        function getIconForSkill(skillId) {
-            const icons = {
-                "carpentry": "fas fa-hammer",
-                "welding": "fas fa-fire",
-                "sewing": "fas fa-cut",
-                "plumbing": "fas fa-wrench",
-                "electronics": "fas fa-bolt"
-            };
-            return icons[skillId] || "fas fa-tools";
-        }
-
         // Load detail view for a specific skill
         function loadSkillDetail(skillId) {
             document.getElementById('skill-grid').style.display = 'none';
             document.getElementById('skill-detail').style.display = 'block';
             
-            const skill = skillsData[skillId];
+            const skill = skillsData.find(s => s.id === skillId);
             if (!skill) {
                 alert('Skill not found');
                 return;
@@ -1075,12 +1664,12 @@
             
             let html = `
                 <div class="skill-header">
-                    <i class="${getIconForSkill(skillId)}"></i>
+                    <i class="${skill.icon}"></i>
                     <h2>${skill.name}</h2>
                 </div>
                 
                 <div class="skill-section">
-                    <h3 class="section-title">Required Tools</h3>
+                    <h3 class="section-title-ui">Required Tools</h3>
                     <div class="tools-grid">
             `;
             
@@ -1098,7 +1687,7 @@
                 </div>
                 
                 <div class="skill-section">
-                    <h3 class="section-title">Step-by-Step Guide</h3>
+                    <h3 class="section-title-ui">Step-by-Step Guide</h3>
                     <div class="steps-container">
             `;
             
@@ -1119,14 +1708,14 @@
                 </div>
                 
                 <div class="skill-section">
-                    <h3 class="section-title">Theory & Principles</h3>
+                    <h3 class="section-title-ui">Theory & Principles</h3>
                     <div class="theory-content">
                         <p>${skill.theory}</p>
                     </div>
                 </div>
                 
                 <div class="skill-section">
-                    <h3 class="section-title">Knowledge Check</h3>
+                    <h3 class="section-title-ui">Knowledge Check</h3>
                     <div class="quiz-container" id="quiz-container">
             `;
             
