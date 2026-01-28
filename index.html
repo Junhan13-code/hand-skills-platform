@@ -36,7 +36,7 @@ overflow: hidden;
 }
 /* Login Form */
 .login-form {
-display: flex;
+display: none; /* Hidden by default */
 flex-direction: column;
 align-items: center;
 padding: 60px 40px;
@@ -96,7 +96,7 @@ font-weight: 500;
 }
 /* Admin Dashboard */
 .admin-dashboard {
-display: none;
+display: none; /* Hidden by default */
 min-height: 600px;
 }
 .dashboard-layout {
@@ -208,7 +208,7 @@ gap: 15px;
 }
 /* User Interface */
 .user-interface {
-display: none;
+display: block; /* Shown by default */
 min-height: 600px;
 }
 .skill-grid {
@@ -551,41 +551,51 @@ async function loadSkillsFromFirestore() {
         return skillsData;
     } catch (error) {
         console.error("Error loading skills: ", error);
-        alert("Error loading skills from server.");
+        // Don't alert here as it might spam the user on every load if rules are restrictive
+        // Consider showing a subtle message in the UI instead
+        // alert("Error loading skills from server.");
     }
 }
 
-// --- Updated Application Logic ---
-// Check if user is logged in using Firebase Auth state persistence
+// --- Updated Application Logic (Default User View with Admin Access) ---
+
+// Global variable to track if admin is currently logged in
+let isAdminLoggedIn = false;
+
+// Initialize the app - Show user interface by default
 function checkLoginStatus() {
-    firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
-            // User is signed in, see docs for a list of available properties
-            // https://firebase.google.com/docs/reference/js/auth.user
-            console.log("User is logged in:", user.email);
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('adminDashboard').style.display = 'block';
-            document.getElementById('userInterface').style.display = 'none';
-            // Load skills after confirming admin is logged in
-            loadSkillsFromFirestore().then(() => {
-                loadSkillsList(); // Load skills into the admin panel
-                // Load skills into the user interface if needed elsewhere
-                if (typeof loadSkillGrid === 'function') {
-                    loadSkillGrid(); // Assuming loadSkillGrid is defined later in this script
-                }
-            });
-        } else {
-            // User is signed out
-            console.log("User is logged out");
-            document.getElementById('loginForm').style.display = 'flex';
-            document.getElementById('adminDashboard').style.display = 'none';
-            document.getElementById('userInterface').style.display = 'none';
+    // Hide login form and admin dashboard initially
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('adminDashboard').style.display = 'none';
+
+    // Show user interface by default
+    document.getElementById('userInterface').style.display = 'block';
+
+    // Load skills for the user interface
+    loadSkillsFromFirestore().then(() => {
+        loadSkillGrid(); // Load skills into the user grid
+        // Admin panel will load skills only when accessed
+    }).catch(error => {
+        console.error("Error loading skills for user view (check Firestore rules):", error);
+        // Potentially show a message in the user interface if no skills load
+        const gridElement = document.getElementById('skill-grid');
+        if (gridElement) {
+            gridElement.innerHTML = '<p>Error loading skills. Please try again later.</p>';
         }
     });
 }
 
-// Login function using Firebase Auth (Enhanced with Prompts)
-// Login function using Firebase Auth (Enhanced with Specific Prompts)
+// Function to show the admin login form
+function showAdminLogin() {
+    // Hide user interface
+    document.getElementById('userInterface').style.display = 'none';
+    // Show login form
+    document.getElementById('loginForm').style.display = 'flex';
+    // Hide admin dashboard until login
+    document.getElementById('adminDashboard').style.display = 'none';
+}
+
+// Login function using Firebase Auth (Enhanced with Specific Prompts and View Switching)
 async function login() {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
@@ -611,11 +621,22 @@ async function login() {
         const user = userCredential.user;
         console.log("Login successful:", user.email);
 
+        // Mark admin as logged in
+        isAdminLoggedIn = true;
+
         // Clear the form error message on success
         showError('');
         // Show success alert
         alert("Login successful! Welcome, " + user.email);
-        // The dashboard will be shown by the onAuthStateChanged listener
+
+        // Switch to admin dashboard
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('userInterface').style.display = 'none';
+        document.getElementById('adminDashboard').style.display = 'block';
+
+        // Load skills for the admin panel
+        await loadSkillsFromFirestore();
+        loadSkillsList(); // Load skills into the admin panel
 
     } catch (error) {
         console.error("Login error:", error); // Debug log
@@ -657,6 +678,31 @@ async function login() {
         alert(alertMessage);
     }
 }
+
+// Logout function using Firebase Auth (Switches back to user view)
+function logout() {
+    firebase.auth().signOut().then(() => {
+        console.log("User logged out successfully.");
+        // Mark admin as logged out
+        isAdminLoggedIn = false;
+
+        // Switch back to user interface
+        document.getElementById('adminDashboard').style.display = 'none';
+        document.getElementById('loginForm').style.display = 'none'; // Hide login form
+        document.getElementById('userInterface').style.display = 'block'; // Show user view
+
+        // Reload skills for the user view (optional, might already be loaded)
+        loadSkillsFromFirestore().then(() => {
+            loadSkillGrid();
+        });
+
+    }).catch((error) => {
+        console.error("Logout error:", error);
+        // Handle logout errors if needed, perhaps show an alert
+        alert("Logout failed: " + error.message);
+    });
+}
+
 // Show different sections in admin panel (unchanged)
 function showSection(section) {
     // Hide all sections
@@ -1206,32 +1252,24 @@ function goBackToGrid() {
 }
 
 // --- Initial Setup ---
-// Switch to user interface (unchanged)
 document.addEventListener('DOMContentLoaded', function() {
-    // Add a demo button to switch to user interface (as in original)
-    // (This assumes there's an element with class 'admin-header' - adjust if needed)
-    // const adminHeader = document.querySelector('.admin-header');
-    // if (adminHeader) {
-    //     const userBtn = document.createElement('button');
-    //     userBtn.className = 'btn';
-    //     userBtn.style.background = '#28a745';
-    //     userBtn.textContent = 'Switch to User View';
-    //     userBtn.onclick = function() {
-    //         document.getElementById('loginForm').style.display = 'none';
-    //         document.getElementById('adminDashboard').style.display = 'none';
-    //         document.getElementById('userInterface').style.display = 'block';
-    //         // Load skills for user view when switching
-    //         loadSkillGrid();
-    //     };
-    //     adminHeader.appendChild(userBtn);
-    // }
+    // Create the admin login button
+    const adminLoginButton = document.createElement('button');
+    adminLoginButton.textContent = 'Admin Login';
+    adminLoginButton.className = 'btn'; // Use your existing button styles if applicable
+    adminLoginButton.style.position = 'fixed';
+    adminLoginButton.style.top = '10px';
+    adminLoginButton.style.right = '10px';
+    adminLoginButton.style.zIndex = '1000'; // Ensure it's on top
+    adminLoginButton.onclick = showAdminLogin;
 
-    // Initialize the app by checking login status
-    // This will also trigger loading skills if logged in
+    // Append it to the body or a specific container
+    document.body.appendChild(adminLoginButton);
+
+    // Initialize the app by checking login status (loads user view)
     checkLoginStatus();
 });
 
 </script>
 </body>
 </html>
-
