@@ -59,6 +59,124 @@
             opacity: 0.9;
         }
 
+        /* Admin Login Button */
+        .admin-login {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+
+        .admin-btn {
+            background: rgba(0,0,0,0.3);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .admin-btn:hover {
+            background: rgba(0,0,0,0.5);
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .admin-content {
+            background: white;
+            width: 90%;
+            max-width: 1000px;
+            max-height: 90vh;
+            border-radius: 10px;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .close-admin {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .admin-section {
+            margin-bottom: 2rem;
+        }
+
+        .admin-section h3 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .skill-editor {
+            background: var(--light);
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+
+        .editor-row {
+            display: flex;
+            margin-bottom: 0.5rem;
+            align-items: center;
+        }
+
+        .editor-label {
+            min-width: 120px;
+            font-weight: bold;
+        }
+
+        .editor-input {
+            flex-grow: 1;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+
+        .editor-textarea {
+            width: 100%;
+            height: 100px;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+
+        .save-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
         /* Main Content */
         main {
             margin-bottom: 3rem;
@@ -356,6 +474,12 @@
                 margin-right: 0;
                 margin-bottom: 1rem;
             }
+            
+            .admin-login {
+                position: static;
+                text-align: center;
+                margin-top: 1rem;
+            }
         }
     </style>
 </head>
@@ -364,6 +488,9 @@
         <div class="container">
             <h1><i class="fas fa-tools"></i> Hand Skills Learning Platform</h1>
             <p>Master essential hands-on skills with step-by-step guidance</p>
+        </div>
+        <div class="admin-login">
+            <button class="admin-btn" id="adminLoginBtn"><i class="fas fa-lock"></i> Admin Login</button>
         </div>
     </header>
 
@@ -384,6 +511,65 @@
             <p>&copy; 2026 Hand Skills Learning Platform | Master Essential Hands-On Skills</p>
         </div>
     </footer>
+
+    <!-- Admin Panel -->
+    <div class="admin-panel" id="adminPanel">
+        <div class="admin-content">
+            <div class="admin-header">
+                <h2>Admin Panel - Edit Skills</h2>
+                <button class="close-admin" id="closeAdminBtn">Close</button>
+            </div>
+            
+            <div class="admin-section">
+                <h3>Select Skill to Edit</h3>
+                <select id="skillSelector" class="editor-input">
+                    <option value="carpentry">Carpentry</option>
+                    <option value="welding">Welding</option>
+                    <option value="sewing">Sewing</option>
+                    <option value="plumbing">Plumbing</option>
+                    <option value="electronics">Electronics</option>
+                </select>
+            </div>
+            
+            <div class="admin-section">
+                <h3>Skill Editor</h3>
+                <div class="skill-editor">
+                    <div class="editor-row">
+                        <span class="editor-label">Name:</span>
+                        <input type="text" id="skillName" class="editor-input">
+                    </div>
+                    <div class="editor-row">
+                        <span class="editor-label">Description:</span>
+                        <textarea id="skillDesc" class="editor-textarea"></textarea>
+                    </div>
+                    <div class="editor-row">
+                        <span class="editor-label">Tools (comma separated):</span>
+                        <textarea id="skillTools" class="editor-textarea"></textarea>
+                    </div>
+                    <div class="editor-row">
+                        <span class="editor-label">Theory:</span>
+                        <textarea id="skillTheory" class="editor-textarea"></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="admin-section">
+                <h3>Steps Editor</h3>
+                <div id="stepsEditorContainer">
+                    <!-- Steps will be added here dynamically -->
+                </div>
+            </div>
+            
+            <div class="admin-section">
+                <h3>Quiz Editor</h3>
+                <div id="quizEditorContainer">
+                    <!-- Quiz questions will be added here dynamically -->
+                </div>
+            </div>
+            
+            <button class="save-btn" id="saveChangesBtn">Save Changes</button>
+        </div>
+    </div>
 
     <script>
         // Data for the 5 common hand skills
@@ -681,7 +867,157 @@
         // Initialize the app when the page loads
         document.addEventListener('DOMContentLoaded', function() {
             loadSkillGrid();
+            setupAdminPanel();
         });
+
+        // Setup admin panel functionality
+        function setupAdminPanel() {
+            const adminLoginBtn = document.getElementById('adminLoginBtn');
+            const adminPanel = document.getElementById('adminPanel');
+            const closeAdminBtn = document.getElementById('closeAdminBtn');
+            const skillSelector = document.getElementById('skillSelector');
+            const saveChangesBtn = document.getElementById('saveChangesBtn');
+
+            adminLoginBtn.addEventListener('click', function() {
+                const password = prompt("Enter admin password:");
+                if (password === "admin123") { // Change this to your preferred password
+                    adminPanel.style.display = 'flex';
+                    loadSkillForEditing(skillSelector.value);
+                } else {
+                    alert("Incorrect password!");
+                }
+            });
+
+            closeAdminBtn.addEventListener('click', function() {
+                adminPanel.style.display = 'none';
+            });
+
+            skillSelector.addEventListener('change', function() {
+                loadSkillForEditing(this.value);
+            });
+
+            saveChangesBtn.addEventListener('click', function() {
+                saveSkillChanges(skillSelector.value);
+            });
+        }
+
+        // Load skill data into editor
+        function loadSkillForEditing(skillId) {
+            const skill = skillsData[skillId];
+            if (!skill) return;
+
+            document.getElementById('skillName').value = skill.name;
+            document.getElementById('skillDesc').value = skill.description;
+            document.getElementById('skillTools').value = skill.tools.join(', ');
+            document.getElementById('skillTheory').value = skill.theory;
+
+            // Load steps
+            const stepsContainer = document.getElementById('stepsEditorContainer');
+            stepsContainer.innerHTML = '';
+            skill.steps.forEach((step, index) => {
+                const stepElement = document.createElement('div');
+                stepElement.className = 'skill-editor';
+                stepElement.innerHTML = `
+                    <div class="editor-row">
+                        <span class="editor-label">Step ${index + 1} Title:</span>
+                        <input type="text" class="editor-input step-title" value="${step.title}">
+                    </div>
+                    <div class="editor-row">
+                        <span class="editor-label">Step ${index + 1} Description:</span>
+                        <textarea class="editor-textarea step-desc">${step.description}</textarea>
+                    </div>
+                    <div class="editor-row">
+                        <span class="editor-label">Step ${index + 1} Image URL:</span>
+                        <input type="text" class="editor-input step-image" value="${step.image}">
+                    </div>
+                `;
+                stepsContainer.appendChild(stepElement);
+            });
+
+            // Load quiz
+            const quizContainer = document.getElementById('quizEditorContainer');
+            quizContainer.innerHTML = '';
+            skill.quiz.forEach((q, index) => {
+                const quizElement = document.createElement('div');
+                quizElement.className = 'skill-editor';
+                quizElement.innerHTML = `
+                    <div class="editor-row">
+                        <span class="editor-label">Question ${index + 1}:</span>
+                        <textarea class="editor-textarea quiz-question">${q.question}</textarea>
+                    </div>
+                    <div class="editor-row">
+                        <span class="editor-label">Option A:</span>
+                        <input type="text" class="editor-input quiz-option" value="${q.options[0]}">
+                    </div>
+                    <div class="editor-row">
+                        <span class="editor-label">Option B:</span>
+                        <input type="text" class="editor-input quiz-option" value="${q.options[1]}">
+                    </div>
+                    <div class="editor-row">
+                        <span class="editor-label">Option C:</span>
+                        <input type="text" class="editor-input quiz-option" value="${q.options[2]}">
+                    </div>
+                    <div class="editor-row">
+                        <span class="editor-label">Option D:</span>
+                        <input type="text" class="editor-input quiz-option" value="${q.options[3]}">
+                    </div>
+                    <div class="editor-row">
+                        <span class="editor-label">Correct Answer (0-3):</span>
+                        <input type="number" class="editor-input quiz-answer" value="${q.answer}" min="0" max="3">
+                    </div>
+                `;
+                quizContainer.appendChild(quizElement);
+            });
+        }
+
+        // Save changes back to skill data
+        function saveSkillChanges(skillId) {
+            const skill = skillsData[skillId];
+            if (!skill) return;
+
+            // Update basic info
+            skill.name = document.getElementById('skillName').value;
+            skill.description = document.getElementById('skillDesc').value;
+            skill.tools = document.getElementById('skillTools').value.split(',').map(t => t.trim());
+            skill.theory = document.getElementById('skillTheory').value;
+
+            // Update steps
+            const stepElements = document.querySelectorAll('#stepsEditorContainer .skill-editor');
+            skill.steps = [];
+            stepElements.forEach((el, index) => {
+                const title = el.querySelector('.step-title').value;
+                const desc = el.querySelector('.step-desc').value;
+                const image = el.querySelector('.step-image').value;
+                skill.steps.push({
+                    title: title,
+                    description: desc,
+                    image: image
+                });
+            });
+
+            // Update quiz
+            const quizElements = document.querySelectorAll('#quizEditorContainer .skill-editor');
+            skill.quiz = [];
+            quizElements.forEach((el, index) => {
+                const question = el.querySelector('.quiz-question').value;
+                const options = [
+                    el.querySelector('.quiz-option:nth-child(2)').value,
+                    el.querySelector('.quiz-option:nth-child(4)').value,
+                    el.querySelector('.quiz-option:nth-child(6)').value,
+                    el.querySelector('.quiz-option:nth-child(8)').value
+                ];
+                const answer = parseInt(el.querySelector('.quiz-answer').value);
+                skill.quiz.push({
+                    question: question,
+                    options: options,
+                    answer: answer
+                });
+            });
+
+            // Reload the skill grid to show changes
+            loadSkillGrid();
+            alert("Changes saved successfully!");
+        }
 
         // Load the main skill grid
         function loadSkillGrid() {
@@ -702,7 +1038,7 @@
                         </div>
                         <div class="skill-content">
                             <h3 class="skill-name">${skill.name}</h3>
-                            <p class="skill-desc">Master essential techniques in ${skill.name.toLowerCase()}</p>
+                            <p class="skill-desc">${skillsData[skill.id].description}</p>
                             <button class="skill-btn">Learn Now</button>
                         </div>
                     </div>
