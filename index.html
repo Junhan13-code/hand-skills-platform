@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hand Skills Learning Platform</title>
+    <title>Hand Skills Learning Platform - Admin & User System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <style>
         * {
             margin: 0;
@@ -40,25 +43,6 @@
             padding: 0 20px;
         }
 
-        /* Header Styles */
-        header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 2rem 0;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
         /* Admin Login Button */
         .admin-login {
             position: absolute;
@@ -82,79 +66,117 @@
             background: rgba(0,0,0,0.5);
         }
 
-        /* Admin Panel */
-        .admin-panel {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 1000;
-            display: none;
+        /* Login/Register Forms */
+        .auth-container {
+            display: flex;
             justify-content: center;
             align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
         }
 
-        .admin-content {
+        .auth-box {
             background: white;
-            width: 90%;
-            max-width: 1000px;
-            max-height: 90vh;
+            padding: 2.5rem;
             border-radius: 10px;
-            padding: 2rem;
-            overflow-y: auto;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+
+        .auth-box h2 {
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn:hover {
+            background: var(--secondary);
+        }
+
+        .btn-secondary {
+            background: var(--gray);
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: var(--success);
+        }
+
+        .btn-success:hover {
+            background: #22c55e;
+        }
+
+        .error-message {
+            color: var(--danger);
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .auth-toggle {
+            margin-top: 1rem;
+            color: var(--gray);
+        }
+
+        .auth-toggle a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Admin Dashboard */
+        .admin-dashboard {
+            display: none;
+            padding: 2rem 0;
         }
 
         .admin-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid var(--light);
-        }
-
-        .close-admin {
-            background: var(--danger);
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        /* NEW STYLING FOR ADMIN PANEL */
-        .admin-dashboard {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 1000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .admin-content-new {
-            background: white;
-            width: 90%;
-            max-width: 1200px;
-            max-height: 90vh;
-            border-radius: 10px;
-            padding: 2rem;
-            overflow-y: auto;
-        }
-
-        .admin-header-new {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             margin-bottom: 2rem;
             padding-bottom: 1rem;
             border-bottom: 1px solid var(--light);
+        }
+
+        .admin-header h1 {
+            color: var(--primary);
         }
 
         .logout-btn {
@@ -166,7 +188,7 @@
             cursor: pointer;
         }
 
-        .admin-content-new-inner {
+        .admin-content {
             display: grid;
             grid-template-columns: 1fr 2fr;
             gap: 2rem;
@@ -205,8 +227,6 @@
             border-radius: 10px;
             padding: 2rem;
             box-shadow: var(--shadow);
-            max-height: 70vh;
-            overflow-y: auto;
         }
 
         .section-title {
@@ -281,7 +301,6 @@
             flex: 1;
         }
 
-        input[type="text"],
         textarea {
             width: 100%;
             padding: 0.8rem;
@@ -353,11 +372,32 @@
             color: white;
         }
 
-        /* Original User Interface Styles */
-        main {
-            margin-bottom: 3rem;
+        /* User Interface */
+        .user-interface {
+            display: none;
+            padding: 2rem 0;
         }
 
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Skill Grid */
         .skill-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -426,6 +466,7 @@
             background: var(--secondary);
         }
 
+        /* Skill Detail */
         .skill-detail {
             background: white;
             border-radius: 10px;
@@ -466,6 +507,7 @@
             border-bottom: 1px solid var(--light);
         }
 
+        /* Tools Section */
         .tools-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -495,6 +537,7 @@
             color: white;
         }
 
+        /* Steps Section */
         .steps-container {
             display: flex;
             flex-direction: column;
@@ -526,6 +569,7 @@
             color: var(--primary);
         }
 
+        /* Theory Section */
         .theory-content {
             background: var(--light);
             padding: 1.5rem;
@@ -533,6 +577,7 @@
             line-height: 1.8;
         }
 
+        /* Quiz Section */
         .quiz-container {
             background: var(--light);
             padding: 1.5rem;
@@ -607,6 +652,43 @@
             font-weight: 600;
         }
 
+        /* User Profile */
+        .user-profile {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            margin-right: 1rem;
+        }
+
+        .profile-info h3 {
+            margin-bottom: 0.25rem;
+        }
+
+        .profile-info p {
+            color: var(--gray);
+        }
+
+        /* Footer */
         footer {
             background: var(--dark);
             color: white;
@@ -615,16 +697,9 @@
             margin-top: 3rem;
         }
 
-        .loading {
-            text-align: center;
-            padding: 2rem;
-            font-size: 1.2rem;
-            color: var(--gray);
-        }
-
         /* Responsive Design */
         @media (max-width: 992px) {
-            .admin-content-new-inner {
+            .admin-content {
                 grid-template-columns: 1fr;
             }
             .nav-panel {
@@ -651,15 +726,15 @@
                 margin-bottom: 1rem;
             }
             
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
             .admin-login {
                 position: static;
                 text-align: center;
                 margin-top: 1rem;
-            }
-            
-            .form-row {
-                flex-direction: column;
-                gap: 0;
             }
         }
     </style>
@@ -675,14 +750,72 @@
         </div>
     </header>
 
-    <!-- NEW ADMIN PANEL STRUCTURE -->
+    <!-- Login Form -->
+    <div class="auth-container" id="loginForm" style="display: none;">
+        <div class="auth-box">
+            <h2><i class="fas fa-lock"></i> Admin Login</h2>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter password">
+            </div>
+            <button class="btn" onclick="login()">Login</button>
+            <div class="error-message" id="login-error"></div>
+            <div class="auth-toggle">
+                <p>Not an admin? <a href="#" onclick="showUserAuth()">Student Login/Registration</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Registration/Login Form -->
+    <div class="auth-container" id="userAuth" style="display: none;">
+        <div class="auth-box">
+            <h2><i class="fas fa-user"></i> Student Registration</h2>
+            <div class="form-group">
+                <label for="user-email">Email Address</label>
+                <input type="email" id="user-email" placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="user-rank">Rank</label>
+                <select id="user-rank">
+                    <option value="">Select Rank</option>
+                    <option value="Private">Private</option>
+                    <option value="Corporal">Corporal</option>
+                    <option value="Sergeant">Sergeant</option>
+                    <option value="Lieutenant">Lieutenant</option>
+                    <option value="Captain">Captain</option>
+                    <option value="Major">Major</option>
+                    <option value="Colonel">Colonel</option>
+                    <option value="General">General</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="user-name">Full Name</label>
+                <input type="text" id="user-name" placeholder="Enter your full name">
+            </div>
+            <div class="form-group">
+                <label for="user-course">Course</label>
+                <input type="text" id="user-course" placeholder="Enter course (e.g., 56th Mech)">
+            </div>
+            <button class="btn btn-success" onclick="registerUser()">Register & Login</button>
+            <div class="error-message" id="user-error"></div>
+            <div class="auth-toggle">
+                <p>Already registered? <a href="#" onclick="showLoginForm()">Admin Login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
     <div class="admin-dashboard" id="adminDashboard">
-        <div class="admin-content-new">
-            <div class="admin-header-new">
+        <div class="container">
+            <div class="admin-header">
                 <h1><i class="fas fa-tools"></i> Hand Skills Learning Platform - Admin Panel</h1>
                 <button class="logout-btn" onclick="logout()">Logout</button>
             </div>
-            <div class="admin-content-new-inner">
+            <div class="admin-content">
                 <div class="nav-panel">
                     <h3>Navigation</h3>
                     <div class="nav-item active" onclick="showSection('dashboard')">Dashboard</div>
@@ -698,7 +831,7 @@
                         <div style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
                             <div style="background: var(--light); padding: 1.5rem; border-radius: 8px; text-align: center;">
                                 <i class="fas fa-tools" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem;"></i>
-                                <h3>5 Skills</h3>
+                                <h3 id="total-skills">0</h3>
                                 <p>Total skills in the system</p>
                             </div>
                             <div style="background: var(--light); padding: 1.5rem; border-radius: 8px; text-align: center;">
@@ -717,7 +850,7 @@
                     <div id="skills-section" class="section" style="display: none;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                             <h2 class="section-title">Manage Skills</h2>
-                            <button class="action-btn" onclick="addNewSkill()" style="background: var(--success);">Add New Skill</button>
+                            <button class="btn" onclick="addNewSkill()" style="background: var(--success);">Add New Skill</button>
                         </div>
                         <div class="skill-list" id="skillsList">
                             <!-- Skills will be loaded here -->
@@ -759,18 +892,18 @@
                             <div id="steps-container">
                                 <!-- Steps will be added here -->
                             </div>
-                            <button class="action-btn add-step-btn" onclick="addStep()">Add Step</button>
+                            <button class="btn add-step-btn" onclick="addStep()">Add Step</button>
                         </div>
                         <div class="quiz-editor">
                             <h3>Quiz Questions</h3>
                             <div id="quiz-container">
                                 <!-- Quiz questions will be added here -->
                             </div>
-                            <button class="action-btn add-quiz-btn" onclick="addQuizQuestion()">Add Question</button>
+                            <button class="btn add-quiz-btn" onclick="addQuizQuestion()">Add Question</button>
                         </div>
                         <div class="form-actions">
-                            <button class="action-btn" onclick="showSection('skills')" style="background: var(--gray);">Cancel</button>
-                            <button class="action-btn" onclick="saveSkill()" style="background: var(--primary);">Save Changes</button>
+                            <button class="btn btn-secondary" onclick="showSection('skills')">Cancel</button>
+                            <button class="btn" onclick="saveSkill()">Save Changes</button>
                         </div>
                     </div>
                     <!-- Users Management Section -->
@@ -801,488 +934,201 @@
         </div>
     </div>
 
-    <!-- ORIGINAL USER INTERFACE -->
-    <main class="container" id="mainContent">
-        <div id="main-content">
-            <div class="skill-grid" id="skill-grid">
-                <!-- Skills will be loaded here -->
-            </div>
-            
-            <div id="skill-detail" class="skill-detail">
-                <!-- Skill details will be loaded here -->
-            </div>
-        </div>
-    </main>
-
-    <footer>
-        <div class="container">
-            <p>&copy; 2026 Hand Skills Learning Platform | Master Essential Hands-On Skills</p>
-        </div>
-    </footer>
-
-    <!-- ORIGINAL ADMIN PANEL (Kept for fallback if needed) -->
-    <div class="admin-panel" id="adminPanelOld">
-        <div class="admin-content">
-            <div class="admin-header">
-                <h2>Admin Panel - Edit Skills (Fallback)</h2>
-                <button class="close-admin" id="closeAdminBtnOld">Close</button>
-            </div>
-            
-            <div class="admin-section">
-                <h3>Select Skill to Edit</h3>
-                <select id="skillSelector" class="editor-input">
-                    <option value="carpentry">Carpentry</option>
-                    <option value="welding">Welding</option>
-                    <option value="sewing">Sewing</option>
-                    <option value="plumbing">Plumbing</option>
-                    <option value="electronics">Electronics</option>
-                </select>
-            </div>
-            
-            <div class="admin-section">
-                <h3>Skill Editor</h3>
-                <div class="skill-editor">
-                    <div class="editor-row">
-                        <span class="editor-label">Name:</span>
-                        <input type="text" id="skillName" class="editor-input">
+    <!-- User Interface -->
+    <div class="user-interface" id="userInterface">
+        <main class="container">
+            <div class="user-profile">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
                     </div>
-                    <div class="editor-row">
-                        <span class="editor-label">Description:</span>
-                        <textarea id="skillDesc" class="editor-textarea"></textarea>
-                    </div>
-                    <div class="editor-row">
-                        <span class="editor-label">Tools (comma separated):</span>
-                        <textarea id="skillTools" class="editor-textarea"></textarea>
-                    </div>
-                    <div class="editor-row">
-                        <span class="editor-label">Theory:</span>
-                        <textarea id="skillTheory" class="editor-textarea"></textarea>
+                    <div class="profile-info">
+                        <h3 id="profile-name">Guest User</h3>
+                        <p id="profile-rank">Rank: Guest</p>
+                        <p id="profile-course">Course: Not Enrolled</p>
                     </div>
                 </div>
             </div>
-            
-            <div class="admin-section">
-                <h3>Steps Editor</h3>
-                <div id="stepsEditorContainer">
-                    <!-- Steps will be added here dynamically -->
+            <div id="main-content">
+                <div class="skill-grid" id="skill-grid">
+                    <!-- Skills will be loaded here -->
+                </div>
+                <div id="skill-detail" class="skill-detail">
+                    <!-- Skill details will be loaded here -->
                 </div>
             </div>
-            
-            <div class="admin-section">
-                <h3>Quiz Editor</h3>
-                <div id="quizEditorContainer">
-                    <!-- Quiz questions will be added here dynamically -->
-                </div>
+        </main>
+        <footer>
+            <div class="container">
+                <p>&copy; 2026 Hand Skills Learning Platform | Master Essential Hands-On Skills</p>
             </div>
-            
-            <button class="save-btn" id="saveChangesBtn">Save Changes</button>
-        </div>
+        </footer>
     </div>
 
     <script>
-        // Data for the 5 common hand skills
-        let skillsData = [
-            {
-                id: "carpentry",
-                name: "Carpentry",
-                icon: "fas fa-hammer",
-                description: "The art of cutting, shaping, and installing building materials during construction.",
-                tools: [
-                    "Chisel Set",
-                    "Hand Saw",
-                    "Tape Measure",
-                    "Square Ruler",
-                    "Block Plane",
-                    "Marking Gauge"
-                ],
-                steps: [
-                    {
-                        title: "Measure and Mark",
-                        description: "Carefully measure the wood and mark cutting lines with a pencil and square.",
-                        image: "https://source.unsplash.com/400x300/?ruler,wood"
-                    },
-                    {
-                        title: "Cut to Size",
-                        description: "Use a hand saw to cut the wood according to your measurements.",
-                        image: "https://source.unsplash.com/400x300/?saw,cutting"
-                    },
-                    {
-                        title: "Shape Edges",
-                        description: "Smooth rough edges with a block plane for a finished look.",
-                        image: "https://source.unsplash.com/400x300/?plane,tool"
-                    },
-                    {
-                        title: "Join Pieces",
-                        description: "Connect pieces using appropriate joinery techniques like dovetails or mortise and tenon.",
-                        image: "https://source.unsplash.com/400x300/?joinery,woodwork"
-                    }
-                ],
-                theory: "Carpentry involves understanding wood properties, joinery techniques, and tool maintenance. Different woods have varying grain patterns, hardness, and workability. Proper tool maintenance ensures safety and precision. Understanding wood movement helps prevent cracking and warping in finished projects.",
-                quiz: [
-                    {
-                        question: "What is the primary purpose of a marking gauge?",
-                        options: [
-                            "To measure distances",
-                            "To mark precise lines parallel to an edge",
-                            "To check angles",
-                            "To smooth surfaces"
-                        ],
-                        answer: 1
-                    },
-                    {
-                        question: "Which joint is known for its strength and appearance?",
-                        options: [
-                            "Butt joint",
-                            "Dowel joint",
-                            "Dovetail joint",
-                            "Pocket screw joint"
-                        ],
-                        answer: 2
-                    }
-                ]
-            },
-            {
-                id: "welding",
-                name: "Welding",
-                icon: "fas fa-fire",
-                description: "A fabrication process that joins materials by causing fusion, often using heat.",
-                tools: [
-                    "Welding Helmet",
-                    "Welding Gloves",
-                    "Welding Rods",
-                    "Angle Grinder",
-                    "Wire Brush",
-                    "Clamps"
-                ],
-                steps: [
-                    {
-                        title: "Prepare Workspace",
-                        description: "Ensure proper ventilation, clear workspace, and wear protective gear.",
-                        image: "https://source.unsplash.com/400x300/?welding,safety"
-                    },
-                    {
-                        title: "Clean Metal Surfaces",
-                        description: "Remove rust, paint, or oil with wire brush or grinder for strong welds.",
-                        image: "https://source.unsplash.com/400x300/?cleaning,metal"
-                    },
-                    {
-                        title: "Set Up Equipment",
-                        description: "Adjust amperage and select appropriate welding rod for material.",
-                        image: "https://source.unsplash.com/400x300/?welder,equipment"
-                    },
-                    {
-                        title: "Make Weld Beads",
-                        description: "Apply steady motion to create consistent, strong joints.",
-                        image: "https://source.unsplash.com/400x300/?welding,process"
-                    }
-                ],
-                theory: "Welding creates permanent joints by melting base metals and adding filler material. Common types include MIG, TIG, and stick welding. Safety is paramount due to UV radiation, sparks, and toxic fumes. Understanding metal properties helps select appropriate welding parameters and techniques.",
-                quiz: [
-                    {
-                        question: "What does MIG stand for?",
-                        options: [
-                            "Metal Inert Gas",
-                            "Manual Internal Grinding",
-                            "Multi-Integration Generator",
-                            "Magnetic Impulse Gun"
-                        ],
-                        answer: 0
-                    },
-                    {
-                        question: "What is the main hazard of welding?",
-                        options: [
-                            "Electrical shock only",
-                            "UV radiation, sparks, and fumes",
-                            "Noise pollution",
-                            "Chemical burns"
-                        ],
-                        answer: 1
-                    }
-                ]
-            },
-            {
-                id: "sewing",
-                name: "Sewing",
-                icon: "fas fa-cut",
-                description: "The craft of joining fabric pieces together with thread and needle.",
-                tools: [
-                    "Sewing Machine",
-                    "Fabric Scissors",
-                    "Measuring Tape",
-                    "Pins",
-                    "Seam Ripper",
-                    "Thimble"
-                ],
-                steps: [
-                    {
-                        title: "Select Fabric and Pattern",
-                        description: "Choose appropriate fabric weight and pattern for your project.",
-                        image: "https://source.unsplash.com/400x300/?fabric,textile"
-                    },
-                    {
-                        title: "Cut Fabric Pieces",
-                        description: "Carefully cut fabric according to pattern pieces using sharp scissors.",
-                        image: "https://source.unsplash.com/400x300/?cutting,fabric"
-                    },
-                    {
-                        title: "Pin Pieces Together",
-                        description: "Secure fabric layers with pins before sewing to maintain alignment.",
-                        image: "https://source.unsplash.com/400x300/?pinning,sewing"
-                    },
-                    {
-                        title: "Sew Seams",
-                        description: "Stitch fabric pieces together following seam allowances.",
-                        image: "https://source.unsplash.com/400x300/?sewing,machine"
-                    }
-                ],
-                theory: "Sewing involves understanding fabric properties, grain direction, and seam techniques. Different fabrics require different needles, threads, and stitch settings. Proper pressing and finishing techniques ensure professional results. Seam allowances and hemming techniques vary by garment type.",
-                quiz: [
-                    {
-                        question: "What is the purpose of a seam ripper?",
-                        options: [
-                            "To measure seams",
-                            "To remove stitches",
-                            "To press seams flat",
-                            "To hold fabric together"
-                        ],
-                        answer: 1
-                    },
-                    {
-                        question: "Which direction should fabric grain run for most garments?",
-                        options: [
-                            "Diagonally across the body",
-                            "Parallel to the body length",
-                            "Perpendicular to the body length",
-                            "It doesn't matter"
-                        ],
-                        answer: 1
-                    }
-                ]
-            },
-            {
-                id: "plumbing",
-                name: "Plumbing",
-                icon: "fas fa-wrench",
-                description: "The system of pipes, fixtures, and apparatus for conveying fluids.",
-                tools: [
-                    "Pipe Wrench",
-                    "Plumber's Snake",
-                    "Pipe Cutter",
-                    "Teflon Tape",
-                    "Adjustable Wrench",
-                    "Plunger"
-                ],
-                steps: [
-                    {
-                        title: "Identify Problem",
-                        description: "Locate the source of leaks or clogs using visual inspection and testing.",
-                        image: "https://source.unsplash.com/400x300/?plumbing,problem"
-                    },
-                    {
-                        title: "Turn Off Water Supply",
-                        description: "Shut off water before beginning any repair work.",
-                        image: "https://source.unsplash.com/400x300/?water,valve"
-                    },
-                    {
-                        title: "Disassemble Components",
-                        description: "Carefully remove fittings and pipes using appropriate tools.",
-                        image: "https://source.unsplash.com/400x300/?pipe,disassembly"
-                    },
-                    {
-                        title: "Install New Parts",
-                        description: "Replace damaged components and reconnect with proper sealing.",
-                        image: "https://source.unsplash.com/400x300/?installation,plumbing"
-                    }
-                ],
-                theory: "Plumbing systems operate under pressure differences and gravity flow. Understanding pipe materials (PVC, copper, PEX) helps select appropriate joining methods. Proper slope prevents clogs in drain lines. Pressure regulators and shut-off valves control water flow and protect fixtures.",
-                quiz: [
-                    {
-                        question: "What is the primary purpose of a P-trap under sinks?",
-                        options: [
-                            "To increase water pressure",
-                            "To prevent sewer gases from entering the home",
-                            "To filter debris",
-                            "To reduce noise"
-                        ],
-                        answer: 1
-                    },
-                    {
-                        question: "What material is commonly used for water supply lines?",
-                        options: [
-                            "Cast iron",
-                            "PVC",
-                            "Copper",
-                            "Galvanized steel"
-                        ],
-                        answer: 2
-                    }
-                ]
-            },
-            {
-                id: "electronics",
-                name: "Electronics",
-                icon: "fas fa-bolt",
-                description: "The branch of physics dealing with electron flow in circuits.",
-                tools: [
-                    "Soldering Iron",
-                    "Digital Multimeter",
-                    "Wire Strippers",
-                    "Breadboard",
-                    "Desoldering Pump",
-                    "Safety Glasses"
-                ],
-                steps: [
-                    {
-                        title: "Plan Circuit",
-                        description: "Draw schematic and determine component placement.",
-                        image: "https://source.unsplash.com/400x300/?circuit,schematic"
-                    },
-                    {
-                        title: "Prepare Components",
-                        description: "Bend leads and verify component values before installation.",
-                        image: "https://source.unsplash.com/400x300/?components,electronics"
-                    },
-                    {
-                        title: "Assemble Circuit",
-                        description: "Place components on breadboard or PCB following schematic.",
-                        image: "https://source.unsplash.com/400x300/?breadboard,circuit"
-                    },
-                    {
-                        title: "Solder Connections",
-                        description: "Apply heat and solder to create secure electrical connections.",
-                        image: "https://source.unsplash.com/400x300/?soldering,connection"
-                    }
-                ],
-                theory: "Electronics relies on Ohm's Law (V=IR) and Kirchhoff's laws for circuit analysis. Components include resistors, capacitors, diodes, and transistors. Digital electronics use binary logic while analog processes continuous signals. Proper grounding and decoupling prevent interference and ensure stable operation.",
-                quiz: [
-                    {
-                        question: "What does Ohm's Law state?",
-                        options: [
-                            "Power equals voltage times current",
-                            "Current equals voltage divided by resistance",
-                            "Voltage equals current plus resistance",
-                            "Resistance equals voltage minus current"
-                        ],
-                        answer: 1
-                    },
-                    {
-                        question: "What is the primary function of a capacitor?",
-                        options: [
-                            "To store electrical charge",
-                            "To convert AC to DC",
-                            "To amplify signals",
-                            "To measure voltage"
-                        ],
-                        answer: 0
-                    }
-                ]
-            }
-        ];
-
-        // Sample users data
-        let usersData = [
-            {
-                id: 1,
-                email: "john.doe@example.com",
-                rank: "Sergeant",
-                name: "John Doe",
-                course: "56th Mechanized Battalion",
-                completedSkills: ["carpentry"]
-            },
-            {
-                id: 2,
-                email: "jane.smith@example.com",
-                rank: "Corporal",
-                name: "Jane Smith",
-                course: "42nd Engineering Corps",
-                completedSkills: ["welding", "electronics"]
-            },
-            {
-                id: 3,
-                email: "mike.jones@example.com",
-                rank: "Private",
-                name: "Mike Jones",
-                course: "56th Mechanized Battalion",
-                completedSkills: []
-            }
-        ];
+        // Initialize Firebase
+        const firebaseConfig = {
+            // ADD YOUR FIREBASE CONFIG HERE
+            apiKey: "AIzaSyA6ZdINHlRF583T3HL5RsA4q2fmHeBcB_g",
+            authDomain: "hand-skills-platform.firebaseapp.com",
+            projectId: "hand-skills-platform",
+            storageBucket: "hand-skills-platform.firebasestorage.app",
+            messagingSenderId: "1021058690748",
+            appId: "1:1021058690748:web:40fd86d1060d90bbe1eab9",
+            measurementId: "G-R2J40EVW18"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
         // Global variables
-        let currentSkill = null;
+        let skillsData = [];
+        let usersData = [];
         let currentEditingSkill = null;
         let currentUser = null;
 
-        // Initialize the app when the page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            // Always show main content first
-            document.getElementById('mainContent').style.display = 'block';
-            document.getElementById('adminLoginBtn').style.display = 'block';
-            
-            // Check if admin is logged in
-            const adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
-            if (adminLoggedIn) {
-                showAdminDashboard();
-            } else {
-                // Show main content for non-admins
+        // Initialize the app
+        window.onload = function() {
+            // Show user interface by default
+            document.getElementById('userInterface').style.display = 'block';
+            loadSkillsFromFirebase();
+            setupAdminButton();
+        };
+
+        // Setup admin login button
+        function setupAdminButton() {
+            document.getElementById('adminLoginBtn').addEventListener('click', function() {
+                document.getElementById('userInterface').style.display = 'none';
+                document.getElementById('loginForm').style.display = 'flex';
+            });
+        }
+
+        // Load skills from Firebase
+        async function loadSkillsFromFirebase() {
+            try {
+                const snapshot = await db.collection("skills").get();
+                skillsData = [];
+                snapshot.forEach(doc => {
+                    skillsData.push({ id: doc.id, ...doc.data() });
+                });
                 loadSkillGrid();
+            } catch (error) {
+                console.error("Error loading skills: ", error);
             }
-        });
-
-        // Show admin dashboard
-        function showAdminDashboard() {
-            document.getElementById('adminDashboard').style.display = 'flex';
-            document.getElementById('mainContent').style.display = 'none';
-            document.getElementById('adminLoginBtn').style.display = 'none';
-            loadSkillsList();
-            loadUsersList();
-            updateUserCounts();
-            showSection('dashboard'); // Default to dashboard
         }
 
-        // Show user interface
-        function showUserInterface() {
-            document.getElementById('adminDashboard').style.display = 'none';
-            document.getElementById('mainContent').style.display = 'block';
-            document.getElementById('adminLoginBtn').style.display = 'block';
-            loadSkillGrid();
+        // Admin login function
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            // In a real app, this would validate against a server
+            if (username === 'admin' && password === 'password') {
+                localStorage.setItem('adminLoggedIn', 'true');
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('adminDashboard').style.display = 'block';
+                document.getElementById('userInterface').style.display = 'none';
+                setupFirestoreListeners();
+            } else {
+                document.getElementById('login-error').textContent = 'Invalid credentials';
+            }
         }
 
-        // Setup admin panel functionality
-        function setupAdminPanel() {
-            const adminLoginBtn = document.getElementById('adminLoginBtn');
-            const closeAdminBtnOld = document.getElementById('closeAdminBtnOld');
-            const saveChangesBtn = document.getElementById('saveChangesBtn');
-
-            adminLoginBtn.addEventListener('click', function() {
-                const password = prompt("Enter admin password:");
-                if (password === "admin123") { // Change this to your preferred password
-                    // Simulate successful login
-                    localStorage.setItem('adminLoggedIn', 'true');
-                    showAdminDashboard();
-                } else {
-                    alert("Incorrect password!");
+        // Setup Firestore listeners to sync data in real-time
+        function setupFirestoreListeners() {
+            // Listen for changes in skills collection
+            db.collection("skills").onSnapshot((snapshot) => {
+                skillsData = [];
+                snapshot.forEach(doc => {
+                    skillsData.push({ id: doc.id, ...doc.data() });
+                });
+                updateCounters();
+                if (document.getElementById('skills-section').style.display === 'block') {
+                    loadSkillsList();
+                }
+                if (document.getElementById('userInterface').style.display === 'block') {
+                    loadSkillGrid();
                 }
             });
 
-            closeAdminBtnOld.addEventListener('click', function() {
-                document.getElementById('adminPanelOld').style.display = 'none';
-            });
-
-            saveChangesBtn.addEventListener('click', function() {
-                saveSkillChangesOld();
+            // Listen for changes in users collection
+            db.collection("users").onSnapshot((snapshot) => {
+                usersData = [];
+                snapshot.forEach(doc => {
+                    usersData.push({ id: doc.id, ...doc.data() });
+                });
+                updateCounters();
+                if (document.getElementById('users-section').style.display === 'block') {
+                    loadUsersList();
+                }
             });
         }
 
-        // Admin logout
+        // User registration
+        function registerUser() {
+            const email = document.getElementById('user-email').value;
+            const rank = document.getElementById('user-rank').value;
+            const name = document.getElementById('user-name').value;
+            const course = document.getElementById('user-course').value;
+            
+            if (!email || !rank || !name || !course) {
+                document.getElementById('user-error').textContent = 'Please fill in all fields';
+                return;
+            }
+            
+            // Create new user object
+            const newUser = {
+                email: email,
+                rank: rank,
+                name: name,
+                course: course,
+                completedSkills: []
+            };
+            
+            // Add to Firestore
+            db.collection("users").add(newUser)
+                .then((docRef) => {
+                    // Add generated ID to the user object
+                    newUser.id = docRef.id;
+                    
+                    // Store user data in localStorage
+                    localStorage.setItem('currentUser', JSON.stringify(newUser));
+                    localStorage.setItem('userLoggedIn', 'true');
+                    
+                    // Switch to user interface
+                    document.getElementById('userAuth').style.display = 'none';
+                    document.getElementById('adminDashboard').style.display = 'none';
+                    document.getElementById('userInterface').style.display = 'block';
+                    
+                    // Set current user
+                    currentUser = newUser;
+                    loadUserProfile();
+                    loadSkillGrid();
+                })
+                .catch((error) => {
+                    console.error("Error adding user: ", error);
+                    document.getElementById('user-error').textContent = 'Error registering user';
+                });
+        }
+
+        // Load user profile
+        function loadUserProfile() {
+            if (currentUser) {
+                document.getElementById('profile-name').textContent = currentUser.name;
+                document.getElementById('profile-rank').textContent = `Rank: ${currentUser.rank}`;
+                document.getElementById('profile-course').textContent = `Course: ${currentUser.course}`;
+            }
+        }
+
+        // Logout function
         function logout() {
             localStorage.removeItem('adminLoggedIn');
             localStorage.removeItem('userLoggedIn');
             localStorage.removeItem('currentUser');
             currentUser = null;
             document.getElementById('adminDashboard').style.display = 'none';
-            document.getElementById('mainContent').style.display = 'block';
-            document.getElementById('adminLoginBtn').style.display = 'block';
-            loadSkillGrid(); // Reload main content
+            document.getElementById('userInterface').style.display = 'block';
+            loadSkillsFromFirebase();
         }
 
         // Show different sections in admin panel
@@ -1298,6 +1144,9 @@
             // Load users if on users section
             if (section === 'users') {
                 loadUsersList();
+            }
+            if (section === 'dashboard') {
+                updateCounters();
             }
         }
 
@@ -1332,7 +1181,7 @@
                     <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">${user.course}</td>
                     <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">${user.email}</td>
                     <td style="padding: 0.75rem; border-bottom: 1px solid #eee;">
-                        <button class="action-btn delete-btn" onclick="deleteUser(${user.id})">Delete</button>
+                        <button class="action-btn delete-btn" onclick="deleteUser('${user.id}')">Delete</button>
                     </td>
                 `;
                 usersTableBody.appendChild(row);
@@ -1340,12 +1189,14 @@
         }
 
         // Update dashboard counters
-        function updateUserCounts() {
+        function updateCounters() {
+            document.getElementById('total-skills').textContent = skillsData.length;
             document.getElementById('user-count').textContent = usersData.length;
+            
             // Calculate completed lessons
             let completedCount = 0;
             usersData.forEach(user => {
-                completedCount += user.completedSkills.length;
+                completedCount += user.completedSkills ? user.completedSkills.length : 0;
             });
             document.getElementById('completion-count').textContent = completedCount;
         }
@@ -1355,7 +1206,7 @@
             currentEditingSkill = {
                 id: '',
                 name: '',
-                icon: 'fas fa-tools',
+                icon: '',
                 description: '',
                 tools: [],
                 steps: [],
@@ -1562,76 +1413,86 @@
             currentEditingSkill.tools = document.getElementById('edit-tools').value.split(',').map(t => t.trim()).filter(t => t);
             currentEditingSkill.theory = document.getElementById('edit-theory').value;
 
-            // If it's a new skill, generate ID
+            // If it's a new skill, add to Firestore
             if (!currentEditingSkill.id) {
-                currentEditingSkill.id = currentEditingSkill.name.toLowerCase().replace(/\s+/g, '-');
-            }
-
-            // Find if skill already exists
-            const existingIndex = skillsData.findIndex(s => s.id === currentEditingSkill.id);
-            if (existingIndex !== -1) {
-                // Update existing skill
-                skillsData[existingIndex] = currentEditingSkill;
+                db.collection("skills").add(currentEditingSkill)
+                    .then(() => {
+                        alert('Skill saved successfully!');
+                        // Reset form and return to skills list
+                        document.getElementById('edit-skill-form').style.display = 'none';
+                        document.getElementById('skills-section').style.display = 'block';
+                        // Reload skills list handled by listener
+                    })
+                    .catch((error) => {
+                        console.error("Error adding skill: ", error);
+                        alert('Error saving skill');
+                    });
             } else {
-                // Add new skill
-                skillsData.push(currentEditingSkill);
+                // Update existing skill in Firestore
+                db.collection("skills").doc(currentEditingSkill.id).set(currentEditingSkill)
+                    .then(() => {
+                        alert('Skill updated successfully!');
+                        // Reset form and return to skills list
+                        document.getElementById('edit-skill-form').style.display = 'none';
+                        document.getElementById('skills-section').style.display = 'block';
+                        // Reload skills list handled by listener
+                    })
+                    .catch((error) => {
+                        console.error("Error updating skill: ", error);
+                        alert('Error saving skill');
+                    });
             }
-
-            // Show success message
-            alert('Skill saved successfully!');
-
-            // Go back to skills list
-            document.getElementById('edit-skill-form').style.display = 'none';
-            document.getElementById('skills-section').style.display = 'block';
-
-            // Reload skills list
-            loadSkillsList();
         }
 
         // Delete skill
         function deleteSkill(skillId) {
             if (confirm('Are you sure you want to delete this skill?')) {
-                skillsData = skillsData.filter(skill => skill.id !== skillId);
-                loadSkillsList();
+                db.collection("skills").doc(skillId).delete()
+                    .then(() => {
+                        console.log("Skill deleted successfully");
+                        // Reload handled by listener
+                    })
+                    .catch((error) => {
+                        console.error("Error removing skill: ", error);
+                    });
             }
         }
 
         // Delete user
         function deleteUser(userId) {
             if (confirm('Are you sure you want to delete this user?')) {
-                usersData = usersData.filter(user => user.id !== userId);
-                loadUsersList();
-                updateUserCounts();
+                db.collection("users").doc(userId).delete()
+                    .then(() => {
+                        console.log("User deleted successfully");
+                        // Reload handled by listener
+                    })
+                    .catch((error) => {
+                        console.error("Error removing user: ", error);
+                    });
             }
         }
 
-        // --- OLD ADMIN FUNCTIONALITY (for fallback) ---
-        function saveSkillChangesOld() {
-            // Get skill ID from selector
-            const skillId = document.getElementById('skillSelector').value;
-            const skill = skillsData.find(s => s.id === skillId);
-            
-            if (!skill) return;
-
-            // Update basic info
-            skill.name = document.getElementById('skillName').value;
-            skill.description = document.getElementById('skillDesc').value;
-            skill.tools = document.getElementById('skillTools').value.split(',').map(t => t.trim());
-            skill.theory = document.getElementById('skillTheory').value;
-
-            // Update steps - simplified for old panel
-            // (In a real implementation, you would need to handle steps similarly)
-            // For now, we'll just reload the grid
-            loadSkillGrid();
-            alert("Changes saved successfully!");
+        // Show user auth form
+        function showUserAuth() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('userAuth').style.display = 'flex';
         }
 
-        // Load the main skill grid
+        // Show login form
+        function showLoginForm() {
+            document.getElementById('userAuth').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'flex';
+        }
+
+        // User Interface Functions
+        // Load skill grid for user interface
         function loadSkillGrid() {
             const gridElement = document.getElementById('skill-grid');
             let html = '';
             
             skillsData.forEach(skill => {
+                // Check if user has completed this skill
+                const isCompleted = currentUser && currentUser.completedSkills && currentUser.completedSkills.includes(skill.id);
                 html += `
                     <div class="skill-card-ui" onclick="loadSkillDetail('${skill.id}')">
                         <div class="skill-icon">
@@ -1640,7 +1501,9 @@
                         <div class="skill-content">
                             <h3 class="skill-name">${skill.name}</h3>
                             <p class="skill-desc">${skill.description}</p>
-                            <button class="skill-btn">Learn Now</button>
+                            <button class="skill-btn">
+                                ${isCompleted ? 'Review' : 'Start'} Learning
+                            </button>
                         </div>
                     </div>
                 `;
@@ -1655,12 +1518,7 @@
             document.getElementById('skill-detail').style.display = 'block';
             
             const skill = skillsData.find(s => s.id === skillId);
-            if (!skill) {
-                alert('Skill not found');
-                return;
-            }
-            
-            currentSkill = skill;
+            if (!skill) return;
             
             let html = `
                 <div class="skill-header">
@@ -1746,7 +1604,7 @@
                     </div>
                     <div class="quiz-nav">
                         <button class="back-btn" onclick="goBackToGrid()">← Back to Skills</button>
-                        <button class="skill-btn" onclick="checkQuiz()">Check Answers</button>
+                        <button class="skill-btn" onclick="checkQuiz('${skillId}')">Check Answers</button>
                     </div>
                 </div>
             `;
@@ -1771,35 +1629,66 @@
         }
 
         // Check quiz answers
-        function checkQuiz() {
-            const quiz = currentSkill.quiz;
-            let score = 0;
+        function checkQuiz(skillId) {
+            const skill = skillsData.find(s => s.id === skillId);
+            if (!skill) return;
             
-            quiz.forEach((q, index) => {
+            let score = 0;
+            let allAnswered = true;
+            
+            skill.quiz.forEach((q, index) => {
                 const selectedOption = document.querySelector(`.option[data-question="${index}"].selected`);
-                
-                if (selectedOption) {
-                    const selectedValue = parseInt(selectedOption.dataset.option);
-                    const resultDiv = document.getElementById(`result-${index}`);
-                    
-                    if (selectedValue === q.answer) {
-                        resultDiv.textContent = 'Correct!';
-                        resultDiv.className = 'quiz-result correct';
-                        score++;
-                    } else {
-                        resultDiv.textContent = `Incorrect. Correct answer: ${String.fromCharCode(65 + q.answer)}`;
-                        resultDiv.className = 'quiz-result incorrect';
-                    }
-                    
-                    resultDiv.style.display = 'block';
+                if (!selectedOption) {
+                    allAnswered = false;
+                    return;
                 }
+                
+                const selectedValue = parseInt(selectedOption.dataset.option);
+                const resultDiv = document.getElementById(`result-${index}`);
+                
+                if (selectedValue === q.answer) {
+                    resultDiv.textContent = 'Correct!';
+                    resultDiv.className = 'quiz-result correct';
+                    score++;
+                } else {
+                    resultDiv.textContent = `Incorrect. Correct answer: ${String.fromCharCode(65 + q.answer)}`;
+                    resultDiv.className = 'quiz-result incorrect';
+                }
+                
+                resultDiv.style.display = 'block';
             });
             
+            if (!allAnswered) {
+                alert('Please answer all questions before checking your answers.');
+                return;
+            }
+            
             // Show overall score
-            const totalQuestions = quiz.length;
+            const totalQuestions = skill.quiz.length;
             const percentage = Math.round((score / totalQuestions) * 100);
             
-            alert(`Quiz completed!\nScore: ${score}/${totalQuestions} (${percentage}%)`);
+            // Mark skill as completed if passed
+            if (percentage >= 70 && currentUser) {
+                if (!currentUser.completedSkills.includes(skillId)) {
+                    // Update user's completed skills in Firestore
+                    currentUser.completedSkills.push(skillId);
+                    db.collection("users").doc(currentUser.id).update({
+                        completedSkills: firebase.firestore.FieldValue.arrayUnion(skillId)
+                    }).then(() => {
+                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                        alert(`Quiz completed!
+Score: ${score}/${totalQuestions} (${percentage}%)
+Congratulations! You've completed this skill.`);
+                    });
+                } else {
+                    alert(`Quiz completed!
+Score: ${score}/${totalQuestions} (${percentage}%)`);
+                }
+            } else {
+                alert(`Quiz completed!
+Score: ${score}/${totalQuestions} (${percentage}%)
+You need at least 70% to pass. Try again!`);
+            }
         }
 
         // Go back to skill grid
