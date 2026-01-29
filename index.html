@@ -4,784 +4,776 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hand Skills Learning Platform - Admin & User System</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css    ">
 <!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js    "></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js    "></script>
 <style>
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 :root {
-  --primary: #4361ee;
-  --secondary: #3f37c9;
-  --accent: #4cc9f0;
-  --light: #f8f9fa;
-  --dark: #212529;
-  --gray: #6c757d;
-  --success: #4ade80;
-  --warning: #facc15;
-  --danger: #f87171;
-  --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --transition: all 0.3s ease;
+--primary: #4361ee;
+--secondary: #3f37c9;
+--accent: #4cc9f0;
+--light: #f8f9fa;
+--dark: #212529;
+--gray: #6c757d;
+--success: #4ade80;
+--warning: #facc15;
+--danger: #f87171;
+--shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+--transition: all 0.3s ease;
 }
 body {
-  background-color: #f5f7fb;
-  color: var(--dark);
-  line-height: 1.6;
+background-color: #f5f7fb;
+color: var(--dark);
+line-height: 1.6;
 }
 .container {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
+width: 100%;
+max-width: 1200px;
+margin: 0 auto;
+padding: 0 20px;
 }
 /* Admin Login Button */
 .admin-login {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  z-index: 100;
+position: absolute;
+top: 20px;
+right: 20px;
+z-index: 100;
 }
 .admin-btn {
-  background: rgba(0,0,0,0.3);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: var(--transition);
+background: rgba(0,0,0,0.3);
+color: white;
+border: none;
+padding: 0.75rem 1.5rem;
+border-radius: 5px;
+cursor: pointer;
+font-weight: 600;
+transition: var(--transition);
 }
 .admin-btn:hover {
-  background: rgba(0,0,0,0.5);
+background: rgba(0,0,0,0.5);
 }
 /* Login Popup */
 .login-popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-  display: none;
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0,0,0,0.7);
+display: flex;
+justify-content: center;
+align-items: center;
+z-index: 2000;
+display: none;
 }
 .login-box {
-  background: white;
-  padding: 2.5rem;
-  border-radius: 10px;
-  box-shadow: var(--shadow);
-  width: 100%;
-  max-width: 450px;
-  text-align: center;
-  position: relative;
+background: white;
+padding: 2.5rem;
+border-radius: 10px;
+box-shadow: var(--shadow);
+width: 100%;
+max-width: 450px;
+text-align: center;
+position: relative;
 }
 .login-box h2 {
-  margin-bottom: 1.5rem;
-  color: var(--primary);
+margin-bottom: 1.5rem;
+color: var(--primary);
 }
-.form-group {
-  margin-bottom: 1.2rem;
-  text-align: left;
-}
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-}
-.form-group input, .form-group select {
-  width: 100%;
-  padding: 0.8rem;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 1rem;
-}
-.btn {
-  display: block;
-  width: 100%;
-  padding: 0.8rem;
-  background: var(--primary);
-  color: white;
-  border: none;
-  border-radius: 5px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition);
-}
-.btn:hover {
-  background: var(--secondary);
-}
-.btn-secondary {
-  background: var(--gray);
-}
-.btn-secondary:hover {
-  background: #5a6268;
-}
-.btn-success {
-  background: var(--success);
-}
-.btn-success:hover {
-  background: #22c55e;
-}
-.error-message {
-  color: var(--danger);
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
-}
-.auth-toggle {
-  margin-top: 1rem;
-  color: var(--gray);
-}
-.auth-toggle a {
-  color: var(--primary);
-  text-decoration: none;
-  font-weight: 600;
-}
-
-/* Close button for login popup */
 .close-btn {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  font-size: 1.5rem;
-  cursor: pointer;
-  background: none;
-  border: none;
-  color: var(--gray);
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
+position: absolute;
+top: 15px;
+right: 15px;
+font-size: 1.5rem;
+cursor: pointer;
+color: var(--gray);
 }
 .close-btn:hover {
-  color: var(--dark);
-  background: rgba(0,0,0,0.1);
+color: var(--dark);
 }
-
+.form-group {
+margin-bottom: 1.2rem;
+text-align: left;
+}
+.form-group label {
+display: block;
+margin-bottom: 0.5rem;
+font-weight: 500;
+}
+.form-group input, .form-group select {
+width: 100%;
+padding: 0.8rem;
+border: 1px solid #ddd;
+border-radius: 5px;
+font-size: 1rem;
+}
+.btn {
+display: block;
+width: 100%;
+padding: 0.8rem;
+background: var(--primary);
+color: white;
+border: none;
+border-radius: 5px;
+font-size: 1rem;
+font-weight: 600;
+cursor: pointer;
+transition: var(--transition);
+}
+.btn:hover {
+background: var(--secondary);
+}
+.btn-secondary {
+background: var(--gray);
+}
+.btn-secondary:hover {
+background: #5a6268;
+}
+.btn-success {
+background: var(--success);
+}
+.btn-success:hover {
+background: #22c55e;
+}
+.error-message {
+color: var(--danger);
+margin-top: 0.5rem;
+font-size: 0.9rem;
+}
+.auth-toggle {
+margin-top: 1rem;
+color: var(--gray);
+}
+.auth-toggle a {
+color: var(--primary);
+text-decoration: none;
+font-weight: 600;
+}
 /* Admin Dashboard */
 .admin-dashboard {
-  display: none;
-  padding: 2rem 0;
+display: none;
+padding: 2rem 0;
 }
 .admin-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--light);
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 2rem;
+padding-bottom: 1rem;
+border-bottom: 1px solid var(--light);
 }
 .admin-header h1 {
-  color: var(--primary);
+color: var(--primary);
 }
 .logout-btn {
-  background: var(--danger);
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
-  cursor: pointer;
+background: var(--danger);
+color: white;
+border: none;
+padding: 0.5rem 1rem;
+border-radius: 5px;
+cursor: pointer;
 }
 .admin-content {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 2rem;
+display: grid;
+grid-template-columns: 1fr 2fr;
+gap: 2rem;
 }
 /* Navigation Panel */
 .nav-panel {
-  background: white;
-  border-radius: 10px;
-  padding: 1.5rem;
-  box-shadow: var(--shadow);
+background: white;
+border-radius: 10px;
+padding: 1.5rem;
+box-shadow: var(--shadow);
 }
 .nav-panel h3 {
-  margin-bottom: 1.2rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--light);
+margin-bottom: 1.2rem;
+padding-bottom: 0.5rem;
+border-bottom: 1px solid var(--light);
 }
 .nav-item {
-  padding: 0.8rem;
-  margin-bottom: 0.5rem;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: var(--transition);
+padding: 0.8rem;
+margin-bottom: 0.5rem;
+border-radius: 5px;
+cursor: pointer;
+transition: var(--transition);
 }
 .nav-item:hover, .nav-item.active {
-  background: var(--primary);
-  color: white;
+background: var(--primary);
+color: white;
 }
 /* Main Content Area */
 .main-content-area {
-  background: white;
-  border-radius: 10px;
-  padding: 2rem;
-  box-shadow: var(--shadow);
+background: white;
+border-radius: 10px;
+padding: 2rem;
+box-shadow: var(--shadow);
 }
 .section-title {
-  font-size: 1.5rem;
-  color: var(--primary);
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--light);
+font-size: 1.5rem;
+color: var(--primary);
+margin-bottom: 1.5rem;
+padding-bottom: 0.5rem;
+border-bottom: 1px solid var(--light);
 }
 .skill-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1.5rem;
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+gap: 1.5rem;
 }
 .skill-card {
-  border: 1px solid var(--light);
-  border-radius: 8px;
-  padding: 1.2rem;
-  cursor: pointer;
-  transition: var(--transition);
+border: 1px solid var(--light);
+border-radius: 8px;
+padding: 1.2rem;
+cursor: pointer;
+transition: var(--transition);
 }
 .skill-card:hover {
-  border-color: var(--primary);
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+border-color: var(--primary);
+transform: translateY(-3px);
+box-shadow: 0 5px 15px rgba(0,0,0,0.05);
 }
 .skill-card h4 {
-  margin-bottom: 0.5rem;
-  color: var(--primary);
+margin-bottom: 0.5rem;
+color: var(--primary);
 }
 .skill-actions {
-  margin-top: 1rem;
-  display: flex;
-  gap: 0.5rem;
+margin-top: 1rem;
+display: flex;
+gap: 0.5rem;
 }
 .action-btn {
-  padding: 0.4rem 0.8rem;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  font-size: 0.9rem;
+padding: 0.4rem 0.8rem;
+border-radius: 4px;
+border: none;
+cursor: pointer;
+font-size: 0.9rem;
 }
 .edit-btn {
-  background: var(--warning);
-  color: white;
+background: var(--warning);
+color: white;
 }
 .delete-btn {
-  background: var(--danger);
-  color: white;
+background: var(--danger);
+color: white;
 }
 /* Edit Form */
 .edit-form {
-  display: none;
+display: none;
 }
 .form-row {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1.2rem;
+display: flex;
+gap: 1rem;
+margin-bottom: 1.2rem;
 }
 .form-col {
-  flex: 1;
+flex: 1;
 }
 textarea {
-  width: 100%;
-  padding: 0.8rem;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  resize: vertical;
-  min-height: 100px;
+width: 100%;
+padding: 0.8rem;
+border: 1px solid #ddd;
+border-radius: 5px;
+resize: vertical;
+min-height: 100px;
 }
 .form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 1.5rem;
+display: flex;
+justify-content: flex-end;
+gap: 1rem;
+margin-top: 1.5rem;
 }
 /* Steps Editor */
 .steps-editor {
-  margin-top: 1.5rem;
+margin-top: 1.5rem;
 }
 .step-item {
-  border: 1px solid var(--light);
-  border-radius: 5px;
-  padding: 1rem;
-  margin-bottom: 1rem;
+border: 1px solid var(--light);
+border-radius: 5px;
+padding: 1rem;
+margin-bottom: 1rem;
 }
 .step-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.8rem;
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 0.8rem;
 }
 .step-content {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 1rem;
 }
 .add-step-btn {
-  margin-top: 1rem;
-  background: var(--success);
-  color: white;
+margin-top: 1rem;
+background: var(--success);
+color: white;
 }
 /* Quiz Editor */
 .quiz-editor {
-  margin-top: 1.5rem;
+margin-top: 1.5rem;
 }
 .quiz-question {
-  border: 1px solid var(--light);
-  border-radius: 5px;
-  padding: 1rem;
-  margin-bottom: 1rem;
+border: 1px solid var(--light);
+border-radius: 5px;
+padding: 1rem;
+margin-bottom: 1rem;
 }
 .quiz-options {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+gap: 1rem;
 }
 .add-quiz-btn {
-  margin-top: 1rem;
-  background: var(--success);
-  color: white;
+margin-top: 1rem;
+background: var(--success);
+color: white;
 }
 /* User Interface */
 .user-interface {
-  display: none;
-  padding: 2rem 0;
+display: none;
+padding: 2rem 0;
 }
 /* Header Styles */
 header {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  color: white;
-  padding: 2rem 0;
-  text-align: center;
-  margin-bottom: 2rem;
-  position: relative;
+background: linear-gradient(135deg, var(--primary), var(--secondary));
+color: white;
+padding: 2rem 0;
+text-align: center;
+margin-bottom: 2rem;
 }
 header h1 {
-  font-size: 2.5rem;
-  margin-bottom: 0.5rem;
+font-size: 2.5rem;
+margin-bottom: 0.5rem;
 }
 header p {
-  font-size: 1.1rem;
-  opacity: 0.9;
+font-size: 1.1rem;
+opacity: 0.9;
 }
 /* Skill Grid */
 .skill-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-  margin-top: 2rem;
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+gap: 1.5rem;
+margin-top: 2rem;
 }
 .skill-card-ui {
-  background: white;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: var(--shadow);
-  transition: var(--transition);
-  cursor: pointer;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+background: white;
+border-radius: 10px;
+overflow: hidden;
+box-shadow: var(--shadow);
+transition: var(--transition);
+cursor: pointer;
+height: 100%;
+display: flex;
+flex-direction: column;
 }
 .skill-card-ui:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+transform: translateY(-5px);
+box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 }
 .skill-icon {
-  background: linear-gradient(135deg, var(--primary), var(--accent));
-  color: white;
-  font-size: 3rem;
-  height: 150px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+background: linear-gradient(135deg, var(--primary), var(--accent));
+color: white;
+font-size: 3rem;
+height: 150px;
+display: flex;
+align-items: center;
+justify-content: center;
 }
 .skill-content {
-  padding: 1.5rem;
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
+padding: 1.5rem;
+flex-grow: 1;
+display: flex;
+flex-direction: column;
 }
 .skill-name {
-  font-size: 1.5rem;
-  margin-bottom: 0.75rem;
-  color: var(--primary);
+font-size: 1.5rem;
+margin-bottom: 0.75rem;
+color: var(--primary);
 }
 .skill-desc {
-  color: var(--gray);
-  flex-grow: 1;
+color: var(--gray);
+flex-grow: 1;
 }
 .skill-btn {
-  background: var(--primary);
-  color: white;
-  border: none;
-  padding: 0.75rem;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: 600;
-  margin-top: 1rem;
-  transition: var(--transition);
+background: var(--primary);
+color: white;
+border: none;
+padding: 0.75rem;
+border-radius: 5px;
+cursor: pointer;
+font-weight: 600;
+margin-top: 1rem;
+transition: var(--transition);
 }
 .skill-btn:hover {
-  background: var(--secondary);
+background: var(--secondary);
 }
 /* Skill Detail */
 .skill-detail {
-  background: white;
-  border-radius: 10px;
-  padding: 2rem;
-  box-shadow: var(--shadow);
-  margin-top: 1.5rem;
-  display: none;
+background: white;
+border-radius: 10px;
+padding: 2rem;
+box-shadow: var(--shadow);
+margin-top: 1.5rem;
+display: none;
 }
 .skill-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid var(--light);
+display: flex;
+align-items: center;
+margin-bottom: 2rem;
+padding-bottom: 1rem;
+border-bottom: 2px solid var(--light);
 }
 .skill-header i {
-  font-size: 2.5rem;
-  margin-right: 1rem;
-  color: var(--primary);
+font-size: 2.5rem;
+margin-right: 1rem;
+color: var(--primary);
 }
 .skill-header h2 {
-  font-size: 2rem;
-  color: var(--dark);
+font-size: 2rem;
+color: var(--dark);
 }
 .skill-section {
-  margin-bottom: 2.5rem;
+margin-bottom: 2.5rem;
 }
 .section-title-ui {
-  font-size: 1.5rem;
-  color: var(--primary);
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--light);
+font-size: 1.5rem;
+color: var(--primary);
+margin-bottom: 1rem;
+padding-bottom: 0.5rem;
+border-bottom: 1px solid var(--light);
 }
 /* Tools Section */
 .tools-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+gap: 1rem;
 }
 .tool-item {
-  background: var(--light);
-  border-radius: 8px;
-  padding: 1rem;
-  text-align: center;
-  transition: var(--transition);
+background: var(--light);
+border-radius: 8px;
+padding: 1rem;
+text-align: center;
+transition: var(--transition);
 }
 .tool-item:hover {
-  background: var(--primary);
-  color: white;
+background: var(--primary);
+color: white;
 }
 .tool-item i {
-  font-size: 1.8rem;
-  margin-bottom: 0.5rem;
-  color: var(--primary);
+font-size: 1.8rem;
+margin-bottom: 0.5rem;
+color: var(--primary);
 }
 .tool-item:hover i {
-  color: white;
+color: white;
 }
 /* Steps Section */
 .steps-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+display: flex;
+flex-direction: column;
+gap: 1.5rem;
 }
 .step-card {
-  display: flex;
-  gap: 1.5rem;
-  background: var(--light);
-  border-radius: 8px;
-  overflow: hidden;
+display: flex;
+gap: 1.5rem;
+background: var(--light);
+border-radius: 8px;
+overflow: hidden;
 }
 .step-image {
-  width: 200px;
-  height: 150px;
-  object-fit: cover;
+width: 200px;
+height: 150px;
+object-fit: cover;
 }
 .step-content {
-  padding: 1.2rem;
-  flex-grow: 1;
+padding: 1.2rem;
+flex-grow: 1;
 }
 .step-title {
-  font-size: 1.2rem;
-  margin-bottom: 0.5rem;
-  color: var(--primary);
+font-size: 1.2rem;
+margin-bottom: 0.5rem;
+color: var(--primary);
 }
 /* Theory Section */
 .theory-content {
-  background: var(--light);
-  padding: 1.5rem;
-  border-radius: 8px;
-  line-height: 1.8;
+background: var(--light);
+padding: 1.5rem;
+border-radius: 8px;
+line-height: 1.8;
 }
 /* Quiz Section */
 .quiz-container {
-  background: var(--light);
-  padding: 1.5rem;
-  border-radius: 8px;
+background: var(--light);
+padding: 1.5rem;
+border-radius: 8px;
 }
 .question {
-  margin-bottom: 1.5rem;
+margin-bottom: 1.5rem;
 }
 .question-text {
-  font-weight: 600;
-  margin-bottom: 0.75rem;
+font-weight: 600;
+margin-bottom: 0.75rem;
 }
 .options {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+display: flex;
+flex-direction: column;
+gap: 0.5rem;
 }
 .option {
-  display: flex;
-  align-items: center;
-  padding: 0.75rem;
-  background: white;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: var(--transition);
+display: flex;
+align-items: center;
+padding: 0.75rem;
+background: white;
+border-radius: 5px;
+cursor: pointer;
+transition: var(--transition);
 }
 .option:hover {
-  background: #e9ecef;
+background: #e9ecef;
 }
 .option.selected {
-  background: var(--primary);
-  color: white;
+background: var(--primary);
+color: white;
 }
 .quiz-result {
-  margin-top: 1.5rem;
-  padding: 1rem;
-  border-radius: 5px;
-  text-align: center;
-  font-weight: 600;
+margin-top: 1.5rem;
+padding: 1rem;
+border-radius: 5px;
+text-align: center;
+font-weight: 600;
 }
 .quiz-result.correct {
-  background: var(--success);
-  color: white;
+background: var(--success);
+color: white;
 }
 .quiz-result.incorrect {
-  background: var(--danger);
-  color: white;
+background: var(--danger);
+color: white;
 }
 .quiz-nav {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 1.5rem;
+display: flex;
+justify-content: space-between;
+margin-top: 1.5rem;
 }
 .back-btn {
-  background: var(--gray);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: 600;
+background: var(--gray);
+color: white;
+border: none;
+padding: 0.75rem 1.5rem;
+border-radius: 5px;
+cursor: pointer;
+font-weight: 600;
 }
 /* Footer */
 footer {
-  background: var(--dark);
-  color: white;
-  text-align: center;
-  padding: 1.5rem 0;
-  margin-top: 3rem;
+background: var(--dark);
+color: white;
+text-align: center;
+padding: 1.5rem 0;
+margin-top: 3rem;
 }
 /* Responsive Design */
 @media (max-width: 992px) {
-  .admin-content {
-    grid-template-columns: 1fr;
-  }
-  .nav-panel {
-    margin-bottom: 2rem;
-  }
+.admin-content {
+grid-template-columns: 1fr;
+}
+.nav-panel {
+margin-bottom: 2rem;
+}
 }
 @media (max-width: 768px) {
-  .step-card {
-    flex-direction: column;
-  }
-  .step-image {
-    width: 100%;
-    height: 200px;
-  }
-  .skill-header {
-    flex-direction: column;
-    text-align: center;
-  }
-  .skill-header i {
-    margin-right: 0;
-    margin-bottom: 1rem;
-  }
-  .form-row {
-    flex-direction: column;
-    gap: 0;
-  }
-  .admin-login {
-    position: static;
-    text-align: center;
-    margin-top: 1rem;
-  }
+.step-card {
+flex-direction: column;
+}
+.step-image {
+width: 100%;
+height: 200px;
+}
+.skill-header {
+flex-direction: column;
+text-align: center;
+}
+.skill-header i {
+margin-right: 0;
+margin-bottom: 1rem;
+}
+.form-row {
+flex-direction: column;
+gap: 0;
+}
+.admin-login {
+position: static;
+text-align: center;
+margin-top: 1rem;
+}
 }
 </style>
 </head>
 <body>
 <header>
-  <div class="container">
-    <h1><i class="fas fa-tools"></i> Hand Skills Learning Platform</h1>
-    <p>Master essential hands-on skills with step-by-step guidance</p>
-  </div>
-  <div class="admin-login">
-    <button class="admin-btn" id="adminLoginBtn"><i class="fas fa-lock"></i> Admin Login</button>
-  </div>
+<div class="container">
+<h1><i class="fas fa-tools"></i> Hand Skills Learning Platform</h1>
+<p>Master essential hands-on skills with step-by-step guidance</p>
+</div>
+<div class="admin-login">
+<button class="admin-btn" id="adminLoginBtn"><i class="fas fa-lock"></i> Admin Login</button>
+</div>
 </header>
-
 <!-- Login Popup -->
 <div class="login-popup" id="loginPopup">
-  <div class="login-box">
-    <span class="close-btn" onclick="closeLoginPopup()">&times;</span>
-    <h2><i class="fas fa-lock"></i> Admin Login</h2>
-    <div class="form-group">
-      <label for="username">Username</label>
-      <input type="text" id="username" placeholder="Enter username">
-    </div>
-    <div class="form-group">
-      <label for="password">Password</label>
-      <input type="password" id="password" placeholder="Enter password">
-    </div>
-    <button class="btn" onclick="login()">Login</button>
-    <div class="error-message" id="login-error"></div>
-  </div>
+<div class="login-box">
+<span class="close-btn" onclick="closeLoginPopup()">&times;</span>
+<h2><i class="fas fa-lock"></i> Admin Login</h2>
+<div class="form-group">
+<label for="username">Username</label>
+<input type="text" id="username" placeholder="Enter username">
 </div>
-
+<div class="form-group">
+<label for="password">Password</label>
+<input type="password" id="password" placeholder="Enter password">
+</div>
+<button class="btn" onclick="login()">Login</button>
+<div class="error-message" id="login-error"></div>
+</div>
+</div>
 <!-- Admin Dashboard -->
 <div class="admin-dashboard" id="adminDashboard">
-  <div class="container">
-    <div class="admin-header">
-      <h1><i class="fas fa-tools"></i> Hand Skills Learning Platform - Admin Panel</h1>
-      <button class="logout-btn" onclick="logout()">Logout</button>
-    </div>
-    <div class="admin-content">
-      <div class="nav-panel">
-        <h3>Navigation</h3>
-        <div class="nav-item active" onclick="showSection('dashboard')">Dashboard</div>
-        <div class="nav-item" onclick="showSection('skills')">Manage Skills</div>
-        <div class="nav-item" onclick="showSection('settings')">Settings</div>
-      </div>
-      <div class="main-content-area">
-        <!-- Dashboard Section -->
-        <div id="dashboard-section" class="section">
-          <h2 class="section-title">Dashboard Overview</h2>
-          <p>Welcome to the Hand Skills Learning Platform Admin Panel. From here you can manage skills, content, and user access.</p>
-          <div style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
-            <div style="background: var(--light); padding: 1.5rem; border-radius: 8px; text-align: center;">
-              <i class="fas fa-tools" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem;"></i>
-              <h3 id="total-skills">0</h3>
-              <p>Total skills in the system</p>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Skills Management Section -->
-        <div id="skills-section" class="section" style="display: none;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-            <h2 class="section-title">Manage Skills</h2>
-            <button class="btn" onclick="addNewSkill()" style="background: var(--success);">Add New Skill</button>
-          </div>
-          <div class="skill-list" id="skillsList">
-            <!-- Skills will be loaded here -->
-          </div>
-        </div>
-        
-        <!-- Edit Skill Form -->
-        <div id="edit-skill-form" class="edit-form">
-          <h2 class="section-title">Edit Skill</h2>
-          <div class="form-row">
-            <div class="form-col">
-              <label for="edit-skill-name">Skill Name</label>
-              <input type="text" id="edit-skill-name" placeholder="Enter skill name">
-            </div>
-            <div class="form-col">
-              <label for="edit-skill-icon">Icon Class</label>
-              <input type="text" id="edit-skill-icon" placeholder="e.g., fas fa-hammer">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-col">
-              <label for="edit-skill-description">Description</label>
-              <textarea id="edit-skill-description" placeholder="Enter skill description"></textarea>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-col">
-              <label for="edit-tools">Tools Required (comma separated)</label>
-              <textarea id="edit-tools" placeholder="Enter required tools"></textarea>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-col">
-              <label for="edit-theory">Theory Section</label>
-              <textarea id="edit-theory" placeholder="Enter theoretical content"></textarea>
-            </div>
-          </div>
-          <div class="steps-editor">
-            <h3>Steps</h3>
-            <div id="steps-container">
-              <!-- Steps will be added here -->
-            </div>
-            <button class="btn add-step-btn" onclick="addStep()">Add Step</button>
-          </div>
-          <div class="quiz-editor">
-            <h3>Quiz Questions</h3>
-            <div id="quiz-container">
-              <!-- Quiz questions will be added here -->
-            </div>
-            <button class="btn add-quiz-btn" onclick="addQuizQuestion()">Add Question</button>
-          </div>
-          <div class="form-actions">
-            <button class="btn btn-secondary" onclick="showSection('skills')">Cancel</button>
-            <button class="btn" onclick="saveSkill()">Save Changes</button>
-          </div>
-        </div>
-        
-        <!-- Settings Section -->
-        <div id="settings-section" class="section" style="display: none;">
-          <h2 class="section-title">System Settings</h2>
-          <p>System configuration options would go here in a full implementation.</p>
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="container">
+<div class="admin-header">
+<h1><i class="fas fa-tools"></i> Hand Skills Learning Platform - Admin Panel</h1>
+<button class="logout-btn" onclick="logout()">Logout</button>
 </div>
-
+<div class="admin-content">
+<div class="nav-panel">
+<h3>Navigation</h3>
+<div class="nav-item active" onclick="showSection('dashboard')">Dashboard</div>
+<div class="nav-item" onclick="showSection('skills')">Manage Skills</div>
+<div class="nav-item" onclick="showSection('userPreview')">User Preview</div>
+<div class="nav-item" onclick="showSection('settings')">Settings</div>
+</div>
+<div class="main-content-area">
+<!-- Dashboard Section -->
+<div id="dashboard-section" class="section">
+<h2 class="section-title">Dashboard Overview</h2>
+<p>Welcome to the Hand Skills Learning Platform Admin Panel. From here you can manage skills, content, and user access.</p>
+<div style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+<div style="background: var(--light); padding: 1.5rem; border-radius: 8px; text-align: center;">
+<i class="fas fa-tools" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem;"></i>
+<h3 id="total-skills">0</h3>
+<p>Total skills in the system</p>
+</div>
+</div>
+</div>
+<!-- Skills Management Section -->
+<div id="skills-section" class="section" style="display: none;">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+<h2 class="section-title">Manage Skills</h2>
+<button class="btn" onclick="addNewSkill()" style="background: var(--success);">Add New Skill</button>
+</div>
+<div class="skill-list" id="skillsList">
+<!-- Skills will be loaded here -->
+</div>
+</div>
+<!-- Edit Skill Form -->
+<div id="edit-skill-form" class="edit-form">
+<h2 class="section-title">Edit Skill</h2>
+<div class="form-row">
+<div class="form-col">
+<label for="edit-skill-name">Skill Name</label>
+<input type="text" id="edit-skill-name" placeholder="Enter skill name">
+</div>
+<div class="form-col">
+<label for="edit-skill-icon">Icon Class</label>
+<input type="text" id="edit-skill-icon" placeholder="e.g., fas fa-hammer">
+</div>
+</div>
+<div class="form-row">
+<div class="form-col">
+<label for="edit-skill-description">Description</label>
+<textarea id="edit-skill-description" placeholder="Enter skill description"></textarea>
+</div>
+</div>
+<div class="form-row">
+<div class="form-col">
+<label for="edit-tools">Tools Required (comma separated)</label>
+<textarea id="edit-tools" placeholder="Enter required tools"></textarea>
+</div>
+</div>
+<div class="form-row">
+<div class="form-col">
+<label for="edit-theory">Theory Section</label>
+<textarea id="edit-theory" placeholder="Enter theoretical content"></textarea>
+</div>
+</div>
+<div class="steps-editor">
+<h3>Steps</h3>
+<div id="steps-container">
+<!-- Steps will be added here -->
+</div>
+<button class="btn add-step-btn" onclick="addStep()">Add Step</button>
+</div>
+<div class="quiz-editor">
+<h3>Quiz Questions</h3>
+<div id="quiz-container">
+<!-- Quiz questions will be added here -->
+</div>
+<button class="btn add-quiz-btn" onclick="addQuizQuestion()">Add Question</button>
+</div>
+<div class="form-actions">
+<button class="btn btn-secondary" onclick="cancelEdit()">Cancel</button>
+<button class="btn" onclick="saveSkill()">Save Changes</button>
+</div>
+</div>
+<!-- User Preview Section -->
+<div id="user-preview-section" class="section" style="display: none;">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+<h2 class="section-title">User Preview</h2>
+<button class="btn btn-secondary" onclick="showSection('dashboard')" style="background: var(--gray);">Back to Admin</button>
+</div>
+<div id="preview-content">
+<!-- This will be populated by the user interface -->
+</div>
+</div>
+<!-- Settings Section -->
+<div id="settings-section" class="section" style="display: none;">
+<h2 class="section-title">System Settings</h2>
+<p>System configuration options would go here in a full implementation.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
 <!-- User Interface -->
 <div class="user-interface" id="userInterface">
-  <main class="container">
-    <div id="main-content">
-      <div class="skill-grid" id="skill-grid">
-        <!-- Skills will be loaded here -->
-      </div>
-      <div id="skill-detail" class="skill-detail">
-        <!-- Skill details will be loaded here -->
-      </div>
-    </div>
-  </main>
-  <footer>
-    <div class="container">
-      <p>&copy; 2026 Hand Skills Learning Platform | Master Essential Hands-On Skills</p>
-    </div>
-  </footer>
+<main class="container">
+<div id="main-content">
+<div class="skill-grid" id="skill-grid">
+<!-- Skills will be loaded here -->
 </div>
-
+<div id="skill-detail" class="skill-detail">
+<!-- Skill details will be loaded here -->
+</div>
+</div>
+</main>
+<footer>
+<div class="container">
+<p>&copy; 2026 Hand Skills Learning Platform | Master Essential Hands-On Skills</p>
+</div>
+</footer>
+</div>
 <script>
 // Initialize Firebase
 const firebaseConfig = {
+// ADD YOUR FIREBASE CONFIG HERE
 apiKey: "AIzaSyA6ZdINHlRF583T3HL5RsA4q2fmHeBcB_g",
 authDomain: "hand-skills-platform.firebaseapp.com",
 projectId: "hand-skills-platform",
@@ -798,6 +790,7 @@ let skillsData = [];
 let usersData = [];
 let currentEditingSkill = null;
 let currentUser = null;
+let originalEditingSkill = null; // Store original skill data
 // Initialize the app
 window.onload = function() {
 // Show user interface by default
@@ -835,11 +828,14 @@ document.getElementById('loginPopup').style.display = 'none';
 document.getElementById('adminDashboard').style.display = 'block';
 document.getElementById('userInterface').style.display = 'none';
 setupFirestoreListeners();
-updateCounters(); // Update counters after login
-showSection('dashboard'); // Show dashboard initially
+showSection('dashboard');
 } else {
 document.getElementById('login-error').textContent = 'Invalid credentials';
 }
+}
+// Close login popup
+function closeLoginPopup() {
+document.getElementById('loginPopup').style.display = 'none';
 }
 // Setup Firestore listeners to sync data in real-time
 function setupFirestoreListeners() {
@@ -860,17 +856,23 @@ function setupFirestoreListeners() {
         if (document.getElementById('skills-section').style.display === 'block') {
             loadSkillsList();
         }
+        
+        // Update user preview if currently viewing
+        if (document.getElementById('user-preview-section').style.display === 'block') {
+            loadSkillGrid();
+        }
     });
 }
 // Logout function
 function logout() {
 localStorage.removeItem('adminLoggedIn');
-localStorage.removeItem('userInteractionEnabled');
+localStorage.removeItem('userLoggedIn');
 localStorage.removeItem('currentUser');
 currentUser = null;
 document.getElementById('adminDashboard').style.display = 'none';
-document.getElementById('userInterface').style.display = 'block';
-loadSkillsFromFirebase();
+document.getElementById('userInterface').style.display = 'block'; // Show user interface
+document.getElementById('loginPopup').style.display = 'none'; // Hide login popup
+loadSkillsFromFirebase(); // Reload skills for user view
 }
 // Show different sections in admin panel
 function showSection(section) {
@@ -892,6 +894,11 @@ function showSection(section) {
     // IMPORTANT: Always reload skills list when showing skills section
     if (section === 'skills') {
         loadSkillsList();
+    }
+    
+    // Handle user preview
+    if (section === 'userPreview') {
+        showUserPreview();
     }
 }
 // Load skills list in admin panel
@@ -934,11 +941,13 @@ steps: [],
 theory: '',
 quiz: []
 };
+originalEditingSkill = JSON.parse(JSON.stringify(currentEditingSkill)); // Store original data
 showEditForm();
 }
 // Edit existing skill
 function editSkill(skillId) {
 currentEditingSkill = skillsData.find(skill => skill.id === skillId);
+originalEditingSkill = JSON.parse(JSON.stringify(currentEditingSkill)); // Store original data
 if (currentEditingSkill) {
 showEditForm();
 }
@@ -972,6 +981,15 @@ if (Array.isArray(currentEditingSkill.quiz)) {
 // Show form
 document.getElementById('skills-section').style.display = 'none';
 document.getElementById('edit-skill-form').style.display = 'block';
+}
+// Cancel edit and restore original data
+function cancelEdit() {
+    // Restore original skill data
+    currentEditingSkill = JSON.parse(JSON.stringify(originalEditingSkill));
+    
+    // Return to skills list
+    document.getElementById('edit-skill-form').style.display = 'none';
+    document.getElementById('skills-section').style.display = 'block';
 }
 // Add step to form
 function addStepToForm(index, step = null) {
@@ -1095,7 +1113,7 @@ if (currentEditingSkill.quiz &&
 function removeQuizQuestion(index) {
 if (currentEditingSkill.quiz && currentEditingSkill.quiz[index]) {
 currentEditingSkill.quiz.splice(index, 1);
-// Re-render all questions
+// Re-render all questions with correct numbering
 const quizContainer = document.getElementById('quiz-container');
 quizContainer.innerHTML = '';
 currentEditingSkill.quiz.forEach((question, idx) => {
@@ -1157,6 +1175,18 @@ function deleteSkill(skillId) {
             console.error("Error removing skill with ID '" + skillId + "': ", error);
         });
     }
+}
+// Show user preview in admin panel
+function showUserPreview() {
+    // Show user interface within admin panel
+    document.getElementById('user-preview-section').style.display = 'block';
+    document.getElementById('userInterface').style.display = 'block';
+    
+    // Move user interface content to preview section
+    document.getElementById('preview-content').appendChild(document.getElementById('main-content'));
+    
+    // Load skills in preview
+    loadSkillGrid();
 }
 // User Interface Functions
 // Load skill grid for user interface
