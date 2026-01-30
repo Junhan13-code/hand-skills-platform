@@ -518,6 +518,64 @@ margin-bottom: 1rem;
 .access-input input {
 flex: 1;
 }
+/* Signup Settings Section */
+.signup-settings-section {
+display: none;
+}
+.settings-controls {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 2rem;
+}
+.settings-column {
+background: var(--light);
+padding: 1.5rem;
+border-radius: 8px;
+}
+.setting-title {
+font-size: 1.2rem;
+margin-bottom: 1rem;
+color: var(--primary);
+}
+.setting-item {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 0.5rem;
+padding: 0.5rem 0;
+border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+.setting-actions {
+display: flex;
+gap: 0.5rem;
+}
+.delete-btn-setting {
+background: var(--danger);
+color: white;
+border: none;
+padding: 0.25rem 0.5rem;
+border-radius: 4px;
+cursor: pointer;
+}
+.delete-btn-setting:hover {
+opacity: 0.9;
+}
+.add-item-input {
+display: flex;
+margin-top: 1rem;
+}
+.add-item-input input {
+flex: 1;
+margin-right: 0.5rem;
+}
+.add-item-input button {
+background: var(--success);
+color: white;
+border: none;
+padding: 0.5rem;
+border-radius: 4px;
+cursor: pointer;
+}
 /* Skill Grid */
 .skill-grid {
 display: grid;
@@ -751,6 +809,9 @@ grid-template-columns: 1fr;
 .nav-panel {
 margin-bottom: 2rem;
 }
+.settings-controls {
+grid-template-columns: 1fr;
+}
 }
 @media (max-width: 768px) {
 .step-card {
@@ -837,22 +898,14 @@ margin-right: 1rem;
 <label for="rank">Rank</label>
 <select id="rank">
 <option value="">Select Rank</option>
-<option value="ME1T">ME1T</option>
-<option value="ME2T">ME2T</option>
-<option value="ME3T">ME3T</option>
-<option value="ME4T">ME4T</option>
-<option value="ME5T">ME5T</option>
-<option value="ME6">ME6</option>
+<!-- Options will be loaded dynamically -->
 </select>
 </div>
 <div class="form-group">
 <label for="course">Course</label>
 <select id="course">
 <option value="">Select Course</option>
-<option value="56th Mech">56th Mech</option>
-<option value="56th Avionics">56th Avionics</option>
-<option value="56th Weapons">56th Weapons</option>
-<option value="56th Logistics">56th Logistics</option>
+<!-- Options will be loaded dynamically -->
 </select>
 </div>
 <div class="form-group">
@@ -881,23 +934,13 @@ margin-right: 1rem;
 <div class="form-group">
 <label for="profile-rank">Rank</label>
 <select id="profile-rank">
-<option value="">Select Rank</option>
-<option value="ME1T">ME1T</option>
-<option value="ME2T">ME2T</option>
-<option value="ME3T">ME3T</option>
-<option value="ME4T">ME4T</option>
-<option value="ME5T">ME5T</option>
-<option value="ME6">ME6</option>
+<!-- Options will be loaded dynamically -->
 </select>
 </div>
 <div class="form-group">
 <label for="profile-course">Course</label>
 <select id="profile-course">
-<option value="">Select Course</option>
-<option value="56th Mech">56th Mech</option>
-<option value="56th Avionics">56th Avionics</option>
-<option value="56th Weapons">56th Weapons</option>
-<option value="56th Logistics">56th Logistics</option>
+<!-- Options will be loaded dynamically -->
 </select>
 </div>
 <div class="form-group">
@@ -955,6 +998,7 @@ margin-right: 1rem;
 <div class="nav-item" onclick="showSection('skills')">Manage Skills</div>
 <div class="nav-item" onclick="showSection('users')">Manage Users</div>
 <div class="nav-item" onclick="showSection('adminAccess')">Admin Access</div>
+<div class="nav-item" onclick="showSection('signupSettings')">Signup Settings</div>
 <div class="nav-item" onclick="showSection('settings')">Settings</div>
 </div>
 <div class="main-content-area">
@@ -999,6 +1043,32 @@ margin-right: 1rem;
 </div>
 <div id="adminList">
 <!-- Admin list will be loaded here -->
+</div>
+</div>
+<!-- Signup Settings Section -->
+<div id="signupSettings-section" class="section signup-settings-section">
+<h2 class="section-title">Signup Settings</h2>
+<div class="settings-controls">
+<div class="settings-column">
+<h3 class="setting-title">Manage Ranks</h3>
+<div id="ranksList">
+<!-- Ranks will be loaded here -->
+</div>
+<div class="add-item-input">
+<input type="text" id="newRankInput" placeholder="New rank name">
+<button onclick="addRank()">Add Rank</button>
+</div>
+</div>
+<div class="settings-column">
+<h3 class="setting-title">Manage Courses</h3>
+<div id="coursesList">
+<!-- Courses will be loaded here -->
+</div>
+<div class="add-item-input">
+<input type="text" id="newCourseInput" placeholder="New course name">
+<button onclick="addCourse()">Add Course</button>
+</div>
+</div>
 </div>
 </div>
 <!-- Edit Skill Form -->
@@ -1073,21 +1143,13 @@ margin-right: 1rem;
 <div class="form-group">
 <label for="edit-user-rank">Rank</label>
 <select id="edit-user-rank">
-<option value="ME1T">ME1T</option>
-<option value="ME2T">ME2T</option>
-<option value="ME3T">ME3T</option>
-<option value="ME4T">ME4T</option>
-<option value="ME5T">ME5T</option>
-<option value="ME6">ME6</option>
+<!-- Options will be loaded dynamically -->
 </select>
 </div>
 <div class="form-group">
 <label for="edit-user-course">Course</label>
 <select id="edit-user-course">
-<option value="56th Mech">56th Mech</option>
-<option value="56th Avionics">56th Avionics</option>
-<option value="56th Weapons">56th Weapons</option>
-<option value="56th Logistics">56th Logistics</option>
+<!-- Options will be loaded dynamically -->
 </select>
 </div>
 <button class="btn" onclick="saveEditedUser()">Save Changes</button>
@@ -1139,6 +1201,8 @@ let originalEditingSkill = null; // Store original skill data
 let currentAuthMode = 'login'; // 'login', 'signup', 'forgot', 'profile'
 let editingUserId = null; // Track user being edited
 let isAdmin = false; // Track if current user is admin
+let ranksData = []; // Store ranks from Firestore
+let coursesData = []; // Store courses from Firestore
 
 // Initialize the app
 window.onload = function() {
@@ -1150,12 +1214,100 @@ loadUserData(user.uid);
 // Show user interface by default
 document.getElementById('userInterface').style.display = 'block';
 loadSkillsFromFirebase();
+// Show login popup
+document.getElementById('loginPopup').style.display = 'flex';
 }
 });
 
-// Show login popup by default
-document.getElementById('loginPopup').style.display = 'flex';
+// Load ranks and courses from Firestore
+loadRanksAndCourses();
 };
+
+// Load ranks and courses from Firestore
+async function loadRanksAndCourses() {
+try {
+// Load ranks
+const ranksSnapshot = await db.collection("ranks").orderBy("order").get();
+ranksData = [];
+ranksSnapshot.forEach(doc => {
+ranksData.push({ id: doc.id, ...doc.data() });
+});
+
+// Load courses
+const coursesSnapshot = await db.collection("courses").orderBy("order").get();
+coursesData = [];
+coursesSnapshot.forEach(doc => {
+coursesData.push({ id: doc.id, ...doc.data() });
+});
+
+// Update dropdowns in signup and profile forms
+updateDropdowns();
+} catch (error) {
+console.error("Error loading ranks/courses: ", error);
+}
+}
+
+// Update dropdowns in forms
+function updateDropdowns() {
+// Update signup form rank dropdown
+const rankSelect = document.getElementById('rank');
+rankSelect.innerHTML = '<option value="">Select Rank</option>';
+ranksData.forEach(rank => {
+const option = document.createElement('option');
+option.value = rank.name;
+option.textContent = rank.name;
+rankSelect.appendChild(option);
+});
+
+// Update signup form course dropdown
+const courseSelect = document.getElementById('course');
+courseSelect.innerHTML = '<option value="">Select Course</option>';
+coursesData.forEach(course => {
+const option = document.createElement('option');
+option.value = course.name;
+option.textContent = course.name;
+courseSelect.appendChild(option);
+});
+
+// Update profile form rank dropdown
+const profileRankSelect = document.getElementById('profile-rank');
+profileRankSelect.innerHTML = '<option value="">Select Rank</option>';
+ranksData.forEach(rank => {
+const option = document.createElement('option');
+option.value = rank.name;
+option.textContent = rank.name;
+profileRankSelect.appendChild(option);
+});
+
+// Update profile form course dropdown
+const profileCourseSelect = document.getElementById('profile-course');
+profileCourseSelect.innerHTML = '<option value="">Select Course</option>';
+coursesData.forEach(course => {
+const option = document.createElement('option');
+option.value = course.name;
+option.textContent = course.name;
+profileCourseSelect.appendChild(option);
+});
+
+// Update edit user form dropdowns
+const editRankSelect = document.getElementById('edit-user-rank');
+editRankSelect.innerHTML = '';
+ranksData.forEach(rank => {
+const option = document.createElement('option');
+option.value = rank.name;
+option.textContent = rank.name;
+editRankSelect.appendChild(option);
+});
+
+const editCourseSelect = document.getElementById('edit-user-course');
+editCourseSelect.innerHTML = '';
+coursesData.forEach(course => {
+const option = document.createElement('option');
+option.value = course.name;
+option.textContent = course.name;
+editCourseSelect.appendChild(option);
+});
+}
 
 // Load user data from Firestore
 async function loadUserData(userId) {
@@ -1357,6 +1509,11 @@ function closeLoginPopup() {
 document.getElementById('loginPopup').style.display = 'none';
 }
 
+// Open login popup
+function openLoginPopup() {
+document.getElementById('loginPopup').style.display = 'flex';
+}
+
 // Show profile view
 function showProfileView() {
 if (!currentUser) return;
@@ -1442,6 +1599,24 @@ if (document.getElementById('adminAccess-section').style.display === 'block') {
 loadAdminList();
 }
 });
+
+// Listen for changes in ranks collection
+db.collection("ranks").onSnapshot((snapshot) => {
+loadRanksAndCourses(); // Reload ranks and courses
+// Refresh signup settings section if currently active
+if (document.getElementById('signupSettings-section').style.display === 'block') {
+loadSignupSettings();
+}
+});
+
+// Listen for changes in courses collection
+db.collection("courses").onSnapshot((snapshot) => {
+loadRanksAndCourses(); // Reload ranks and courses
+// Refresh signup settings section if currently active
+if (document.getElementById('signupSettings-section').style.display === 'block') {
+loadSignupSettings();
+}
+});
 }
 
 // Grant admin access to another user
@@ -1523,6 +1698,139 @@ alert('Error revoking admin access: ' + error.message);
 }
 }
 
+// Load signup settings
+async function loadSignupSettings() {
+try {
+// Load ranks
+const ranksSnapshot = await db.collection("ranks").orderBy("order").get();
+const ranksList = document.getElementById('ranksList');
+ranksList.innerHTML = '';
+ranksSnapshot.forEach(doc => {
+const rank = doc.data();
+ranksList.innerHTML += `
+<div class="setting-item">
+<span>${rank.name}</span>
+<div class="setting-actions">
+<button class="delete-btn-setting" onclick="deleteRank('${doc.id}', '${rank.name}')">Delete</button>
+</div>
+</div>
+`;
+});
+
+// Load courses
+const coursesSnapshot = await db.collection("courses").orderBy("order").get();
+const coursesList = document.getElementById('coursesList');
+coursesList.innerHTML = '';
+coursesSnapshot.forEach(doc => {
+const course = doc.data();
+coursesList.innerHTML += `
+<div class="setting-item">
+<span>${course.name}</span>
+<div class="setting-actions">
+<button class="delete-btn-setting" onclick="deleteCourse('${doc.id}', '${course.name}')">Delete</button>
+</div>
+</div>
+`;
+});
+} catch (error) {
+console.error("Error loading signup settings: ", error);
+}
+}
+
+// Add a new rank
+async function addRank() {
+const newRankInput = document.getElementById('newRankInput');
+const newRank = newRankInput.value.trim();
+if (!newRank) {
+alert('Please enter a rank name');
+return;
+}
+
+try {
+// Check if rank already exists
+const existingRank = ranksData.find(r => r.name === newRank);
+if (existingRank) {
+alert('This rank already exists');
+return;
+}
+
+// Add new rank to Firestore
+await db.collection("ranks").add({
+name: newRank,
+order: ranksData.length
+});
+
+// Clear input
+newRankInput.value = '';
+alert('Rank added successfully!');
+} catch (error) {
+console.error("Error adding rank: ", error);
+alert('Error adding rank: ' + error.message);
+}
+}
+
+// Delete a rank
+async function deleteRank(rankId, rankName) {
+if (!confirm(`Are you sure you want to delete the rank "${rankName}"?`)) {
+return;
+}
+
+try {
+await db.collection("ranks").doc(rankId).delete();
+alert('Rank deleted successfully!');
+} catch (error) {
+console.error("Error deleting rank: ", error);
+alert('Error deleting rank: ' + error.message);
+}
+}
+
+// Add a new course
+async function addCourse() {
+const newCourseInput = document.getElementById('newCourseInput');
+const newCourse = newCourseInput.value.trim();
+if (!newCourse) {
+alert('Please enter a course name');
+return;
+}
+
+try {
+// Check if course already exists
+const existingCourse = coursesData.find(c => c.name === newCourse);
+if (existingCourse) {
+alert('This course already exists');
+return;
+}
+
+// Add new course to Firestore
+await db.collection("courses").add({
+name: newCourse,
+order: coursesData.length
+});
+
+// Clear input
+newCourseInput.value = '';
+alert('Course added successfully!');
+} catch (error) {
+console.error("Error adding course: ", error);
+alert('Error adding course: ' + error.message);
+}
+}
+
+// Delete a course
+async function deleteCourse(courseId, courseName) {
+if (!confirm(`Are you sure you want to delete the course "${courseName}"?`)) {
+return;
+}
+
+try {
+await db.collection("courses").doc(courseId).delete();
+alert('Course deleted successfully!');
+} catch (error) {
+console.error("Error deleting course: ", error);
+alert('Error deleting course: ' + error.message);
+}
+}
+
 // Logout function
 function logout() {
 auth.signOut().then(() => {
@@ -1571,6 +1879,11 @@ loadUsersManagement();
 // Load admin list when showing admin access section
 if (section === 'adminAccess') {
 loadAdminList();
+}
+
+// Load signup settings when showing signup settings section
+if (section === 'signupSettings') {
+loadSignupSettings();
 }
 }
 
