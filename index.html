@@ -88,7 +88,7 @@ display: block;
 margin-bottom: 0.5rem;
 font-weight: 500;
 }
-.form-group input, .form-group select, .form-group textarea {
+.form-group input, .form-group select {
 width: 100%;
 padding: 0.8rem;
 border: 1px solid #ddd;
@@ -282,33 +282,6 @@ justify-content: flex-end;
 gap: 1rem;
 margin-top: 1.5rem;
 }
-/* Tools Editor */
-.tools-editor {
-margin-top: 1.5rem;
-}
-.tool-item {
-border: 1px solid var(--light);
-border-radius: 5px;
-padding: 1rem;
-margin-bottom: 1rem;
-position: relative;
-}
-.tool-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 0.8rem;
-}
-.tool-content {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 1rem;
-}
-.add-tool-btn {
-margin-top: 1rem;
-background: var(--success);
-color: white;
-}
 /* Steps Editor */
 .steps-editor {
 margin-top: 1.5rem;
@@ -336,33 +309,6 @@ margin-top: 1rem;
 background: var(--success);
 color: white;
 }
-/* Theory Editor */
-.theory-editor {
-margin-top: 1.5rem;
-}
-.theory-item {
-border: 1px solid var(--light);
-border-radius: 5px;
-padding: 1rem;
-margin-bottom: 1rem;
-position: relative;
-}
-.theory-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 0.8rem;
-}
-.theory-content {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 1rem;
-}
-.add-theory-btn {
-margin-top: 1rem;
-background: var(--success);
-color: white;
-}
 /* Quiz Editor */
 .quiz-editor {
 margin-top: 1.5rem;
@@ -373,7 +319,6 @@ border-radius: 5px;
 padding: 1rem;
 margin-bottom: 1rem;
 position: relative;
-background: white;
 }
 .quiz-header {
 display: flex;
@@ -395,51 +340,6 @@ gap: 1rem;
 margin-top: 1rem;
 background: var(--success);
 color: white;
-}
-/* Google Forms Style Quiz */
-.google-quiz {
-border: 1px solid #dadce0;
-border-radius: 8px;
-padding: 20px;
-margin-top: 1rem;
-}
-.google-quiz-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 15px;
-}
-.google-quiz-title {
-font-size: 16px;
-font-weight: bold;
-color: #202124;
-}
-.google-quiz-body {
-margin-top: 15px;
-}
-.google-quiz-question {
-margin-bottom: 15px;
-}
-.google-quiz-question-text {
-font-weight: 500;
-color: #202124;
-margin-bottom: 8px;
-}
-.google-quiz-options {
-margin-top: 10px;
-}
-.google-quiz-option {
-display: flex;
-align-items: center;
-margin-bottom: 8px;
-}
-.google-quiz-option input[type="radio"],
-.google-quiz-option input[type="checkbox"] {
-margin-right: 8px;
-}
-.google-quiz-option label {
-margin: 0;
-color: #202124;
 }
 /* Settings Tabs */
 .settings-tabs {
@@ -839,7 +739,6 @@ border-radius: 8px;
 padding: 1rem;
 text-align: center;
 transition: var(--transition);
-cursor: pointer;
 }
 .tool-item:hover {
 background: var(--primary);
@@ -1271,12 +1170,17 @@ right: 10px;
 <textarea id="edit-skill-description" placeholder="Enter skill description"></textarea>
 </div>
 </div>
-<div class="tools-editor">
-<h3>Tools Required</h3>
-<div id="tools-container">
-<!-- Tools will be added here -->
+<div class="form-row">
+<div class="form-col">
+<label for="edit-tools">Tools Required (comma separated)</label>
+<textarea id="edit-tools" placeholder="Enter required tools"></textarea>
 </div>
-<button class="btn add-tool-btn" onclick="addTool()">Add Tool</button>
+</div>
+<div class="form-row">
+<div class="form-col">
+<label for="edit-theory">Theory Section</label>
+<textarea id="edit-theory" placeholder="Enter theoretical content"></textarea>
+</div>
 </div>
 <div class="steps-editor">
 <h3>Steps</h3>
@@ -1284,13 +1188,6 @@ right: 10px;
 <!-- Steps will be added here -->
 </div>
 <button class="btn add-step-btn" onclick="addStep()">Add Step</button>
-</div>
-<div class="theory-editor">
-<h3>Theory Section</h3>
-<div id="theory-container">
-<!-- Theory items will be added here -->
-</div>
-<button class="btn add-theory-btn" onclick="addTheoryItem()">Add Theory Item</button>
 </div>
 <div class="quiz-editor">
 <h3>Quiz Questions</h3>
@@ -1302,6 +1199,8 @@ right: 10px;
 <div class="form-actions">
 <button class="btn btn-secondary" onclick="cancelEdit()">Cancel</button>
 <button class="btn" onclick="saveSkill()">Save Changes</button>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -1885,6 +1784,7 @@ adminItems.push(`
 <button class="btn btn-secondary" onclick="revokeAdminAccess('${doc.id}', '${adminData.email}')" style="width: auto; padding: 0.5rem 1rem;">Revoke</button>
 </div>
 `);
+});
 
 adminList.innerHTML += adminItems.join('');
 } catch (error) {
@@ -2253,7 +2153,7 @@ icon: '',
 description: '',
 tools: [],
 steps: [],
-theory: [],
+theory: '',
 quiz: []
 };
 originalEditingSkill = JSON.parse(JSON.stringify(currentEditingSkill)); // Store original data
@@ -2274,15 +2174,8 @@ function showEditForm() {
 document.getElementById('edit-skill-name').value = currentEditingSkill.name || '';
 document.getElementById('edit-skill-icon').value = currentEditingSkill.icon || '';
 document.getElementById('edit-skill-description').value = currentEditingSkill.description || '';
-
-// Clear and populate tools
-const toolsContainer = document.getElementById('tools-container');
-toolsContainer.innerHTML = '';
-if (Array.isArray(currentEditingSkill.tools)) {
-currentEditingSkill.tools.forEach((tool, index) => {
-addToolToForm(index, tool);
-});
-}
+document.getElementById('edit-tools').value = Array.isArray(currentEditingSkill.tools) ? currentEditingSkill.tools.join(', ') : '';
+document.getElementById('edit-theory').value = currentEditingSkill.theory || '';
 
 // Clear and populate steps
 const stepsContainer = document.getElementById('steps-container');
@@ -2290,15 +2183,6 @@ stepsContainer.innerHTML = '';
 if (Array.isArray(currentEditingSkill.steps)) {
 currentEditingSkill.steps.forEach((step, index) => {
 addStepToForm(index, step);
-});
-}
-
-// Clear and populate theory
-const theoryContainer = document.getElementById('theory-container');
-theoryContainer.innerHTML = '';
-if (Array.isArray(currentEditingSkill.theory)) {
-currentEditingSkill.theory.forEach((item, index) => {
-addTheoryItemToForm(index, item);
 });
 }
 
@@ -2324,65 +2208,6 @@ currentEditingSkill = JSON.parse(JSON.stringify(originalEditingSkill));
 // Return to skills list
 document.getElementById('edit-skill-form').style.display = 'none';
 document.getElementById('skills-section').style.display = 'block';
-}
-
-// Add tool to form
-function addToolToForm(index, tool = null) {
-const toolsContainer = document.getElementById('tools-container');
-const toolId = index !== undefined ? index : (currentEditingSkill.tools ? currentEditingSkill.tools.length : 0);
-const toolObj = tool || { name: '', description: '', image: '' };
-
-const toolElement = document.createElement('div');
-toolElement.className = 'tool-item';
-toolElement.id = `tool-${toolId}`;
-toolElement.innerHTML = `
-<div class="tool-header">
-<h4>Tool ${toolId + 1}</h4>
-<button class="action-btn delete-btn" onclick="removeTool(${toolId})">Remove</button>
-</div>
-<div class="tool-content">
-<div>
-<label>Name</label>
-<input type="text" value="${toolObj.name}" onchange="updateToolField(${toolId}, 'name', this.value)" placeholder="Tool name">
-</div>
-<div>
-<label>Description</label>
-<textarea onchange="updateToolField(${toolId}, 'description', this.value)" placeholder="Tool description">${toolObj.description}</textarea>
-</div>
-<div>
-<label>Image URL</label>
-<input type="text" value="${toolObj.image}" onchange="updateToolField(${toolId}, 'image', this.value)" placeholder="Image URL">
-</div>
-</div>
-`;
-toolsContainer.appendChild(toolElement);
-}
-
-// Add new tool
-function addTool() {
-if (!currentEditingSkill.tools) currentEditingSkill.tools = [];
-currentEditingSkill.tools.push({ name: '', description: '', image: '' });
-addToolToForm();
-}
-
-// Update tool field
-function updateToolField(index, field, value) {
-if (currentEditingSkill.tools && currentEditingSkill.tools[index]) {
-currentEditingSkill.tools[index][field] = value;
-}
-}
-
-// Remove tool
-function removeTool(index) {
-if (currentEditingSkill.tools && currentEditingSkill.tools[index]) {
-currentEditingSkill.tools.splice(index, 1);
-// Re-render all tools
-const toolsContainer = document.getElementById('tools-container');
-toolsContainer.innerHTML = '';
-currentEditingSkill.tools.forEach((tool, idx) => {
-addToolToForm(idx, tool);
-});
-}
 }
 
 // Add step to form
@@ -2444,74 +2269,11 @@ addStepToForm(idx, step);
 }
 }
 
-// Add theory item to form
-function addTheoryItemToForm(index, item = null) {
-const theoryContainer = document.getElementById('theory-container');
-const itemId = index !== undefined ? index : (currentEditingSkill.theory ? currentEditingSkill.theory.length : 0);
-const itemObj = item || { type: 'paragraph', content: '', mediaUrl: '' };
-
-const itemElement = document.createElement('div');
-itemElement.className = 'theory-item';
-itemElement.id = `theory-${itemId}`;
-itemElement.innerHTML = `
-<div class="theory-header">
-<h4>Theory Item ${itemId + 1}</h4>
-<button class="action-btn delete-btn" onclick="removeTheoryItem(${itemId})">Remove</button>
-</div>
-<div class="theory-content">
-<div>
-<label>Type</label>
-<select onchange="updateTheoryField(${itemId}, 'type', this.value)">
-<option value="paragraph" ${itemObj.type === 'paragraph' ? 'selected' : ''}>Paragraph</option>
-<option value="image" ${itemObj.type === 'image' ? 'selected' : ''}>Image</option>
-<option value="video" ${itemObj.type === 'video' ? 'selected' : ''}>Video</option>
-</select>
-</div>
-<div>
-<label>Content</label>
-<textarea onchange="updateTheoryField(${itemId}, 'content', this.value)" placeholder="Content">${itemObj.content}</textarea>
-</div>
-<div>
-<label>Media URL</label>
-<input type="text" value="${itemObj.mediaUrl}" onchange="updateTheoryField(${itemId}, 'mediaUrl', this.value)" placeholder="Media URL">
-</div>
-</div>
-`;
-theoryContainer.appendChild(itemElement);
-}
-
-// Add new theory item
-function addTheoryItem() {
-if (!currentEditingSkill.theory) currentEditingSkill.theory = [];
-currentEditingSkill.theory.push({ type: 'paragraph', content: '', mediaUrl: '' });
-addTheoryItemToForm();
-}
-
-// Update theory field
-function updateTheoryField(index, field, value) {
-if (currentEditingSkill.theory && currentEditingSkill.theory[index]) {
-currentEditingSkill.theory[index][field] = value;
-}
-}
-
-// Remove theory item
-function removeTheoryItem(index) {
-if (currentEditingSkill.theory && currentEditingSkill.theory[index]) {
-currentEditingSkill.theory.splice(index, 1);
-// Re-render all theory items
-const theoryContainer = document.getElementById('theory-container');
-theoryContainer.innerHTML = '';
-currentEditingSkill.theory.forEach((item, idx) => {
-addTheoryItemToForm(idx, item);
-});
-}
-}
-
 // Add quiz question to form
 function addQuizQuestionToForm(index, question = null) {
 const quizContainer = document.getElementById('quiz-container');
 const questionId = index !== undefined ? index : (currentEditingSkill.quiz ? currentEditingSkill.quiz.length : 0);
-const q = question || { question: '', options: ['', '', '', ''], answer: 0, type: 'multiple-choice' };
+const q = question || { question: '', options: ['', '', '', ''], answer: 0 };
 
 const questionElement = document.createElement('div');
 questionElement.className = 'quiz-question';
@@ -2522,13 +2284,6 @@ questionElement.innerHTML = `
 <button class="action-btn delete-btn" onclick="removeQuizQuestion(${questionId})">Remove</button>
 </div>
 <div class="quiz-content">
-<div>
-<label>Question Type</label>
-<select onchange="updateQuizField(${questionId}, 'type', this.value)">
-<option value="multiple-choice" ${q.type === 'multiple-choice' ? 'selected' : ''}>Multiple Choice</option>
-<option value="true-false" ${q.type === 'true-false' ? 'selected' : ''}>True/False</option>
-</select>
-</div>
 <div>
 <label>Question Text</label>
 <input type="text" value="${q.question}" onchange="updateQuizField(${questionId}, 'question', this.value)" placeholder="Question text">
@@ -2563,7 +2318,7 @@ quizContainer.appendChild(questionElement);
 // Add new quiz question
 function addQuizQuestion() {
 if (!currentEditingSkill.quiz) currentEditingSkill.quiz = [];
-currentEditingSkill.quiz.push({ question: '', options: ['', '', '', ''], answer: 0, type: 'multiple-choice' });
+currentEditingSkill.quiz.push({ question: '', options: ['', '', '', ''], answer: 0 });
 addQuizQuestionToForm();
 }
 
@@ -2602,6 +2357,8 @@ function saveSkill() {
 currentEditingSkill.name = document.getElementById('edit-skill-name').value;
 currentEditingSkill.icon = document.getElementById('edit-skill-icon').value;
 currentEditingSkill.description = document.getElementById('edit-skill-description').value;
+currentEditingSkill.tools = document.getElementById('edit-tools').value.split(',').map(t => t.trim()).filter(t => t);
+currentEditingSkill.theory = document.getElementById('edit-theory').value;
 
 // If it's a new skill, add to Firestore
 if (!currentEditingSkill.id) {
@@ -2707,9 +2464,9 @@ let html = `
 `;
 skill.tools.forEach(tool => {
 html += `
-<div class="tool-item" onclick="showToolInfo('${tool.name}', '${tool.description}', '${tool.image}')">
+<div class="tool-item">
 <i class="fas fa-toolbox"></i>
-<div>${tool.name}</div>
+<div>${tool}</div>
 </div>
 `;
 });
@@ -2737,17 +2494,7 @@ html += `
 <div class="skill-section">
 <h3 class="section-title-ui">Theory & Principles</h3>
 <div class="theory-content">
-`;
-skill.theory.forEach(item => {
-if (item.type === 'paragraph') {
-html += `<p>${item.content}</p>`;
-} else if (item.type === 'image') {
-html += `<img src="${item.mediaUrl}" alt="Theory Image" style="width: 100%; margin: 1rem 0; border-radius: 5px;">`;
-} else if (item.type === 'video') {
-html += `<iframe width="100%" height="315" src="${item.mediaUrl}" frameborder="0" allowfullscreen></iframe>`;
-}
-});
-html += `
+<p>${skill.theory}</p>
 </div>
 </div>
 <div class="skill-section">
@@ -2796,27 +2543,6 @@ opt.classList.remove('selected');
 this.classList.add('selected');
 });
 });
-}
-
-// Show tool info
-function showToolInfo(name, description, imageUrl) {
-let infoHtml = `
-<div style="background: white; padding: 2rem; border-radius: 10px; box-shadow: var(--shadow); position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 5000; max-width: 500px; width: 90%;">
-<h3>${name}</h3>
-<p>${description}</p>
-${imageUrl ? `<img src="${imageUrl}" alt="${name}" style="width: 100%; margin-top: 1rem; border-radius: 5px;">` : ''}
-<button class="btn" onclick="closeToolInfo()" style="margin-top: 1rem;">Close</button>
-</div>
-`;
-document.body.insertAdjacentHTML('beforeend', infoHtml);
-}
-
-// Close tool info
-function closeToolInfo() {
-const toolInfo = document.querySelector('div[style*="position: fixed"]');
-if (toolInfo) {
-toolInfo.remove();
-}
 }
 
 // Check quiz answers
