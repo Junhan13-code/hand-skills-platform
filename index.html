@@ -144,6 +144,11 @@ color: var(--danger);
 margin-top: 0.5rem;
 font-size: 0.9rem;
 }
+.operation-message {
+color: var(--success);
+margin-top: 0.5rem;
+font-size: 0.9rem;
+}
 /* Admin Dashboard */
 .admin-dashboard {
 display: none;
@@ -1058,6 +1063,7 @@ margin-right: 1rem;
 <input type="text" id="newRankInput" placeholder="New rank name">
 <button onclick="addRank()">Add Rank</button>
 </div>
+<div class="operation-message" id="rankMessage"></div>
 </div>
 <div class="settings-column">
 <h3 class="setting-title">Manage Courses</h3>
@@ -1068,6 +1074,7 @@ margin-right: 1rem;
 <input type="text" id="newCourseInput" placeholder="New course name">
 <button onclick="addCourse()">Add Course</button>
 </div>
+<div class="operation-message" id="courseMessage"></div>
 </div>
 </div>
 </div>
@@ -1529,7 +1536,8 @@ document.getElementById('profile-email-display').textContent = currentUser.email
 // Close profile view
 function closeProfileView() {
 document.getElementById('profileView').style.display = 'none';
-if (document.getElementById('adminDashboard').style.display === 'block') {
+// Show the appropriate interface based on current state
+if (isAdmin) {
 document.getElementById('adminDashboard').style.display = 'block';
 } else {
 document.getElementById('userInterface').style.display = 'block';
@@ -1742,7 +1750,10 @@ async function addRank() {
 const newRankInput = document.getElementById('newRankInput');
 const newRank = newRankInput.value.trim();
 if (!newRank) {
-alert('Please enter a rank name');
+document.getElementById('rankMessage').textContent = 'Please enter a rank name';
+setTimeout(() => {
+document.getElementById('rankMessage').textContent = '';
+}, 3000);
 return;
 }
 
@@ -1750,7 +1761,10 @@ try {
 // Check if rank already exists
 const existingRank = ranksData.find(r => r.name === newRank);
 if (existingRank) {
-alert('This rank already exists');
+document.getElementById('rankMessage').textContent = 'This rank already exists';
+setTimeout(() => {
+document.getElementById('rankMessage').textContent = '';
+}, 3000);
 return;
 }
 
@@ -1762,10 +1776,16 @@ order: ranksData.length
 
 // Clear input
 newRankInput.value = '';
-alert('Rank added successfully!');
+document.getElementById('rankMessage').textContent = 'Rank added successfully!';
+setTimeout(() => {
+document.getElementById('rankMessage').textContent = '';
+}, 3000);
 } catch (error) {
 console.error("Error adding rank: ", error);
-alert('Error adding rank: ' + error.message);
+document.getElementById('rankMessage').textContent = 'Error adding rank: ' + error.message;
+setTimeout(() => {
+document.getElementById('rankMessage').textContent = '';
+}, 3000);
 }
 }
 
@@ -1777,10 +1797,16 @@ return;
 
 try {
 await db.collection("ranks").doc(rankId).delete();
-alert('Rank deleted successfully!');
+document.getElementById('rankMessage').textContent = 'Rank deleted successfully!';
+setTimeout(() => {
+document.getElementById('rankMessage').textContent = '';
+}, 3000);
 } catch (error) {
 console.error("Error deleting rank: ", error);
-alert('Error deleting rank: ' + error.message);
+document.getElementById('rankMessage').textContent = 'Error deleting rank: ' + error.message;
+setTimeout(() => {
+document.getElementById('rankMessage').textContent = '';
+}, 3000);
 }
 }
 
@@ -1789,7 +1815,10 @@ async function addCourse() {
 const newCourseInput = document.getElementById('newCourseInput');
 const newCourse = newCourseInput.value.trim();
 if (!newCourse) {
-alert('Please enter a course name');
+document.getElementById('courseMessage').textContent = 'Please enter a course name';
+setTimeout(() => {
+document.getElementById('courseMessage').textContent = '';
+}, 3000);
 return;
 }
 
@@ -1797,7 +1826,10 @@ try {
 // Check if course already exists
 const existingCourse = coursesData.find(c => c.name === newCourse);
 if (existingCourse) {
-alert('This course already exists');
+document.getElementById('courseMessage').textContent = 'This course already exists';
+setTimeout(() => {
+document.getElementById('courseMessage').textContent = '';
+}, 3000);
 return;
 }
 
@@ -1809,10 +1841,16 @@ order: coursesData.length
 
 // Clear input
 newCourseInput.value = '';
-alert('Course added successfully!');
+document.getElementById('courseMessage').textContent = 'Course added successfully!';
+setTimeout(() => {
+document.getElementById('courseMessage').textContent = '';
+}, 3000);
 } catch (error) {
 console.error("Error adding course: ", error);
-alert('Error adding course: ' + error.message);
+document.getElementById('courseMessage').textContent = 'Error adding course: ' + error.message;
+setTimeout(() => {
+document.getElementById('courseMessage').textContent = '';
+}, 3000);
 }
 }
 
@@ -1824,10 +1862,16 @@ return;
 
 try {
 await db.collection("courses").doc(courseId).delete();
-alert('Course deleted successfully!');
+document.getElementById('courseMessage').textContent = 'Course deleted successfully!';
+setTimeout(() => {
+document.getElementById('courseMessage').textContent = '';
+}, 3000);
 } catch (error) {
 console.error("Error deleting course: ", error);
-alert('Error deleting course: ' + error.message);
+document.getElementById('courseMessage').textContent = 'Error deleting course: ' + error.message;
+setTimeout(() => {
+document.getElementById('courseMessage').textContent = '';
+}, 3000);
 }
 }
 
