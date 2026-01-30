@@ -317,6 +317,18 @@ border: 1px solid var(--light);
 border-radius: 5px;
 padding: 1rem;
 margin-bottom: 1rem;
+position: relative;
+}
+.quiz-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 0.8rem;
+}
+.quiz-content {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 1rem;
 }
 .quiz-options {
 display: grid;
@@ -327,6 +339,31 @@ gap: 1rem;
 margin-top: 1rem;
 background: var(--success);
 color: white;
+}
+/* Settings Tabs */
+.settings-tabs {
+display: flex;
+border-bottom: 1px solid var(--light);
+margin-bottom: 1.5rem;
+}
+.tab-button {
+padding: 0.75rem 1.5rem;
+background: none;
+border: none;
+border-bottom: 3px solid transparent;
+cursor: pointer;
+font-weight: 600;
+color: var(--gray);
+}
+.tab-button.active {
+border-bottom: 3px solid var(--primary);
+color: var(--primary);
+}
+.tab-content {
+display: none;
+}
+.tab-content.active {
+display: block;
 }
 /* User Interface */
 .user-interface {
@@ -508,22 +545,7 @@ position: relative;
 margin-bottom: 1.5rem;
 color: var(--primary);
 }
-/* Admin Access Section */
-.admin-access-section {
-display: none;
-}
-.admin-access-form {
-margin-bottom: 2rem;
-}
-.access-input {
-display: flex;
-gap: 1rem;
-margin-bottom: 1rem;
-}
-.access-input input {
-flex: 1;
-}
-/* Signup Settings Section */
+/* Settings Sections */
 .signup-settings-section {
 display: none;
 }
@@ -817,6 +839,12 @@ margin-bottom: 2rem;
 .settings-controls {
 grid-template-columns: 1fr;
 }
+.settings-tabs {
+flex-wrap: wrap;
+}
+.tab-button {
+padding: 0.5rem;
+}
 }
 @media (max-width: 768px) {
 .step-card {
@@ -984,6 +1012,13 @@ margin-right: 1rem;
 </div>
 </div>
 <div style="margin-top: 2rem;">
+<div class="form-group">
+<label for="edit-rank">Change Rank</label>
+<select id="edit-rank">
+<!-- Options will be loaded dynamically -->
+</select>
+</div>
+<button class="btn" onclick="updateOwnRank()">Update Rank</button>
 <button class="btn btn-secondary" onclick="closeProfileView()">Close</button>
 <button class="btn" onclick="logout()">Logout</button>
 </div>
@@ -1003,7 +1038,6 @@ margin-right: 1rem;
 <div class="nav-item" onclick="showSection('skills')">Manage Skills</div>
 <div class="nav-item" onclick="showSection('users')">Manage Users</div>
 <div class="nav-item" onclick="showSection('adminAccess')">Admin Access</div>
-<div class="nav-item" onclick="showSection('signupSettings')">Signup Settings</div>
 <div class="nav-item" onclick="showSection('settings')">Settings</div>
 </div>
 <div class="main-content-area">
@@ -1050,9 +1084,14 @@ margin-right: 1rem;
 <!-- Admin list will be loaded here -->
 </div>
 </div>
-<!-- Signup Settings Section -->
-<div id="signupSettings-section" class="section signup-settings-section">
-<h2 class="section-title">Signup Settings</h2>
+<!-- Settings Section -->
+<div id="settings-section" class="section" style="display: none;">
+<h2 class="section-title">System Settings</h2>
+<div class="settings-tabs">
+<button class="tab-button active" data-tab="signupSettings">Signup Settings</button>
+<button class="tab-button" data-tab="adminAccess">Admin Access</button>
+</div>
+<div id="signupSettingsTab" class="tab-content active">
 <div class="settings-controls">
 <div class="settings-column">
 <h3 class="setting-title">Manage Ranks</h3>
@@ -1075,6 +1114,21 @@ margin-right: 1rem;
 <button onclick="addCourse()">Add Course</button>
 </div>
 <div class="operation-message" id="courseMessage"></div>
+</div>
+</div>
+</div>
+<div id="adminAccessTab" class="tab-content">
+<h3 class="section-title">Admin Access Management</h3>
+<div class="admin-access-form">
+<div class="form-group">
+<label for="admin-email">Email Address</label>
+<input type="email" id="admin-email" placeholder="Enter email address">
+</div>
+<button class="btn" onclick="grantAdminAccess()">Grant Admin Access</button>
+</div>
+<div id="adminList">
+<!-- Admin list will be loaded here -->
+</div>
 </div>
 </div>
 </div>
@@ -1127,11 +1181,6 @@ margin-right: 1rem;
 <button class="btn btn-secondary" onclick="cancelEdit()">Cancel</button>
 <button class="btn" onclick="saveSkill()">Save Changes</button>
 </div>
-</div>
-<!-- Settings Section -->
-<div id="settings-section" class="section" style="display: none;">
-<h2 class="section-title">System Settings</h2>
-<p>System configuration options would go here in a full implementation.</p>
 </div>
 </div>
 </div>
@@ -1210,6 +1259,7 @@ let editingUserId = null; // Track user being edited
 let isAdmin = false; // Track if current user is admin
 let ranksData = []; // Store ranks from Firestore
 let coursesData = []; // Store courses from Firestore
+let wasInAdminView = false; // Track if we were in admin view before switching
 
 // Initialize the app
 window.onload = function() {
@@ -1313,6 +1363,19 @@ const option = document.createElement('option');
 option.value = course.name;
 option.textContent = course.name;
 editCourseSelect.appendChild(option);
+});
+
+// Update profile view rank dropdown
+const profileViewRankSelect = document.getElementById('edit-rank');
+profileViewRankSelect.innerHTML = '';
+ranksData.forEach(rank => {
+const option = document.createElement('option');
+option.value = rank.name;
+option.textContent = rank.name;
+if (currentUser && rank.name === currentUser.rank) {
+option.selected = true;
+}
+profileViewRankSelect.appendChild(option);
 });
 }
 
@@ -1536,8 +1599,8 @@ document.getElementById('profile-email-display').textContent = currentUser.email
 // Close profile view
 function closeProfileView() {
 document.getElementById('profileView').style.display = 'none';
-// Show the appropriate interface based on current state
-if (isAdmin) {
+// Show the appropriate interface based on previous state
+if (wasInAdminView) {
 document.getElementById('adminDashboard').style.display = 'block';
 } else {
 document.getElementById('userInterface').style.display = 'block';
@@ -1546,6 +1609,7 @@ document.getElementById('userInterface').style.display = 'block';
 
 // Switch to user interface (from admin)
 function switchToUserInterface() {
+wasInAdminView = true;
 document.getElementById('adminDashboard').style.display = 'none';
 document.getElementById('userInterface').style.display = 'block';
 document.getElementById('adminSwitchBtn').style.display = 'none';
@@ -1556,10 +1620,32 @@ loadSkillsFromFirebase();
 
 // Switch to admin interface (from user)
 function switchToAdminInterface() {
+wasInAdminView = false;
 document.getElementById('userInterface').style.display = 'none';
 document.getElementById('adminDashboard').style.display = 'block';
 document.getElementById('adminSwitchBtn').style.display = 'block';
 document.getElementById('adminBackBtn').style.display = 'none';
+}
+
+// Update own rank in profile view
+async function updateOwnRank() {
+const newRank = document.getElementById('edit-rank').value;
+if (!newRank) {
+alert('Please select a rank');
+return;
+}
+
+try {
+await db.collection("users").doc(currentUser.id).update({
+rank: newRank
+});
+currentUser.rank = newRank;
+document.getElementById('profile-rank-display').textContent = newRank;
+alert('Rank updated successfully!');
+} catch (error) {
+console.error("Error updating rank: ", error);
+alert('Error updating rank: ' + error.message);
+}
 }
 
 // Setup Firestore listeners to sync data in real-time
@@ -1612,7 +1698,7 @@ loadAdminList();
 db.collection("ranks").onSnapshot((snapshot) => {
 loadRanksAndCourses(); // Reload ranks and courses
 // Refresh signup settings section if currently active
-if (document.getElementById('signupSettings-section').style.display === 'block') {
+if (document.getElementById('settings-section').style.display === 'block') {
 loadSignupSettings();
 }
 });
@@ -1621,7 +1707,7 @@ loadSignupSettings();
 db.collection("courses").onSnapshot((snapshot) => {
 loadRanksAndCourses(); // Reload ranks and courses
 // Refresh signup settings section if currently active
-if (document.getElementById('signupSettings-section').style.display === 'block') {
+if (document.getElementById('settings-section').style.display === 'block') {
 loadSignupSettings();
 }
 });
@@ -1925,8 +2011,8 @@ if (section === 'adminAccess') {
 loadAdminList();
 }
 
-// Load signup settings when showing signup settings section
-if (section === 'signupSettings') {
+// Load signup settings when showing settings section
+if (section === 'settings') {
 loadSignupSettings();
 }
 }
@@ -2183,12 +2269,13 @@ const questionElement = document.createElement('div');
 questionElement.className = 'quiz-question';
 questionElement.id = `question-${questionId}`;
 questionElement.innerHTML = `
-<div class="step-header">
+<div class="quiz-header">
 <h4>Question ${questionId + 1}</h4>
 <button class="action-btn delete-btn" onclick="removeQuizQuestion(${questionId})">Remove</button>
 </div>
+<div class="quiz-content">
 <div>
-<label>Question</label>
+<label>Question Text</label>
 <input type="text" value="${q.question}" onchange="updateQuizField(${questionId}, 'question', this.value)" placeholder="Question text">
 </div>
 <div class="quiz-options">
@@ -2212,6 +2299,7 @@ questionElement.innerHTML = `
 <div>
 <label>Correct Answer (0=A, 1=B, 2=C, 3=D)</label>
 <input type="number" min="0" max="3" value="${q.answer}" onchange="updateQuizField(${questionId}, 'answer', parseInt(this.value))">
+</div>
 </div>
 `;
 quizContainer.appendChild(questionElement);
@@ -2507,7 +2595,19 @@ function goBackToGrid() {
 document.getElementById('skill-grid').style.display = 'grid';
 document.getElementById('skill-detail').style.display = 'none';
 }
+
+// Settings tab functionality
+document.querySelectorAll('.tab-button').forEach(button => {
+button.addEventListener('click', function() {
+const tabName = this.getAttribute('data-tab');
+// Remove active class from all buttons and tabs
+document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+// Add active class to clicked button and corresponding tab
+this.classList.add('active');
+document.getElementById(`${tabName}Tab`).classList.add('active');
+});
+});
 </script>
 </body>
 </html>
-
