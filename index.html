@@ -4,10 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hand Skills Learning Platform - Admin & User System</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css    ">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js    "></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js    "></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 <style>
 * {
 margin: 0;
@@ -38,26 +39,6 @@ width: 100%;
 max-width: 1200px;
 margin: 0 auto;
 padding: 0 20px;
-}
-/* Admin Login Button */
-.admin-login {
-position: absolute;
-top: 20px;
-right: 20px;
-z-index: 100;
-}
-.admin-btn {
-background: rgba(0,0,0,0.3);
-color: white;
-border: none;
-padding: 0.75rem 1.5rem;
-border-radius: 5px;
-cursor: pointer;
-font-weight: 600;
-transition: var(--transition);
-}
-.admin-btn:hover {
-background: rgba(0,0,0,0.5);
 }
 /* Login Popup */
 .login-popup {
@@ -126,6 +107,7 @@ font-size: 1rem;
 font-weight: 600;
 cursor: pointer;
 transition: var(--transition);
+margin-bottom: 0.5rem;
 }
 .btn:hover {
 background: var(--secondary);
@@ -142,10 +124,11 @@ background: var(--success);
 .btn-success:hover {
 background: #22c55e;
 }
-.error-message {
-color: var(--danger);
-margin-top: 0.5rem;
-font-size: 0.9rem;
+.google-btn {
+background: #DB4437;
+}
+.google-btn:hover {
+background: #c23325;
 }
 .auth-toggle {
 margin-top: 1rem;
@@ -155,6 +138,11 @@ color: var(--gray);
 color: var(--primary);
 text-decoration: none;
 font-weight: 600;
+}
+.error-message {
+color: var(--danger);
+margin-top: 0.5rem;
+font-size: 0.9rem;
 }
 /* Admin Dashboard */
 .admin-dashboard {
@@ -610,11 +598,6 @@ margin-bottom: 1rem;
 flex-direction: column;
 gap: 0;
 }
-.admin-login {
-position: static;
-text-align: center;
-margin-top: 1rem;
-}
 }
 </style>
 </head>
@@ -624,27 +607,99 @@ margin-top: 1rem;
 <h1><i class="fas fa-tools"></i> Hand Skills Learning Platform</h1>
 <p>Master essential hands-on skills with step-by-step guidance</p>
 </div>
-<div class="admin-login">
-<button class="admin-btn" id="adminLoginBtn"><i class="fas fa-lock"></i> Admin Login</button>
-</div>
 </header>
+
 <!-- Login Popup -->
 <div class="login-popup" id="loginPopup">
 <div class="login-box">
 <span class="close-btn" onclick="closeLoginPopup()">&times;</span>
-<h2><i class="fas fa-lock"></i> Admin Login</h2>
+<h2><i class="fas fa-lock"></i> Login</h2>
+<div id="loginForm">
 <div class="form-group">
-<label for="username">Username</label>
-<input type="text" id="username" placeholder="Enter username">
+<label for="email">Email</label>
+<input type="email" id="email" placeholder="Enter your email">
 </div>
 <div class="form-group">
 <label for="password">Password</label>
 <input type="password" id="password" placeholder="Enter password">
 </div>
 <button class="btn" onclick="login()">Login</button>
-<div class="error-message" id="login-error"></div>
+<button class="btn google-btn" onclick="googleLogin()">
+<i class="fab fa-google"></i> Sign in with Google
+</button>
+<div class="auth-toggle">
+<a href="#" onclick="toggleAuthMode()">New User? Sign Up</a> |
+<a href="#" onclick="showForgotPassword()">Forgot Password?</a>
 </div>
 </div>
+
+<div id="signupForm" style="display: none;">
+<div class="form-group">
+<label for="signup-email">Email</label>
+<input type="email" id="signup-email" placeholder="Enter your email">
+</div>
+<div class="form-group">
+<label for="signup-password">Password</label>
+<input type="password" id="signup-password" placeholder="Create a password">
+</div>
+<div class="form-group">
+<label for="rank">Rank</label>
+<select id="rank">
+<option value="">Select Rank</option>
+<option value="ME1T">ME1T</option>
+<option value="ME2T">ME2T</option>
+<option value="ME3T">ME3T</option>
+<option value="ME4T">ME4T</option>
+<option value="ME5T">ME5T</option>
+<option value="ME6">ME6</option>
+</select>
+</div>
+<div class="form-group">
+<label for="name">Full Name</label>
+<input type="text" id="name" placeholder="Enter your full name">
+</div>
+<button class="btn" onclick="signup()">Sign Up</button>
+<div class="auth-toggle">
+<a href="#" onclick="toggleAuthMode()">Already have an account? Login</a>
+</div>
+</div>
+
+<div id="forgotPasswordForm" style="display: none;">
+<div class="form-group">
+<label for="forgot-email">Email</label>
+<input type="email" id="forgot-email" placeholder="Enter your email">
+</div>
+<button class="btn" onclick="sendPasswordReset()">Send Reset Email</button>
+<div class="auth-toggle">
+<a href="#" onclick="toggleAuthMode()">Back to Login</a>
+</div>
+</div>
+
+<div id="profileForm" style="display: none;">
+<h3>Complete Your Profile</h3>
+<div class="form-group">
+<label for="profile-rank">Rank</label>
+<select id="profile-rank">
+<option value="">Select Rank</option>
+<option value="ME1T">ME1T</option>
+<option value="ME2T">ME2T</option>
+<option value="ME3T">ME3T</option>
+<option value="ME4T">ME4T</option>
+<option value="ME5T">ME5T</option>
+<option value="ME6">ME6</option>
+</select>
+</div>
+<div class="form-group">
+<label for="profile-name">Full Name</label>
+<input type="text" id="profile-name" placeholder="Enter your full name">
+</div>
+<button class="btn" onclick="completeProfile()">Save Profile</button>
+</div>
+
+<div class="error-message" id="auth-error"></div>
+</div>
+</div>
+
 <!-- Admin Dashboard -->
 <div class="admin-dashboard" id="adminDashboard">
 <div class="container">
@@ -752,6 +807,7 @@ margin-top: 1rem;
 </div>
 </div>
 </div>
+
 <!-- User Interface -->
 <div class="user-interface" id="userInterface">
 <main class="container">
@@ -770,10 +826,10 @@ margin-top: 1rem;
 </div>
 </footer>
 </div>
+
 <script>
 // Initialize Firebase
 const firebaseConfig = {
-// ADD YOUR FIREBASE CONFIG HERE
 apiKey: "AIzaSyA6ZdINHlRF583T3HL5RsA4q2fmHeBcB_g",
 authDomain: "hand-skills-platform.firebaseapp.com",
 projectId: "hand-skills-platform",
@@ -782,153 +838,323 @@ messagingSenderId: "1021058690748",
 appId: "1:1021058690748:web:40fd86d1060d90bbe1eab9",
 measurementId: "G-R2J40EVW18"
 };
+
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
 const db = firebase.firestore();
+
 // Global variables
 let skillsData = [];
 let usersData = [];
 let currentEditingSkill = null;
 let currentUser = null;
 let originalEditingSkill = null; // Store original skill data
+let currentAuthMode = 'login'; // 'login', 'signup', 'forgot', 'profile'
+
 // Initialize the app
 window.onload = function() {
+// Check if user is already logged in
+auth.onAuthStateChanged(user => {
+if (user) {
+loadUserData(user.uid);
+} else {
 // Show user interface by default
 document.getElementById('userInterface').style.display = 'block';
 loadSkillsFromFirebase();
-setupAdminButton();
-};
-// Setup admin login button
-function setupAdminButton() {
-document.getElementById('adminLoginBtn').addEventListener('click', function() {
+}
+});
+
+// Show login popup by default
 document.getElementById('loginPopup').style.display = 'flex';
-});
-}
-// Load skills from Firebase
-async function loadSkillsFromFirebase() {
+};
+
+// Load user data from Firestore
+async function loadUserData(userId) {
 try {
-const snapshot = await db.collection("skills").get();
-skillsData = [];
-snapshot.forEach(doc => {
-skillsData.push({ id: doc.id, ...doc.data() });
-});
-loadSkillGrid();
-} catch (error) {
-console.error("Error loading skills: ", error);
-}
-}
-// Admin login function
-function login() {
-const username = document.getElementById('username').value;
-const password = document.getElementById('password').value;
-// In a real app, this would validate against a server
-if (username === 'admin' && password === 'password') {
-localStorage.setItem('adminLoggedIn', 'true');
-document.getElementById('loginPopup').style.display = 'none';
+const userDoc = await db.collection("users").doc(userId).get();
+if (userDoc.exists) {
+currentUser = userDoc.data();
+currentUser.id = userId;
+
+// Check if user is admin
+const adminDoc = await db.collection("admins").doc(userId).get();
+if (adminDoc.exists) {
+// Show admin dashboard
 document.getElementById('adminDashboard').style.display = 'block';
 document.getElementById('userInterface').style.display = 'none';
+document.getElementById('loginPopup').style.display = 'none';
 setupFirestoreListeners();
 showSection('dashboard');
 } else {
-document.getElementById('login-error').textContent = 'Invalid credentials';
+// Show user interface
+document.getElementById('userInterface').style.display = 'block';
+document.getElementById('adminDashboard').style.display = 'none';
+document.getElementById('loginPopup').style.display = 'none';
+loadSkillsFromFirebase();
+}
+} else {
+// New user - prompt for profile completion
+showProfileCompletion();
+}
+} catch (error) {
+console.error("Error loading user data: ", error);
 }
 }
+
+// Show profile completion form
+function showProfileCompletion() {
+document.getElementById('loginForm').style.display = 'none';
+document.getElementById('signupForm').style.display = 'none';
+document.getElementById('forgotPasswordForm').style.display = 'none';
+document.getElementById('profileForm').style.display = 'block';
+document.getElementById('auth-error').textContent = '';
+}
+
+// Complete profile after signup/google login
+async function completeProfile() {
+const rank = document.getElementById('profile-rank').value;
+const name = document.getElementById('profile-name').value.toUpperCase();
+
+if (!rank || !name) {
+document.getElementById('auth-error').textContent = 'Please fill in all fields';
+return;
+}
+
+try {
+// Get current user UID
+const user = auth.currentUser;
+if (!user) throw new Error('No authenticated user');
+
+// Save profile to Firestore
+await db.collection("users").doc(user.uid).set({
+rank: rank,
+name: name,
+email: user.email,
+completedSkills: [],
+lastLogin: new Date()
+});
+
+// Reload user data
+loadUserData(user.uid);
+} catch (error) {
+console.error("Error completing profile: ", error);
+document.getElementById('auth-error').textContent = error.message;
+}
+}
+
+// Toggle between login/signup/forgot forms
+function toggleAuthMode() {
+if (currentAuthMode === 'login') {
+document.getElementById('loginForm').style.display = 'none';
+document.getElementById('signupForm').style.display = 'block';
+currentAuthMode = 'signup';
+} else if (currentAuthMode === 'signup') {
+document.getElementById('signupForm').style.display = 'none';
+document.getElementById('loginForm').style.display = 'block';
+currentAuthMode = 'login';
+}
+document.getElementById('auth-error').textContent = '';
+}
+
+function showForgotPassword() {
+document.getElementById('loginForm').style.display = 'none';
+document.getElementById('forgotPasswordForm').style.display = 'block';
+currentAuthMode = 'forgot';
+document.getElementById('auth-error').textContent = '';
+}
+
+// Login function
+function login() {
+const email = document.getElementById('email').value;
+const password = document.getElementById('password').value;
+
+if (!email || !password) {
+document.getElementById('auth-error').textContent = 'Please enter both email and password';
+return;
+}
+
+auth.signInWithEmailAndPassword(email, password)
+.then(userCredential => {
+loadUserData(userCredential.user.uid);
+})
+.catch(error => {
+document.getElementById('auth-error').textContent = error.message;
+});
+}
+
+// Signup function
+function signup() {
+const email = document.getElementById('signup-email').value;
+const password = document.getElementById('signup-password').value;
+const rank = document.getElementById('rank').value;
+const name = document.getElementById('name').value.toUpperCase();
+
+if (!email || !password || !rank || !name) {
+document.getElementById('auth-error').textContent = 'Please fill in all fields';
+return;
+}
+
+auth.createUserWithEmailAndPassword(email, password)
+.then(userCredential => {
+// Save profile data to Firestore
+db.collection("users").doc(userCredential.user.uid).set({
+rank: rank,
+name: name,
+email: email,
+completedSkills: [],
+lastLogin: new Date()
+});
+loadUserData(userCredential.user.uid);
+})
+.catch(error => {
+document.getElementById('auth-error').textContent = error.message;
+});
+}
+
+// Google login function
+function googleLogin() {
+const provider = new firebase.auth.GoogleAuthProvider();
+auth.signInWithPopup(provider)
+.then(result => {
+const user = result.user;
+// Check if user exists in Firestore
+db.collection("users").doc(user.uid).get().then(doc => {
+if (doc.exists) {
+// User already exists, load data
+loadUserData(user.uid);
+} else {
+// New user via Google, prompt for profile completion
+showProfileCompletion();
+}
+});
+})
+.catch(error => {
+document.getElementById('auth-error').textContent = error.message;
+});
+}
+
+// Send password reset email
+function sendPasswordReset() {
+const email = document.getElementById('forgot-email').value;
+if (!email) {
+document.getElementById('auth-error').textContent = 'Please enter your email';
+return;
+}
+
+auth.sendPasswordResetEmail(email)
+.then(() => {
+alert('Password reset email sent!');
+toggleAuthMode();
+})
+.catch(error => {
+document.getElementById('auth-error').textContent = error.message;
+});
+}
+
 // Close login popup
 function closeLoginPopup() {
 document.getElementById('loginPopup').style.display = 'none';
 }
+
 // Setup Firestore listeners to sync data in real-time
 function setupFirestoreListeners() {
-    // Listen for changes in skills collection
-    db.collection("skills").onSnapshot((snapshot) => {
-        skillsData = [];
-        snapshot.forEach(doc => {
-            skillsData.push({ id: doc.id, ...doc.data() });
-        });
-        updateCounters();
-        
-        // Update user interface if visible
-        if (document.getElementById('userInterface').style.display === 'block') {
-            loadSkillGrid();
-        }
-        
-        // Update admin list if currently viewing the skills section
-        if (document.getElementById('skills-section').style.display === 'block') {
-            loadSkillsList();
-        }
-        
-        // Update user preview if currently viewing
-        if (document.getElementById('user-preview-section').style.display === 'block') {
-            loadSkillGrid();
-        }
-    });
+// Listen for changes in skills collection
+db.collection("skills").onSnapshot((snapshot) => {
+skillsData = [];
+snapshot.forEach(doc => {
+skillsData.push({ id: doc.id, ...doc.data() });
+});
+updateCounters();
+
+// Update user interface if visible
+if (document.getElementById('userInterface').style.display === 'block') {
+loadSkillGrid();
 }
+
+// Update admin list if currently viewing the skills section
+if (document.getElementById('skills-section').style.display === 'block') {
+loadSkillsList();
+}
+
+// Update user preview if currently viewing
+if (document.getElementById('user-preview-section').style.display === 'block') {
+loadSkillGrid();
+}
+});
+}
+
 // Logout function
 function logout() {
-localStorage.removeItem('adminLoggedIn');
-localStorage.removeItem('userLoggedIn');
-localStorage.removeItem('currentUser');
+auth.signOut().then(() => {
 currentUser = null;
 document.getElementById('adminDashboard').style.display = 'none';
-document.getElementById('userInterface').style.display = 'block'; // Show user interface
-document.getElementById('loginPopup').style.display = 'none'; // Hide login popup
-loadSkillsFromFirebase(); // Reload skills for user view
+document.getElementById('userInterface').style.display = 'block';
+document.getElementById('loginPopup').style.display = 'flex';
+loadSkillsFromFirebase();
+}).catch(error => {
+console.error("Error signing out: ", error);
+});
 }
+
 // Show different sections in admin panel
 function showSection(section) {
-    // Hide all sections
-    document.querySelectorAll('.section').forEach(el => el.style.display = 'none');
-    document.getElementById('edit-skill-form').style.display = 'none';
-    
-    // Remove active class from all nav items
-    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    
-    // Show selected section and highlight nav item
-    document.getElementById(`${section}-section`).style.display = 'block';
-    document.querySelector(`.nav-item[onclick="showSection('${section}')"]`).classList.add('active');
-    
-    if (section === 'dashboard') {
-        updateCounters();
-    }
-    
-    // IMPORTANT: Always reload skills list when showing skills section
-    if (section === 'skills') {
-        loadSkillsList();
-    }
-    
-    // Handle user preview
-    if (section === 'userPreview') {
-        showUserPreview();
-    }
+// Hide all sections
+document.querySelectorAll('.section').forEach(el => el.style.display = 'none');
+document.getElementById('edit-skill-form').style.display = 'none';
+
+// Remove active class from all nav items
+document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+
+// Show selected section and highlight nav item
+document.getElementById(`${section}-section`).style.display = 'block';
+document.querySelector(`.nav-item[onclick="showSection('${section}')"]`).classList.add('active');
+
+if (section === 'dashboard') {
+updateCounters();
 }
+
+// IMPORTANT: Always reload skills list when showing skills section
+if (section === 'skills') {
+loadSkillsList();
+}
+
+// Handle user preview
+if (section === 'userPreview') {
+showUserPreview();
+}
+}
+
 // Load skills list in admin panel
 function loadSkillsList() {
-    const skillsList = document.getElementById('skillsList');
-    skillsList.innerHTML = '';
+const skillsList = document.getElementById('skillsList');
+skillsList.innerHTML = '';
 
-    if (skillsData.length === 0) {
-        skillsList.innerHTML = '<p>No skills available.</p>';
-        return;
-    }
-
-    skillsData.forEach(skill => {
-        const skillCard = document.createElement('div');
-        skillCard.className = 'skill-card';
-        skillCard.innerHTML = `
-            <h4>${skill.name}</h4>
-            <p>${skill.description.substring(0, 100)}...</p>
-            <div class="skill-actions">
-                <button class="action-btn edit-btn" onclick="editSkill('${skill.id}')">Edit</button>
-                <button class="action-btn delete-btn" onclick="deleteSkill('${skill.id}')">Delete</button>
-            </div>
-        `;
-        skillsList.appendChild(skillCard);
-    });
+if (skillsData.length === 0) {
+skillsList.innerHTML = '<p>No skills available.</p>';
+return;
 }
+
+skillsData.forEach(skill => {
+const skillCard = document.createElement('div');
+skillCard.className = 'skill-card';
+skillCard.innerHTML = `
+<h4>${skill.name}</h4>
+<p>${skill.description.substring(0, 100)}...</p>
+<div class="skill-actions">
+<button class="action-btn edit-btn" onclick="editSkill('${skill.id}')">Edit</button>
+<button class="action-btn delete-btn" onclick="deleteSkill('${skill.id}')">Delete</button>
+</div>
+`;
+skillsList.appendChild(skillCard);
+});
+}
+
 // Update dashboard counters
 function updateCounters() {
 document.getElementById('total-skills').textContent = skillsData.length;
 }
+
 // Add new skill
 function addNewSkill() {
 currentEditingSkill = {
@@ -944,6 +1170,7 @@ quiz: []
 originalEditingSkill = JSON.parse(JSON.stringify(currentEditingSkill)); // Store original data
 showEditForm();
 }
+
 // Edit existing skill
 function editSkill(skillId) {
 currentEditingSkill = skillsData.find(skill => skill.id === skillId);
@@ -952,6 +1179,7 @@ if (currentEditingSkill) {
 showEditForm();
 }
 }
+
 // Show edit form
 function showEditForm() {
 document.getElementById('edit-skill-name').value = currentEditingSkill.name || '';
@@ -964,33 +1192,35 @@ document.getElementById('edit-theory').value = currentEditingSkill.theory || '';
 const stepsContainer = document.getElementById('steps-container');
 stepsContainer.innerHTML = '';
 if (Array.isArray(currentEditingSkill.steps)) {
-    currentEditingSkill.steps.forEach((step, index) => {
-        addStepToForm(index, step);
-    });
+currentEditingSkill.steps.forEach((step, index) => {
+addStepToForm(index, step);
+});
 }
 
 // Clear and populate quiz
 const quizContainer = document.getElementById('quiz-container');
 quizContainer.innerHTML = '';
 if (Array.isArray(currentEditingSkill.quiz)) {
-    currentEditingSkill.quiz.forEach((question, index) => {
-        addQuizQuestionToForm(index, question);
-    });
+currentEditingSkill.quiz.forEach((question, index) => {
+addQuizQuestionToForm(index, question);
+});
 }
 
 // Show form
 document.getElementById('skills-section').style.display = 'none';
 document.getElementById('edit-skill-form').style.display = 'block';
 }
+
 // Cancel edit and restore original data
 function cancelEdit() {
-    // Restore original skill data
-    currentEditingSkill = JSON.parse(JSON.stringify(originalEditingSkill));
-    
-    // Return to skills list
-    document.getElementById('edit-skill-form').style.display = 'none';
-    document.getElementById('skills-section').style.display = 'block';
+// Restore original skill data
+currentEditingSkill = JSON.parse(JSON.stringify(originalEditingSkill));
+
+// Return to skills list
+document.getElementById('edit-skill-form').style.display = 'none';
+document.getElementById('skills-section').style.display = 'block';
 }
+
 // Add step to form
 function addStepToForm(index, step = null) {
 const stepsContainer = document.getElementById('steps-container');
@@ -1022,18 +1252,21 @@ stepElement.innerHTML = `
 `;
 stepsContainer.appendChild(stepElement);
 }
+
 // Add new step
 function addStep() {
 if (!currentEditingSkill.steps) currentEditingSkill.steps = [];
 currentEditingSkill.steps.push({ title: '', description: '', image: '' });
 addStepToForm();
 }
+
 // Update step field
 function updateStepField(index, field, value) {
 if (currentEditingSkill.steps && currentEditingSkill.steps[index]) {
 currentEditingSkill.steps[index][field] = value;
 }
 }
+
 // Remove step
 function removeStep(index) {
 if (currentEditingSkill.steps && currentEditingSkill.steps[index]) {
@@ -1046,6 +1279,7 @@ addStepToForm(idx, step);
 });
 }
 }
+
 // Add quiz question to form
 function addQuizQuestionToForm(index, question = null) {
 const quizContainer = document.getElementById('quiz-container');
@@ -1089,26 +1323,30 @@ questionElement.innerHTML = `
 `;
 quizContainer.appendChild(questionElement);
 }
+
 // Add new quiz question
 function addQuizQuestion() {
 if (!currentEditingSkill.quiz) currentEditingSkill.quiz = [];
 currentEditingSkill.quiz.push({ question: '', options: ['', '', '', ''], answer: 0 });
 addQuizQuestionToForm();
 }
+
 // Update quiz field
 function updateQuizField(questionId, field, value) {
 if (currentEditingSkill.quiz && currentEditingSkill.quiz[questionId]) {
 currentEditingSkill.quiz[questionId][field] = value;
 }
 }
+
 // Update quiz option
 function updateQuizOption(questionId, optionIndex, value) {
 if (currentEditingSkill.quiz && 
-    currentEditingSkill.quiz[questionId] && 
-    currentEditingSkill.quiz[questionId].options[optionIndex] !== undefined) {
-    currentEditingSkill.quiz[questionId].options[optionIndex] = value;
+currentEditingSkill.quiz[questionId] && 
+currentEditingSkill.quiz[questionId].options[optionIndex] !== undefined) {
+currentEditingSkill.quiz[questionId].options[optionIndex] = value;
 }
 }
+
 // Remove quiz question
 function removeQuizQuestion(index) {
 if (currentEditingSkill.quiz && currentEditingSkill.quiz[index]) {
@@ -1121,6 +1359,7 @@ addQuizQuestionToForm(idx, question);
 });
 }
 }
+
 // Save skill
 function saveSkill() {
 // Update current skill with form values
@@ -1158,37 +1397,53 @@ alert('Error saving skill');
 });
 }
 }
+
 // Delete skill
 function deleteSkill(skillId) {
-    if (!skillId) {
-        console.warn("Attempted to delete a skill with an invalid or empty ID:", skillId);
-        alert("Cannot delete skill: Invalid ID.");
-        return;
-    }
-
-    if (confirm('Are you sure you want to delete this skill?')) {
-        db.collection("skills").doc(skillId).delete()
-        .then(() => {
-            console.log("Skill deleted successfully with ID:", skillId);
-        })
-        .catch((error) => {
-            console.error("Error removing skill with ID '" + skillId + "': ", error);
-        });
-    }
+if (!skillId) {
+console.warn("Attempted to delete a skill with an invalid or empty ID:", skillId);
+alert("Cannot delete skill: Invalid ID.");
+return;
 }
+
+if (confirm('Are you sure you want to delete this skill?')) {
+db.collection("skills").doc(skillId).delete()
+.then(() => {
+console.log("Skill deleted successfully with ID:", skillId);
+})
+.catch((error) => {
+console.error("Error removing skill with ID '" + skillId + "': ", error);
+});
+}
+}
+
 // Show user preview in admin panel
 function showUserPreview() {
-    // Show user interface within admin panel
-    document.getElementById('user-preview-section').style.display = 'block';
-    document.getElementById('userInterface').style.display = 'block';
-    
-    // Move user interface content to preview section
-    document.getElementById('preview-content').appendChild(document.getElementById('main-content'));
-    
-    // Load skills in preview
-    loadSkillGrid();
+// Show user interface within admin panel
+document.getElementById('user-preview-section').style.display = 'block';
+document.getElementById('userInterface').style.display = 'block';
+
+// Move user interface content to preview section
+document.getElementById('preview-content').appendChild(document.getElementById('main-content'));
+
+// Load skills in preview
+loadSkillGrid();
 }
-// User Interface Functions
+
+// Load skills from Firebase
+async function loadSkillsFromFirebase() {
+try {
+const snapshot = await db.collection("skills").get();
+skillsData = [];
+snapshot.forEach(doc => {
+skillsData.push({ id: doc.id, ...doc.data() });
+});
+loadSkillGrid();
+} catch (error) {
+console.error("Error loading skills: ", error);
+}
+}
+
 // Load skill grid for user interface
 function loadSkillGrid() {
 const gridElement = document.getElementById('skill-grid');
@@ -1213,6 +1468,7 @@ ${isCompleted ? 'Review' : 'Start'} Learning
 });
 gridElement.innerHTML = html;
 }
+
 // Load detail view for a specific skill
 function loadSkillDetail(skillId) {
 document.getElementById('skill-grid').style.display = 'none';
@@ -1310,6 +1566,7 @@ this.classList.add('selected');
 });
 });
 }
+
 // Check quiz answers
 function checkQuiz(skillId) {
 const skill = skillsData.find(s => s.id === skillId);
@@ -1364,6 +1621,7 @@ Score: ${score}/${totalQuestions} (${percentage}%)
 You need at least 70% to pass. Try again!`);
 }
 }
+
 // Go back to skill grid
 function goBackToGrid() {
 document.getElementById('skill-grid').style.display = 'grid';
