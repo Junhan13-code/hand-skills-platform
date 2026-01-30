@@ -423,46 +423,74 @@ transition: var(--transition);
 .admin-switch-btn:hover {
 background: rgba(0,0,0,0.5);
 }
-/* Profile View */
-.profile-view {
+/* Profile Popup */
+.profile-popup {
+position: fixed;
+top: 70px;
+right: 20px;
+width: 300px;
 background: white;
 border-radius: 10px;
-padding: 2rem;
 box-shadow: var(--shadow);
-margin-top: 1.5rem;
+z-index: 1000;
 display: none;
 }
 .profile-header {
 display: flex;
 align-items: center;
-margin-bottom: 2rem;
-padding-bottom: 1rem;
-border-bottom: 2px solid var(--light);
+padding: 1rem;
+border-bottom: 1px solid var(--light);
 }
 .profile-header i {
-font-size: 2.5rem;
-margin-right: 1rem;
+font-size: 1.5rem;
+margin-right: 0.5rem;
 color: var(--primary);
 }
-.profile-header h2 {
-font-size: 2rem;
-color: var(--dark);
+.profile-header h3 {
+font-size: 1.2rem;
+margin: 0;
+}
+.profile-content {
+padding: 1rem;
 }
 .profile-info {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 1.5rem;
+margin-bottom: 1rem;
 }
 .info-item {
-margin-bottom: 1rem;
+margin-bottom: 0.5rem;
 }
 .info-label {
 font-weight: 600;
 color: var(--gray);
+font-size: 0.9rem;
 }
 .info-value {
-font-size: 1.1rem;
-margin-top: 0.25rem;
+font-size: 1rem;
+}
+.change-rank-select {
+width: 100%;
+margin-bottom: 1rem;
+padding: 0.5rem;
+border: 1px solid #ddd;
+border-radius: 5px;
+}
+.update-rank-btn {
+width: 100%;
+margin-bottom: 0.5rem;
+}
+.close-profile-btn {
+width: 100%;
+background: var(--gray);
+}
+.close-profile-btn:hover {
+background: #5a6268;
+}
+.logout-btn-popup {
+width: 100%;
+background: var(--danger);
+}
+.logout-btn-popup:hover {
+background: #e53e3e;
 }
 /* User Management Section */
 .users-section {
@@ -874,6 +902,11 @@ margin-top: 1rem;
 .profile-btn {
 margin-right: 1rem;
 }
+.profile-popup {
+position: absolute;
+top: 50px;
+right: 10px;
+}
 }
 </style>
 </head>
@@ -883,7 +916,7 @@ margin-right: 1rem;
 <h1><i class="fas fa-tools"></i> Hand Skills Learning Platform</h1>
 <p>Master essential hands-on skills with step-by-step guidance</p>
 </div>
-<button class="profile-btn" id="profileBtn" onclick="showProfileView()" style="display: none;">
+<button class="profile-btn" id="profileBtn" onclick="toggleProfilePopup()" style="display: none;">
 <i class="fas fa-user"></i> Profile
 </button>
 <button class="admin-switch-btn" id="adminSwitchBtn" onclick="switchToUserInterface()" style="display: none;">
@@ -893,6 +926,43 @@ margin-right: 1rem;
 <i class="fas fa-lock"></i> Admin View
 </button>
 </header>
+
+<!-- Profile Popup -->
+<div class="profile-popup" id="profilePopup">
+<div class="profile-header">
+<i class="fas fa-user-circle"></i>
+<h3>User Profile</h3>
+</div>
+<div class="profile-content">
+<div class="profile-info">
+<div class="info-item">
+<span class="info-label">Name</span>
+<div class="info-value" id="popup-name-display"></div>
+</div>
+<div class="info-item">
+<span class="info-label">Rank</span>
+<div class="info-value" id="popup-rank-display"></div>
+</div>
+<div class="info-item">
+<span class="info-label">Course</span>
+<div class="info-value" id="popup-course-display"></div>
+</div>
+<div class="info-item">
+<span class="info-label">Email</span>
+<div class="info-value" id="popup-email-display"></div>
+</div>
+</div>
+<div class="form-group">
+<label for="edit-rank">Change Rank</label>
+<select id="edit-rank" class="change-rank-select">
+<!-- Options will be loaded dynamically -->
+</select>
+</div>
+<button class="btn update-rank-btn" onclick="updateOwnRank()">Update Rank</button>
+<button class="btn close-profile-btn" onclick="toggleProfilePopup()">Close</button>
+<button class="btn logout-btn-popup" onclick="logout()">Logout</button>
+</div>
+</div>
 
 <!-- Login Popup -->
 <div class="login-popup" id="loginPopup">
@@ -987,43 +1057,6 @@ margin-right: 1rem;
 </div>
 </div>
 
-<!-- Profile View -->
-<div class="profile-view" id="profileView" style="display: none;">
-<div class="profile-header">
-<i class="fas fa-user-circle"></i>
-<h2>User Profile</h2>
-</div>
-<div class="profile-info">
-<div class="info-item">
-<span class="info-label">Name</span>
-<div class="info-value" id="profile-name-display"></div>
-</div>
-<div class="info-item">
-<span class="info-label">Rank</span>
-<div class="info-value" id="profile-rank-display"></div>
-</div>
-<div class="info-item">
-<span class="info-label">Course</span>
-<div class="info-value" id="profile-course-display"></div>
-</div>
-<div class="info-item">
-<span class="info-label">Email</span>
-<div class="info-value" id="profile-email-display"></div>
-</div>
-</div>
-<div style="margin-top: 2rem;">
-<div class="form-group">
-<label for="edit-rank">Change Rank</label>
-<select id="edit-rank">
-<!-- Options will be loaded dynamically -->
-</select>
-</div>
-<button class="btn" onclick="updateOwnRank()">Update Rank</button>
-<button class="btn btn-secondary" onclick="closeProfileView()">Close</button>
-<button class="btn" onclick="logout()">Logout</button>
-</div>
-</div>
-
 <!-- Admin Dashboard -->
 <div class="admin-dashboard" id="adminDashboard">
 <div class="container">
@@ -1037,7 +1070,6 @@ margin-right: 1rem;
 <div class="nav-item active" onclick="showSection('dashboard')">Dashboard</div>
 <div class="nav-item" onclick="showSection('skills')">Manage Skills</div>
 <div class="nav-item" onclick="showSection('users')">Manage Users</div>
-<div class="nav-item" onclick="showSection('adminAccess')">Admin Access</div>
 <div class="nav-item" onclick="showSection('settings')">Settings</div>
 </div>
 <div class="main-content-area">
@@ -1068,20 +1100,6 @@ margin-right: 1rem;
 <h2 class="section-title">Manage Users</h2>
 <div id="usersContent">
 <!-- User groups will be loaded here -->
-</div>
-</div>
-<!-- Admin Access Section -->
-<div id="adminAccess-section" class="section admin-access-section">
-<h2 class="section-title">Admin Access Management</h2>
-<div class="admin-access-form">
-<div class="form-group">
-<label for="admin-email">Email Address</label>
-<input type="email" id="admin-email" placeholder="Enter email address">
-</div>
-<button class="btn" onclick="grantAdminAccess()">Grant Admin Access</button>
-</div>
-<div id="adminList">
-<!-- Admin list will be loaded here -->
 </div>
 </div>
 <!-- Settings Section -->
@@ -1365,9 +1383,9 @@ option.textContent = course.name;
 editCourseSelect.appendChild(option);
 });
 
-// Update profile view rank dropdown
-const profileViewRankSelect = document.getElementById('edit-rank');
-profileViewRankSelect.innerHTML = '';
+// Update profile popup rank dropdown
+const profilePopupRankSelect = document.getElementById('edit-rank');
+profilePopupRankSelect.innerHTML = '';
 ranksData.forEach(rank => {
 const option = document.createElement('option');
 option.value = rank.name;
@@ -1375,7 +1393,7 @@ option.textContent = rank.name;
 if (currentUser && rank.name === currentUser.rank) {
 option.selected = true;
 }
-profileViewRankSelect.appendChild(option);
+profilePopupRankSelect.appendChild(option);
 });
 }
 
@@ -1584,26 +1602,20 @@ function openLoginPopup() {
 document.getElementById('loginPopup').style.display = 'flex';
 }
 
-// Show profile view
-function showProfileView() {
-if (!currentUser) return;
-document.getElementById('userInterface').style.display = 'none';
-document.getElementById('adminDashboard').style.display = 'none';
-document.getElementById('profileView').style.display = 'block';
-document.getElementById('profile-name-display').textContent = currentUser.name;
-document.getElementById('profile-rank-display').textContent = currentUser.rank;
-document.getElementById('profile-course-display').textContent = currentUser.course;
-document.getElementById('profile-email-display').textContent = currentUser.email;
-}
-
-// Close profile view
-function closeProfileView() {
-document.getElementById('profileView').style.display = 'none';
-// Show the appropriate interface based on previous state
-if (wasInAdminView) {
-document.getElementById('adminDashboard').style.display = 'block';
+// Toggle profile popup
+function toggleProfilePopup() {
+const popup = document.getElementById('profilePopup');
+if (popup.style.display === 'block') {
+popup.style.display = 'none';
 } else {
-document.getElementById('userInterface').style.display = 'block';
+popup.style.display = 'block';
+// Update profile info in popup
+document.getElementById('popup-name-display').textContent = currentUser.name;
+document.getElementById('popup-rank-display').textContent = currentUser.rank;
+document.getElementById('popup-course-display').textContent = currentUser.course;
+document.getElementById('popup-email-display').textContent = currentUser.email;
+// Update rank dropdown in popup
+updateDropdowns();
 }
 }
 
@@ -1627,7 +1639,7 @@ document.getElementById('adminSwitchBtn').style.display = 'block';
 document.getElementById('adminBackBtn').style.display = 'none';
 }
 
-// Update own rank in profile view
+// Update own rank in profile popup
 async function updateOwnRank() {
 const newRank = document.getElementById('edit-rank').value;
 if (!newRank) {
@@ -1640,7 +1652,9 @@ await db.collection("users").doc(currentUser.id).update({
 rank: newRank
 });
 currentUser.rank = newRank;
-document.getElementById('profile-rank-display').textContent = newRank;
+document.getElementById('popup-rank-display').textContent = newRank;
+// Update dropdown in popup
+updateDropdowns();
 alert('Rank updated successfully!');
 } catch (error) {
 console.error("Error updating rank: ", error);
@@ -1689,7 +1703,7 @@ loadUsersManagement();
 // Listen for changes in admins collection
 db.collection("admins").onSnapshot((snapshot) => {
 // Refresh admin access section if currently active
-if (document.getElementById('adminAccess-section').style.display === 'block') {
+if (document.getElementById('adminAccessTab').style.display === 'block') {
 loadAdminList();
 }
 });
@@ -1968,7 +1982,7 @@ currentUser = null;
 isAdmin = false;
 document.getElementById('adminDashboard').style.display = 'none';
 document.getElementById('userInterface').style.display = 'block';
-document.getElementById('profileView').style.display = 'none';
+document.getElementById('profilePopup').style.display = 'none';
 document.getElementById('profileBtn').style.display = 'none';
 document.getElementById('adminSwitchBtn').style.display = 'none';
 document.getElementById('adminBackBtn').style.display = 'none';
@@ -2004,11 +2018,6 @@ loadSkillsList();
 // Load users management when showing users section
 if (section === 'users') {
 loadUsersManagement();
-}
-
-// Load admin list when showing admin access section
-if (section === 'adminAccess') {
-loadAdminList();
 }
 
 // Load signup settings when showing settings section
