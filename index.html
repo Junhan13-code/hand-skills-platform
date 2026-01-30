@@ -503,6 +503,21 @@ position: relative;
 margin-bottom: 1.5rem;
 color: var(--primary);
 }
+/* Admin Access Section */
+.admin-access-section {
+display: none;
+}
+.admin-access-form {
+margin-bottom: 2rem;
+}
+.access-input {
+display: flex;
+gap: 1rem;
+margin-bottom: 1rem;
+}
+.access-input input {
+flex: 1;
+}
 /* Skill Grid */
 .skill-grid {
 display: grid;
@@ -780,6 +795,9 @@ margin-right: 1rem;
 <button class="admin-switch-btn" id="adminSwitchBtn" onclick="switchToUserInterface()" style="display: none;">
 <i class="fas fa-user-graduate"></i> User View
 </button>
+<button class="admin-switch-btn" id="adminBackBtn" onclick="switchToAdminInterface()" style="display: none;">
+<i class="fas fa-lock"></i> Admin View
+</button>
 </header>
 
 <!-- Login Popup -->
@@ -936,6 +954,7 @@ margin-right: 1rem;
 <div class="nav-item active" onclick="showSection('dashboard')">Dashboard</div>
 <div class="nav-item" onclick="showSection('skills')">Manage Skills</div>
 <div class="nav-item" onclick="showSection('users')">Manage Users</div>
+<div class="nav-item" onclick="showSection('adminAccess')">Admin Access</div>
 <div class="nav-item" onclick="showSection('settings')">Settings</div>
 </div>
 <div class="main-content-area">
@@ -966,6 +985,20 @@ margin-right: 1rem;
 <h2 class="section-title">Manage Users</h2>
 <div id="usersContent">
 <!-- User groups will be loaded here -->
+</div>
+</div>
+<!-- Admin Access Section -->
+<div id="adminAccess-section" class="section admin-access-section">
+<h2 class="section-title">Admin Access Management</h2>
+<div class="admin-access-form">
+<div class="form-group">
+<label for="admin-email">Email Address</label>
+<input type="email" id="admin-email" placeholder="Enter email address">
+</div>
+<button class="btn" onclick="grantAdminAccess()">Grant Admin Access</button>
+</div>
+<div id="adminList">
+<!-- Admin list will be loaded here -->
 </div>
 </div>
 <!-- Edit Skill Form -->
@@ -1105,6 +1138,7 @@ let currentUser = null;
 let originalEditingSkill = null; // Store original skill data
 let currentAuthMode = 'login'; // 'login', 'signup', 'forgot', 'profile'
 let editingUserId = null; // Track user being edited
+let isAdmin = false; // Track if current user is admin
 
 // Initialize the app
 window.onload = function() {
@@ -1134,21 +1168,25 @@ currentUser.id = userId;
 // Check if user is admin
 const adminDoc = await db.collection("admins").doc(userId).get();
 if (adminDoc.exists) {
+isAdmin = true;
 // Show admin dashboard
 document.getElementById('adminDashboard').style.display = 'block';
 document.getElementById('userInterface').style.display = 'none';
 document.getElementById('loginPopup').style.display = 'none';
 document.getElementById('profileBtn').style.display = 'block';
 document.getElementById('adminSwitchBtn').style.display = 'block';
+document.getElementById('adminBackBtn').style.display = 'none';
 setupFirestoreListeners();
 showSection('dashboard');
 } else {
+isAdmin = false;
 // Show user interface
 document.getElementById('userInterface').style.display = 'block';
 document.getElementById('adminDashboard').style.display = 'none';
 document.getElementById('loginPopup').style.display = 'none';
 document.getElementById('profileBtn').style.display = 'block';
 document.getElementById('adminSwitchBtn').style.display = 'none';
+document.getElementById('adminBackBtn').style.display = 'none';
 loadSkillsFromFirebase();
 }
 } else {
@@ -1156,7 +1194,7 @@ loadSkillsFromFirebase();
 showProfileCompletion();
 }
 } catch (error) {
-console.error("Error loading user data: ", error);
+console.error("Error loading user  ", error);
 }
 }
 
@@ -1346,6 +1384,9 @@ function switchToUserInterface() {
 document.getElementById('adminDashboard').style.display = 'none';
 document.getElementById('userInterface').style.display = 'block';
 document.getElementById('adminSwitchBtn').style.display = 'none';
+document.getElementById('adminBackBtn').style.display = 'block';
+// Load skills for user view
+loadSkillsFromFirebase();
 }
 
 // Switch to admin interface (from user)
@@ -1353,6 +1394,7 @@ function switchToAdminInterface() {
 document.getElementById('userInterface').style.display = 'none';
 document.getElementById('adminDashboard').style.display = 'block';
 document.getElementById('adminSwitchBtn').style.display = 'block';
+document.getElementById('adminBackBtn').style.display = 'none';
 }
 
 // Setup Firestore listeners to sync data in real-time
@@ -1392,17 +1434,106 @@ if (document.getElementById('users-section').style.display === 'block') {
 loadUsersManagement();
 }
 });
+
+// Listen for changes in admins collection
+db.collection("admins").onSnapshot((snapshot) => {
+// Refresh admin access section if currently active
+if (document.getElementById('adminAccess-section').style.display === 'block') {
+loadAdminList();
+}
+});
+}
+
+// Grant admin access to another user
+async function grantAdminAccess() {
+const email = document.getElementById('admin-email').value;
+if (!email) {
+alert('Please enter an email address');
+return;
+}
+
+try {
+// Find user by email
+const userQuery = await db.collection("users").where("email", "==", email).get();
+if (userQuery.empty) {
+alert('User not found');
+return;
+}
+
+const userDoc = userQuery.docs[0];
+const userId = userDoc.id;
+
+// Add user to admins collection
+await db.collection("admins").doc(userId).set({
+email: email,
+grantedBy: currentUser.email,
+date: new Date()
+});
+
+// Clear the input field
+document.getElementById('admin-email').value = '';
+alert('Admin access granted successfully!');
+} catch (error) {
+console.error("Error granting admin access: ", error);
+alert('Error granting admin access: ' + error.message);
+}
+}
+
+// Load admin list
+async function loadAdminList() {
+try {
+const snapshot = await db.collection("admins").get();
+const adminList = document.getElementById('adminList');
+adminList.innerHTML = '<h3 class="section-title">Current Admins</h3>';
+
+if (snapshot.empty) {
+adminList.innerHTML += '<p>No admins found.</p>';
+return;
+}
+
+const adminItems = [];
+snapshot.forEach(doc => {
+const adminData = doc.data();
+adminItems.push(`
+<div style="background: var(--light); padding: 1rem; margin: 0.5rem 0; border-radius: 5px; display: flex; justify-content: space-between; align-items: center;">
+<span>${adminData.email}</span>
+<button class="btn btn-secondary" onclick="revokeAdminAccess('${doc.id}', '${adminData.email}')" style="width: auto; padding: 0.5rem 1rem;">Revoke</button>
+</div>
+`);
+});
+
+adminList.innerHTML += adminItems.join('');
+} catch (error) {
+console.error("Error loading admin list: ", error);
+}
+}
+
+// Revoke admin access
+async function revokeAdminAccess(adminId, email) {
+if (!confirm(`Are you sure you want to revoke admin access for ${email}?`)) {
+return;
+}
+
+try {
+await db.collection("admins").doc(adminId).delete();
+alert('Admin access revoked successfully!');
+} catch (error) {
+console.error("Error revoking admin access: ", error);
+alert('Error revoking admin access: ' + error.message);
+}
 }
 
 // Logout function
 function logout() {
 auth.signOut().then(() => {
 currentUser = null;
+isAdmin = false;
 document.getElementById('adminDashboard').style.display = 'none';
 document.getElementById('userInterface').style.display = 'block';
 document.getElementById('profileView').style.display = 'none';
 document.getElementById('profileBtn').style.display = 'none';
 document.getElementById('adminSwitchBtn').style.display = 'none';
+document.getElementById('adminBackBtn').style.display = 'none';
 document.getElementById('loginPopup').style.display = 'flex';
 loadSkillsFromFirebase();
 }).catch(error => {
@@ -1435,6 +1566,11 @@ loadSkillsList();
 // Load users management when showing users section
 if (section === 'users') {
 loadUsersManagement();
+}
+
+// Load admin list when showing admin access section
+if (section === 'adminAccess') {
+loadAdminList();
 }
 }
 
