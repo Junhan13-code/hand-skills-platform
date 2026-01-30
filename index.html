@@ -344,6 +344,165 @@ header p {
 font-size: 1.1rem;
 opacity: 0.9;
 }
+/* Profile Button */
+.profile-btn {
+position: absolute;
+top: 20px;
+right: 120px;
+background: rgba(0,0,0,0.3);
+color: white;
+border: none;
+padding: 0.75rem 1.5rem;
+border-radius: 5px;
+cursor: pointer;
+font-weight: 600;
+transition: var(--transition);
+}
+.profile-btn:hover {
+background: rgba(0,0,0,0.5);
+}
+/* Admin Switch Button */
+.admin-switch {
+position: absolute;
+top: 20px;
+right: 20px;
+z-index: 100;
+}
+.admin-switch-btn {
+background: rgba(0,0,0,0.3);
+color: white;
+border: none;
+padding: 0.75rem 1.5rem;
+border-radius: 5px;
+cursor: pointer;
+font-weight: 600;
+transition: var(--transition);
+}
+.admin-switch-btn:hover {
+background: rgba(0,0,0,0.5);
+}
+/* Profile View */
+.profile-view {
+background: white;
+border-radius: 10px;
+padding: 2rem;
+box-shadow: var(--shadow);
+margin-top: 1.5rem;
+display: none;
+}
+.profile-header {
+display: flex;
+align-items: center;
+margin-bottom: 2rem;
+padding-bottom: 1rem;
+border-bottom: 2px solid var(--light);
+}
+.profile-header i {
+font-size: 2.5rem;
+margin-right: 1rem;
+color: var(--primary);
+}
+.profile-header h2 {
+font-size: 2rem;
+color: var(--dark);
+}
+.profile-info {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 1.5rem;
+}
+.info-item {
+margin-bottom: 1rem;
+}
+.info-label {
+font-weight: 600;
+color: var(--gray);
+}
+.info-value {
+font-size: 1.1rem;
+margin-top: 0.25rem;
+}
+/* User Management Section */
+.users-section {
+display: none;
+}
+.course-group {
+margin-bottom: 2rem;
+}
+.course-title {
+font-size: 1.3rem;
+color: var(--secondary);
+margin-bottom: 1rem;
+padding-bottom: 0.5rem;
+border-bottom: 1px solid var(--light);
+}
+.user-list {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+gap: 1rem;
+}
+.user-card {
+background: var(--light);
+border-radius: 8px;
+padding: 1rem;
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+.user-details {
+flex-grow: 1;
+}
+.user-name {
+font-weight: 600;
+margin-bottom: 0.25rem;
+}
+.user-rank {
+font-size: 0.9rem;
+color: var(--gray);
+}
+.user-course {
+font-size: 0.9rem;
+color: var(--primary);
+}
+.edit-user-btn {
+background: var(--warning);
+color: white;
+border: none;
+padding: 0.5rem 1rem;
+border-radius: 4px;
+cursor: pointer;
+}
+.edit-user-btn:hover {
+background: #e4bb0b;
+}
+/* Edit User Modal */
+.edit-user-modal {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0,0,0,0.7);
+display: flex;
+justify-content: center;
+align-items: center;
+z-index: 3000;
+display: none;
+}
+.edit-user-box {
+background: white;
+padding: 2rem;
+border-radius: 10px;
+box-shadow: var(--shadow);
+width: 100%;
+max-width: 500px;
+text-align: center;
+position: relative;
+}
+.edit-user-box h3 {
+margin-bottom: 1.5rem;
+color: var(--primary);
+}
 /* Skill Grid */
 .skill-grid {
 display: grid;
@@ -598,6 +757,14 @@ margin-bottom: 1rem;
 flex-direction: column;
 gap: 0;
 }
+.profile-btn, .admin-switch {
+position: static;
+text-align: center;
+margin-top: 1rem;
+}
+.profile-btn {
+margin-right: 1rem;
+}
 }
 </style>
 </head>
@@ -607,6 +774,12 @@ gap: 0;
 <h1><i class="fas fa-tools"></i> Hand Skills Learning Platform</h1>
 <p>Master essential hands-on skills with step-by-step guidance</p>
 </div>
+<button class="profile-btn" id="profileBtn" onclick="showProfileView()" style="display: none;">
+<i class="fas fa-user"></i> Profile
+</button>
+<button class="admin-switch-btn" id="adminSwitchBtn" onclick="switchToUserInterface()" style="display: none;">
+<i class="fas fa-user-graduate"></i> User View
+</button>
 </header>
 
 <!-- Login Popup -->
@@ -655,6 +828,16 @@ gap: 0;
 </select>
 </div>
 <div class="form-group">
+<label for="course">Course</label>
+<select id="course">
+<option value="">Select Course</option>
+<option value="56th Mech">56th Mech</option>
+<option value="56th Avionics">56th Avionics</option>
+<option value="56th Weapons">56th Weapons</option>
+<option value="56th Logistics">56th Logistics</option>
+</select>
+</div>
+<div class="form-group">
 <label for="name">Full Name</label>
 <input type="text" id="name" placeholder="Enter your full name">
 </div>
@@ -690,6 +873,16 @@ gap: 0;
 </select>
 </div>
 <div class="form-group">
+<label for="profile-course">Course</label>
+<select id="profile-course">
+<option value="">Select Course</option>
+<option value="56th Mech">56th Mech</option>
+<option value="56th Avionics">56th Avionics</option>
+<option value="56th Weapons">56th Weapons</option>
+<option value="56th Logistics">56th Logistics</option>
+</select>
+</div>
+<div class="form-group">
 <label for="profile-name">Full Name</label>
 <input type="text" id="profile-name" placeholder="Enter your full name">
 </div>
@@ -697,6 +890,36 @@ gap: 0;
 </div>
 
 <div class="error-message" id="auth-error"></div>
+</div>
+</div>
+
+<!-- Profile View -->
+<div class="profile-view" id="profileView" style="display: none;">
+<div class="profile-header">
+<i class="fas fa-user-circle"></i>
+<h2>User Profile</h2>
+</div>
+<div class="profile-info">
+<div class="info-item">
+<span class="info-label">Name</span>
+<div class="info-value" id="profile-name-display"></div>
+</div>
+<div class="info-item">
+<span class="info-label">Rank</span>
+<div class="info-value" id="profile-rank-display"></div>
+</div>
+<div class="info-item">
+<span class="info-label">Course</span>
+<div class="info-value" id="profile-course-display"></div>
+</div>
+<div class="info-item">
+<span class="info-label">Email</span>
+<div class="info-value" id="profile-email-display"></div>
+</div>
+</div>
+<div style="margin-top: 2rem;">
+<button class="btn btn-secondary" onclick="closeProfileView()">Close</button>
+<button class="btn" onclick="logout()">Logout</button>
 </div>
 </div>
 
@@ -712,7 +935,7 @@ gap: 0;
 <h3>Navigation</h3>
 <div class="nav-item active" onclick="showSection('dashboard')">Dashboard</div>
 <div class="nav-item" onclick="showSection('skills')">Manage Skills</div>
-<div class="nav-item" onclick="showSection('userPreview')">User Preview</div>
+<div class="nav-item" onclick="showSection('users')">Manage Users</div>
 <div class="nav-item" onclick="showSection('settings')">Settings</div>
 </div>
 <div class="main-content-area">
@@ -736,6 +959,13 @@ gap: 0;
 </div>
 <div class="skill-list" id="skillsList">
 <!-- Skills will be loaded here -->
+</div>
+</div>
+<!-- Users Management Section -->
+<div id="users-section" class="section users-section">
+<h2 class="section-title">Manage Users</h2>
+<div id="usersContent">
+<!-- User groups will be loaded here -->
 </div>
 </div>
 <!-- Edit Skill Form -->
@@ -788,16 +1018,6 @@ gap: 0;
 <button class="btn" onclick="saveSkill()">Save Changes</button>
 </div>
 </div>
-<!-- User Preview Section -->
-<div id="user-preview-section" class="section" style="display: none;">
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-<h2 class="section-title">User Preview</h2>
-<button class="btn btn-secondary" onclick="showSection('dashboard')" style="background: var(--gray);">Back to Admin</button>
-</div>
-<div id="preview-content">
-<!-- This will be populated by the user interface -->
-</div>
-</div>
 <!-- Settings Section -->
 <div id="settings-section" class="section" style="display: none;">
 <h2 class="section-title">System Settings</h2>
@@ -805,6 +1025,39 @@ gap: 0;
 </div>
 </div>
 </div>
+</div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="edit-user-modal" id="editUserModal">
+<div class="edit-user-box">
+<span class="close-btn" onclick="closeEditUserModal()">&times;</span>
+<h3>Edit User</h3>
+<div class="form-group">
+<label for="edit-user-name">Name</label>
+<input type="text" id="edit-user-name" placeholder="Enter user name">
+</div>
+<div class="form-group">
+<label for="edit-user-rank">Rank</label>
+<select id="edit-user-rank">
+<option value="ME1T">ME1T</option>
+<option value="ME2T">ME2T</option>
+<option value="ME3T">ME3T</option>
+<option value="ME4T">ME4T</option>
+<option value="ME5T">ME5T</option>
+<option value="ME6">ME6</option>
+</select>
+</div>
+<div class="form-group">
+<label for="edit-user-course">Course</label>
+<select id="edit-user-course">
+<option value="56th Mech">56th Mech</option>
+<option value="56th Avionics">56th Avionics</option>
+<option value="56th Weapons">56th Weapons</option>
+<option value="56th Logistics">56th Logistics</option>
+</select>
+</div>
+<button class="btn" onclick="saveEditedUser()">Save Changes</button>
 </div>
 </div>
 
@@ -851,6 +1104,7 @@ let currentEditingSkill = null;
 let currentUser = null;
 let originalEditingSkill = null; // Store original skill data
 let currentAuthMode = 'login'; // 'login', 'signup', 'forgot', 'profile'
+let editingUserId = null; // Track user being edited
 
 // Initialize the app
 window.onload = function() {
@@ -884,6 +1138,8 @@ if (adminDoc.exists) {
 document.getElementById('adminDashboard').style.display = 'block';
 document.getElementById('userInterface').style.display = 'none';
 document.getElementById('loginPopup').style.display = 'none';
+document.getElementById('profileBtn').style.display = 'block';
+document.getElementById('adminSwitchBtn').style.display = 'block';
 setupFirestoreListeners();
 showSection('dashboard');
 } else {
@@ -891,6 +1147,8 @@ showSection('dashboard');
 document.getElementById('userInterface').style.display = 'block';
 document.getElementById('adminDashboard').style.display = 'none';
 document.getElementById('loginPopup').style.display = 'none';
+document.getElementById('profileBtn').style.display = 'block';
+document.getElementById('adminSwitchBtn').style.display = 'none';
 loadSkillsFromFirebase();
 }
 } else {
@@ -914,9 +1172,10 @@ document.getElementById('auth-error').textContent = '';
 // Complete profile after signup/google login
 async function completeProfile() {
 const rank = document.getElementById('profile-rank').value;
+const course = document.getElementById('profile-course').value;
 const name = document.getElementById('profile-name').value.toUpperCase();
 
-if (!rank || !name) {
+if (!rank || !course || !name) {
 document.getElementById('auth-error').textContent = 'Please fill in all fields';
 return;
 }
@@ -929,6 +1188,7 @@ if (!user) throw new Error('No authenticated user');
 // Save profile to Firestore
 await db.collection("users").doc(user.uid).set({
 rank: rank,
+course: course,
 name: name,
 email: user.email,
 completedSkills: [],
@@ -988,9 +1248,10 @@ function signup() {
 const email = document.getElementById('signup-email').value;
 const password = document.getElementById('signup-password').value;
 const rank = document.getElementById('rank').value;
+const course = document.getElementById('course').value;
 const name = document.getElementById('name').value.toUpperCase();
 
-if (!email || !password || !rank || !name) {
+if (!email || !password || !rank || !course || !name) {
 document.getElementById('auth-error').textContent = 'Please fill in all fields';
 return;
 }
@@ -1000,6 +1261,7 @@ auth.createUserWithEmailAndPassword(email, password)
 // Save profile data to Firestore
 db.collection("users").doc(userCredential.user.uid).set({
 rank: rank,
+course: course,
 name: name,
 email: email,
 completedSkills: [],
@@ -1057,6 +1319,42 @@ function closeLoginPopup() {
 document.getElementById('loginPopup').style.display = 'none';
 }
 
+// Show profile view
+function showProfileView() {
+if (!currentUser) return;
+document.getElementById('userInterface').style.display = 'none';
+document.getElementById('adminDashboard').style.display = 'none';
+document.getElementById('profileView').style.display = 'block';
+document.getElementById('profile-name-display').textContent = currentUser.name;
+document.getElementById('profile-rank-display').textContent = currentUser.rank;
+document.getElementById('profile-course-display').textContent = currentUser.course;
+document.getElementById('profile-email-display').textContent = currentUser.email;
+}
+
+// Close profile view
+function closeProfileView() {
+document.getElementById('profileView').style.display = 'none';
+if (document.getElementById('adminDashboard').style.display === 'block') {
+document.getElementById('adminDashboard').style.display = 'block';
+} else {
+document.getElementById('userInterface').style.display = 'block';
+}
+}
+
+// Switch to user interface (from admin)
+function switchToUserInterface() {
+document.getElementById('adminDashboard').style.display = 'none';
+document.getElementById('userInterface').style.display = 'block';
+document.getElementById('adminSwitchBtn').style.display = 'none';
+}
+
+// Switch to admin interface (from user)
+function switchToAdminInterface() {
+document.getElementById('userInterface').style.display = 'none';
+document.getElementById('adminDashboard').style.display = 'block';
+document.getElementById('adminSwitchBtn').style.display = 'block';
+}
+
 // Setup Firestore listeners to sync data in real-time
 function setupFirestoreListeners() {
 // Listen for changes in skills collection
@@ -1082,6 +1380,18 @@ if (document.getElementById('user-preview-section').style.display === 'block') {
 loadSkillGrid();
 }
 });
+
+// Listen for changes in users collection
+db.collection("users").onSnapshot((snapshot) => {
+usersData = [];
+snapshot.forEach(doc => {
+usersData.push({ id: doc.id, ...doc.data() });
+});
+// Refresh user management section if currently active
+if (document.getElementById('users-section').style.display === 'block') {
+loadUsersManagement();
+}
+});
 }
 
 // Logout function
@@ -1090,6 +1400,9 @@ auth.signOut().then(() => {
 currentUser = null;
 document.getElementById('adminDashboard').style.display = 'none';
 document.getElementById('userInterface').style.display = 'block';
+document.getElementById('profileView').style.display = 'none';
+document.getElementById('profileBtn').style.display = 'none';
+document.getElementById('adminSwitchBtn').style.display = 'none';
 document.getElementById('loginPopup').style.display = 'flex';
 loadSkillsFromFirebase();
 }).catch(error => {
@@ -1119,9 +1432,9 @@ if (section === 'skills') {
 loadSkillsList();
 }
 
-// Handle user preview
-if (section === 'userPreview') {
-showUserPreview();
+// Load users management when showing users section
+if (section === 'users') {
+loadUsersManagement();
 }
 }
 
@@ -1148,6 +1461,93 @@ skillCard.innerHTML = `
 `;
 skillsList.appendChild(skillCard);
 });
+}
+
+// Load users management in admin panel
+function loadUsersManagement() {
+const usersContent = document.getElementById('usersContent');
+usersContent.innerHTML = '';
+
+// Group users by course
+const courses = {};
+usersData.forEach(user => {
+if (!courses[user.course]) {
+courses[user.course] = [];
+}
+courses[user.course].push(user);
+});
+
+// Render each course group
+Object.keys(courses).forEach(course => {
+const courseGroup = document.createElement('div');
+courseGroup.className = 'course-group';
+courseGroup.innerHTML = `
+<h3 class="course-title">${course}</h3>
+<div class="user-list" id="course-${course.replace(/\s+/g, '-')}">
+<!-- Users will be added here -->
+</div>
+`;
+usersContent.appendChild(courseGroup);
+
+// Add users to this course
+const userList = document.getElementById(`course-${course.replace(/\s+/g, '-')}`);
+courses[course].forEach(user => {
+const userCard = document.createElement('div');
+userCard.className = 'user-card';
+userCard.innerHTML = `
+<div class="user-details">
+<div class="user-name">${user.name}</div>
+<div class="user-rank">${user.rank}</div>
+<div class="user-course">${user.course}</div>
+</div>
+<button class="edit-user-btn" onclick="editUser('${user.id}')">Edit</button>
+`;
+userList.appendChild(userCard);
+});
+});
+}
+
+// Edit user function
+function editUser(userId) {
+editingUserId = userId;
+const user = usersData.find(u => u.id === userId);
+if (!user) return;
+
+document.getElementById('edit-user-name').value = user.name;
+document.getElementById('edit-user-rank').value = user.rank;
+document.getElementById('edit-user-course').value = user.course;
+
+document.getElementById('editUserModal').style.display = 'flex';
+}
+
+// Save edited user
+async function saveEditedUser() {
+const name = document.getElementById('edit-user-name').value.toUpperCase();
+const rank = document.getElementById('edit-user-rank').value;
+const course = document.getElementById('edit-user-course').value;
+
+if (!name || !rank || !course) {
+alert('Please fill in all fields');
+return;
+}
+
+try {
+await db.collection("users").doc(editingUserId).update({
+name: name,
+rank: rank,
+course: course
+});
+document.getElementById('editUserModal').style.display = 'none';
+alert('User updated successfully!');
+} catch (error) {
+console.error("Error updating user: ", error);
+alert('Error updating user: ' + error.message);
+}
+}
+
+// Close edit user modal
+function closeEditUserModal() {
+document.getElementById('editUserModal').style.display = 'none';
 }
 
 // Update dashboard counters
@@ -1415,19 +1815,6 @@ console.log("Skill deleted successfully with ID:", skillId);
 console.error("Error removing skill with ID '" + skillId + "': ", error);
 });
 }
-}
-
-// Show user preview in admin panel
-function showUserPreview() {
-// Show user interface within admin panel
-document.getElementById('user-preview-section').style.display = 'block';
-document.getElementById('userInterface').style.display = 'block';
-
-// Move user interface content to preview section
-document.getElementById('preview-content').appendChild(document.getElementById('main-content'));
-
-// Load skills in preview
-loadSkillGrid();
 }
 
 // Load skills from Firebase
