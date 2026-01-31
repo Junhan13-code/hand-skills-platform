@@ -54,7 +54,7 @@ display: flex;
 justify-content: center;
 align-items: center;
 z-index: 2000;
-display: none;
+display: none; /* Hidden by default */
 }
 .login-box {
 background: white;
@@ -153,7 +153,7 @@ font-size: 0.9rem;
 }
 /* Admin Dashboard */
 .admin-dashboard {
-display: none;
+/* display: none; */ /* Remove this line - hide via JS initially */
 padding: 2rem 0;
 }
 .admin-header {
@@ -370,7 +370,7 @@ display: block;
 }
 /* User Interface */
 .user-interface {
-display: none;
+/* display: none; */ /* Remove this line - show via JS initially when logged out */
 padding: 2rem 0;
 }
 /* Header Styles */
@@ -1300,6 +1300,7 @@ z-index: 3001; /* Ensure it's above other modals */
 </div>
 </div>
 </main>
+</div>
 <footer>
 <div class="container">
 <p>&copy; 2026 Hand Skills Learning Platform | Master Essential Hands-On Skills</p>
@@ -1342,6 +1343,29 @@ let pendingRevokeAdminEmail = null;
 
 // Initialize the app
 window.onload = function() {
+// Set initial visibility for UI elements
+// Hide admin dashboard initially
+document.getElementById('adminDashboard').style.display = 'none';
+// Hide login popup initially
+document.getElementById('loginPopup').style.display = 'none';
+// Hide profile popup initially
+document.getElementById('profilePopup').style.display = 'none';
+// Hide the login button initially
+document.getElementById('loginBtn').style.display = 'none';
+// Hide admin/user switch buttons initially
+document.getElementById('adminSwitchBtn').style.display = 'none';
+document.getElementById('adminBackBtn').style.display = 'none';
+// Hide profile button initially
+document.getElementById('profileBtn').style.display = 'none';
+// Hide the edit user modal initially
+document.getElementById('editUserModal').style.display = 'none';
+// Hide the confirmation modals initially
+document.getElementById('confirmRevokeModal').style.display = 'none';
+document.getElementById('grantSuccessModal').style.display = 'none';
+
+// Show the user interface by default
+document.getElementById('userInterface').style.display = 'block';
+
 // Check if user is already logged in
 auth.onAuthStateChanged(user => {
 if (user) {
@@ -1351,13 +1375,20 @@ loadUserData(user.uid);
 document.getElementById('loginBtn').style.display = 'none';
 } else {
 // User is not logged in
-// Show user interface by default
+// Ensure user interface is shown
 document.getElementById('userInterface').style.display = 'block';
-loadSkillsFromFirebase();
-// Hide the login popup initially
+// Hide admin interface
+document.getElementById('adminDashboard').style.display = 'none';
+// Hide profile/admin buttons
+document.getElementById('profileBtn').style.display = 'none';
+document.getElementById('adminSwitchBtn').style.display = 'none';
+document.getElementById('adminBackBtn').style.display = 'none';
+// Hide the login popup if it happens to be open
 document.getElementById('loginPopup').style.display = 'none';
 // Show the login button in the header
 document.getElementById('loginBtn').style.display = 'block';
+// Load skills for unauthenticated users
+loadSkillsFromFirebase();
 }
 });
 // Load ranks and courses from Firestore
@@ -1647,14 +1678,12 @@ document.getElementById('auth-error').textContent = error.message;
 }
 
 // Close login popup
-// Close login popup
 function closeLoginPopup() {
 document.getElementById('loginPopup').style.display = 'none';
 // Show the login button in the header when popup is closed while logged out
 document.getElementById('loginBtn').style.display = 'block';
 }
 
-// Open login popup
 // Open login popup
 function openLoginPopup() {
 document.getElementById('loginPopup').style.display = 'flex';
@@ -1733,7 +1762,7 @@ skillsData.push({ id: doc.id, ...doc.data() });
 // Sort by 'order' field, handling potentially missing 'order' values gracefully
 // Assign a high default value (like the current length) if 'order' is missing or null/undefined
 skillsData.sort((a, b) => {
-const orderA = a.order !== undefined && a.order !== null ? a.order : Infinity; // Or use a large number
+const orderA = a.order !== undefined && a.order !== null ? a.order : Infinity; // Use Infinity or a large number
 const orderB = b.order !== undefined && b.order !== null ? b.order : Infinity;
 return orderA - orderB;
 });
@@ -2390,7 +2419,7 @@ currentUser = null;
 isAdmin = false;
 // Hide interfaces
 document.getElementById('adminDashboard').style.display = 'none';
-document.getElementById('userInterface').style.display = 'block';
+document.getElementById('userInterface').style.display = 'block'; // Show user interface after logout
 document.getElementById('profilePopup').style.display = 'none';
 // Hide profile/admin buttons
 document.getElementById('profileBtn').style.display = 'none';
@@ -2400,6 +2429,7 @@ document.getElementById('adminBackBtn').style.display = 'none';
 document.getElementById('loginPopup').style.display = 'none';
 // Show the login button again after logging out
 document.getElementById('loginBtn').style.display = 'block';
+// Reload skills for the logged-out state
 loadSkillsFromFirebase();
 }).catch(error => {
 console.error("Error signing out: ", error);
