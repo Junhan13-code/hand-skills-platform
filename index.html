@@ -2141,58 +2141,79 @@ console.error("Error signing out: ", error);
 // Show different sections in admin panel
 // Show different sections in admin panel
 function showSection(section) {
-// Hide all sections
-document.querySelectorAll('.section').forEach(el => el.style.display = 'none');
-document.getElementById('edit-skill-form').style.display = 'none';
-// Remove active class from all nav items
-document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-// Show selected section and highlight nav item
-document.getElementById(`${section}-section`).style.display = 'block';
-document.querySelector(`.nav-item[onclick="showSection('${section}')"]`).classList.add('active');
-if (section === 'dashboard') {
-updateCounters();
+    // Hide all sections
+    document.querySelectorAll('.section').forEach(el => el.style.display = 'none');
+    document.getElementById('edit-skill-form').style.display = 'none';
+    // Remove active class from all nav items
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    // Show selected section and highlight nav item
+    document.getElementById(`${section}-section`).style.display = 'block';
+    document.querySelector(`.nav-item[onclick="showSection('${section}')"]`).classList.add('active');
+    if (section === 'dashboard') {
+        updateCounters();
+    }
+    // IMPORTANT: Always reload skills list when showing skills section
+    if (section === 'skills') {
+        loadSkillsList(); // Use the modified function
+    }
+    // Load users management when showing users section
+    if (section === 'users') {
+        loadUsersManagement();
+    }
+    // Load settings content when showing settings section
+    if (section === 'settings') {
+        // Load signup settings by default or the active tab
+        const activeTabButton = document.querySelector('.tab-button.active');
+        const activeTabId = activeTabButton ? activeTabButton.getAttribute('data-tab') : 'signupSettings';
+        if (activeTabId === 'signupSettings') {
+            loadSignupSettings();
+        } else if (activeTabId === 'adminAccess') {
+            loadAdminList(); // Call loadAdminList when Admin Access tab is active
+        }
+    }
 }
-// IMPORTANT: Always reload skills list when showing skills section
-if (section === 'skills') {
-loadSkillsList();
-}
-// Load users management when showing users section
-if (section === 'users') {
-loadUsersManagement();
-}
-// Load settings content when showing settings section
-if (section === 'settings') {
-// Load signup settings by default or the active tab
-const activeTabButton = document.querySelector('.tab-button.active');
-const activeTabId = activeTabButton ? activeTabButton.getAttribute('data-tab') : 'signupSettings';
-if (activeTabId === 'signupSettings') {
-loadSignupSettings();
-} else if (activeTabId === 'adminAccess') {
-loadAdminList(); // Call loadAdminList when Admin Access tab is active
-}
-}
-}
-// Load skills list in admin panel
+// Load skills list in admin panel - MODIFIED TO USE GRID LAYOUT WITH EDIT/DELETE BUTTONS
 function loadSkillsList() {
-const skillsList = document.getElementById('skillsList');
-skillsList.innerHTML = '';
-if (skillsData.length === 0) {
-skillsList.innerHTML = '<p>No skills available.</p>';
-return;
-}
-skillsData.forEach(skill => {
-const skillCard = document.createElement('div');
-skillCard.className = 'skill-card';
-skillCard.innerHTML = `
-<h4>${skill.name}</h4>
-<p>${skill.description.substring(0, 100)}...</p>
-<div class="skill-actions">
-<button class="action-btn edit-btn" onclick="editSkill('${skill.id}')">Edit</button>
-<button class="action-btn delete-btn" onclick="deleteSkill('${skill.id}')">Delete</button>
-</div>
-`;
-skillsList.appendChild(skillCard);
-});
+    const skillsList = document.getElementById('skillsList'); // Assuming the container ID remains 'skillsList'
+    skillsList.innerHTML = ''; // Clear previous content
+
+    if (skillsData.length === 0) {
+        skillsList.innerHTML = '<p>No skills available.</p>';
+        return;
+    }
+
+    // Create a container element styled like the user skill grid
+    const skillGrid = document.createElement('div');
+    skillGrid.className = 'skill-grid'; // Reuse the user interface grid class
+
+    skillsData.forEach(skill => {
+        // Create a skill card element similar to the user interface
+        const skillCard = document.createElement('div');
+        skillCard.className = 'skill-card-ui'; // Reuse the user interface card class
+        // Add a unique identifier if needed for targeting later
+        skillCard.setAttribute('data-skill-id', skill.id);
+
+        // Construct the inner HTML for the card, including the admin buttons
+        skillCard.innerHTML = `
+            <div class="skill-icon">
+                <i class="${skill.icon}"></i>
+            </div>
+            <div class="skill-content">
+                <h3 class="skill-name">${skill.name}</h3>
+                <p class="skill-desc">${skill.description.substring(0, 100)}...</p>
+                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;"> <!-- Flex container for buttons -->
+                    <button class="skill-btn" style="background: var(--warning); flex: 1;" onclick="editSkill('${skill.id}')">Edit</button>
+                    <button class="skill-btn" style="background: var(--danger); flex: 1;" onclick="deleteSkill('${skill.id}')">Delete</button>
+                </div>
+            </div>
+        `;
+
+        // Append the constructed card to the grid container
+        skillGrid.appendChild(skillCard);
+    });
+
+    // Append the grid container to the main skills list area
+    skillsList.appendChild(skillGrid);
 }
 // Load users management in admin panel
 function loadUsersManagement() {
@@ -2760,4 +2781,5 @@ loadAdminList(); // Load admin list specifically when the Admin Access tab is cl
 </script>
 </body>
 </html>
+
 
