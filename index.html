@@ -204,40 +204,19 @@ margin-top: 1rem;
 display: flex;
 gap: 0.5rem;
 }
-/* CORRECTED SELECTORS: Use more specific classes or IDs for the action buttons */
-.skill-card .skill-actions .action-btn,
-#edit-skill-form .action-btn,
-#edit-skill-form .btn.add-step-btn,
-#edit-skill-form .btn.add-quiz-btn,
-#edit-skill-form .btn.update-rank-btn,
-#edit-skill-form .btn.logout-btn-popup,
-#edit-skill-form .btn.close-profile-btn,
-#edit-skill-form .btn.delete-btn-setting,
-#edit-skill-form .btn.move-up-btn,
-#edit-skill-form .btn.move-down-btn,
-#edit-skill-form .btn.btn-secondary,
-#edit-skill-form .btn.btn-primary {
+/* CORRECTED SELECTORS: Define specific styles for buttons in different contexts */
+/* Buttons inside the Edit Skill Form */
+#edit-skill-form .btn,
+#edit-skill-form .action-btn { /* Include action buttons inside steps/quiz editors */
 padding: 0.4rem 0.8rem;
 border-radius: 4px;
 border: none;
 cursor: pointer;
 font-size: 0.9rem;
-margin-left: 0.25rem; /* Add small gap between buttons if needed */
-margin-right: 0.25rem;
 }
-/* Specific styles for action buttons inside skill cards */
-.skill-card .skill-actions .edit-btn {
-background: var(--warning);
-color: white;
-}
-.skill-card .skill-actions .delete-btn {
-background: var(--danger);
-color: white;
-}
-/* Specific styles for action buttons inside edit form */
+/* Specific background colors for edit form buttons (can be inline) */
 #edit-skill-form .btn.add-step-btn,
 #edit-skill-form .btn.add-quiz-btn {
-margin-top: 1rem;
 background: var(--success);
 color: white;
 }
@@ -249,17 +228,112 @@ color: white;
 background: var(--primary);
 color: white;
 }
-/* Specific styles for setting item actions */
+
+/* Buttons inside the Profile Popup */
+.profile-content .update-rank-btn,
+.profile-content .close-profile-btn,
+.profile-content .logout-btn-popup {
+padding: 0.5rem 1rem; /* Example padding */
+border-radius: 5px;   /* Example radius */
+border: none;         /* Example border */
+cursor: pointer;      /* Example cursor */
+font-size: 1rem;      /* Example size */
+width: 100%;          /* Full width for consistency */
+margin-bottom: 0.5rem; /* Space between buttons */
+color: white;         /* Ensure text contrast */
+}
+.profile-content .update-rank-btn {
+background: var(--primary); /* Example color */
+}
+.profile-content .close-profile-btn {
+background: var(--gray); /* Example color */
+}
+.profile-content .close-profile-btn:hover {
+background: #5a6268;
+}
+.profile-content .logout-btn-popup {
+background: var(--danger); /* Example color */
+}
+.profile-content .logout-btn-popup:hover {
+background: #e53e3e;
+}
+
+/* Buttons in the Admin Skills List Header and Skill Cards */
+#skills-section .section-title ~ div button.btn, /* Target the "Add New Skill" button */
+.skill-card-ui .skill-content .skill-btn { /* Target buttons in skill cards (Edit, Delete, Move Up/Down) */
+padding: 0.4rem 0.8rem;
+border-radius: 4px;
+border: none;
+cursor: pointer;
+font-size: 0.9rem;
+color: white; /* Ensure text contrast */
+}
+/* Specific colors for skill card buttons (inline styles in HTML take precedence) */
+.skill-card-ui .skill-content .skill-btn[style*="var(--warning)"] { /* Example: Edit button */
+background: var(--warning);
+}
+.skill-card-ui .skill-content .skill-btn[style*="var(--danger)"] { /* Example: Delete button */
+background: var(--danger);
+}
+.skill-card-ui .skill-content .skill-btn[style*="var(--primary)"] { /* Example: Move Up/Down buttons */
+background: var(--primary);
+}
+
+/* Buttons in the User Management Section (User Cards) */
+.user-card .edit-user-btn,
+.user-card .action-btn.delete-btn { /* Target the Edit and Delete buttons in user cards */
+padding: 0.5rem 1rem;
+border-radius: 4px;
+border: none;
+cursor: pointer;
+font-size: 0.9rem;
+color: white; /* Ensure text contrast */
+}
+.user-card .edit-user-btn {
+background: var(--warning);
+}
+.user-card .edit-user-btn:hover {
+background: #e4bb0b;
+}
+.user-card .action-btn.delete-btn {
+background: var(--danger);
+}
+
+/* Buttons in the Settings Section (Signup Settings) */
+.setting-actions .delete-btn-setting,
+.setting-actions .move-up-btn,
+.setting-actions .move-down-btn {
+padding: 0.25rem 0.5rem; /* Smaller padding for inline actions */
+border-radius: 4px;
+border: none;
+cursor: pointer;
+font-size: 0.8rem; /* Smaller font */
+color: white; /* Ensure text contrast */
+}
 .setting-actions .delete-btn-setting {
 background: var(--danger);
-color: white;
-padding: 0.25rem 0.5rem;
 }
-.setting-actions .move-up-btn, .setting-actions .move-down-btn {
+.setting-actions .move-up-btn,
+.setting-actions .move-down-btn {
 background: var(--primary);
-color: white;
-padding: 0.25rem 0.5rem;
 }
+
+/* Buttons in the Settings Section (Admin Access) */
+.admin-access-form button.btn,
+#adminList button.btn { /* Target buttons in admin access section */
+padding: 0.5rem 1rem;
+border-radius: 5px;
+border: none;
+cursor: pointer;
+font-size: 1rem;
+color: white; /* Ensure text contrast */
+background: var(--primary);
+}
+#adminList button.btn { /* Revoke button */
+background: var(--danger);
+}
+
+
 /* Edit Form */
 .edit-form {
 display: none;
@@ -469,24 +543,6 @@ padding: 0.5rem;
 border: 1px solid #ddd;
 border-radius: 5px;
 }
-.update-rank-btn {
-width: 100%;
-margin-bottom: 0.5rem;
-}
-.close-profile-btn {
-width: 100%;
-background: var(--gray);
-}
-.close-profile-btn:hover {
-background: #5a6268;
-}
-.logout-btn-popup {
-width: 100%;
-background: var(--danger);
-}
-.logout-btn-popup:hover {
-background: #e53e3e;
-}
 /* User Management Section */
 .users-section {
 display: none;
@@ -528,17 +584,6 @@ color: var(--gray);
 .user-course {
 font-size: 0.9rem;
 color: var(--primary);
-}
-.edit-user-btn {
-background: var(--warning);
-color: white;
-border: none;
-padding: 0.5rem 1rem;
-border-radius: 4px;
-cursor: pointer;
-}
-.edit-user-btn:hover {
-background: #e4bb0b;
 }
 /* Edit User Modal */
 .edit-user-modal {
@@ -598,18 +643,6 @@ border-bottom: 1px solid rgba(0,0,0,0.1);
 .setting-actions {
 display: flex;
 gap: 0.5rem;
-}
-.delete-btn-setting {
-border: none;
-padding: 0.25rem 0.5rem;
-border-radius: 4px;
-cursor: pointer;
-}
-.move-up-btn, .move-down-btn {
-border: none;
-padding: 0.25rem 0.5rem;
-border-radius: 4px;
-cursor: pointer;
 }
 .add-item-input {
 display: flex;
@@ -678,7 +711,7 @@ color: var(--primary);
 color: var(--gray);
 flex-grow: 1;
 }
-.skill-btn {
+.skill-btn { /* This is the original class for buttons inside skill cards in the grid */
 background: var(--primary);
 color: white;
 border: none;
@@ -3157,4 +3190,5 @@ loadAdminList(); // Load admin list specifically when the Admin Access tab is cl
 </script>
 </body>
 </html>
+
 
