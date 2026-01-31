@@ -1,1881 +1,734 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hand Skills Learning Platform - Admin & User System</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-<style>
-* {
-margin: 0;
-padding: 0;
-box-sizing: border-box;
-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-:root {
---primary: #4361ee;
---secondary: #3f37c9;
---accent: #4cc9f0;
---light: #f8f9fa;
---dark: #212529;
---gray: #6c757d;
---success: #4ade80;
---warning: #facc15;
---danger: #f87171;
---shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
---transition: all 0.3s ease;
-}
-body {
-background-color: #f5f7fb;
-color: var(--dark);
-line-height: 1.6;
-}
-.container {
-width: 100%;
-max-width: 1200px;
-margin: 0 auto;
-padding: 0 20px;
-}
-/* Login Popup */
-.login-popup {
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-background: rgba(0,0,0,0.7);
-display: flex;
-justify-content: center;
-align-items: center;
-z-index: 2000;
-display: none;
-}
-.login-box {
-background: white;
-padding: 2.5rem;
-border-radius: 10px;
-box-shadow: var(--shadow);
-width: 100%;
-max-width: 450px;
-text-align: center;
-position: relative;
-}
-.login-box h2 {
-margin-bottom: 1.5rem;
-color: var(--primary);
-}
-.close-btn {
-position: absolute;
-top: 15px;
-right: 15px;
-font-size: 1.5rem;
-cursor: pointer;
-color: var(--gray);
-}
-.close-btn:hover {
-color: var(--dark);
-}
-.form-group {
-margin-bottom: 1.2rem;
-text-align: left;
-}
-.form-group label {
-display: block;
-margin-bottom: 0.5rem;
-font-weight: 500;
-}
-.form-group input, .form-group select {
-width: 100%;
-padding: 0.8rem;
-border: 1px solid #ddd;
-border-radius: 5px;
-font-size: 1rem;
-}
-.btn {
-display: block;
-width: 100%;
-padding: 0.8rem;
-background: var(--primary);
-color: white;
-border: none;
-border-radius: 5px;
-font-size: 1rem;
-font-weight: 600;
-cursor: pointer;
-transition: var(--transition);
-margin-bottom: 0.5rem;
-}
-.btn:hover {
-background: var(--secondary);
-}
-.btn-secondary {
-background: var(--gray);
-}
-.btn-secondary:hover {
-background: #5a6268;
-}
-.btn-success {
-background: var(--success);
-}
-.btn-success:hover {
-background: #22c55e;
-}
-.google-btn {
-background: #DB4437;
-}
-.google-btn:hover {
-background: #c23325;
-}
-.auth-toggle {
-margin-top: 1rem;
-color: var(--gray);
-}
-.auth-toggle a {
-color: var(--primary);
-text-decoration: none;
-font-weight: 600;
-}
-.error-message {
-color: var(--danger);
-margin-top: 0.5rem;
-font-size: 0.9rem;
-}
-.operation-message {
-color: var(--success);
-margin-top: 0.5rem;
-font-size: 0.9rem;
-}
-/* Admin Dashboard */
-.admin-dashboard {
-display: none;
-padding: 2rem 0;
-}
-.admin-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 2rem;
-padding-bottom: 1rem;
-border-bottom: 1px solid var(--light);
-}
-.admin-header h1 {
-color: var(--primary);
-}
-.logout-btn {
-background: var(--danger);
-color: white;
-border: none;
-padding: 0.5rem 1rem;
-border-radius: 5px;
-cursor: pointer;
-}
-.admin-content {
-display: grid;
-grid-template-columns: 1fr 2fr;
-gap: 2rem;
-}
-/* Navigation Panel */
-.nav-panel {
-background: white;
-border-radius: 10px;
-padding: 1.5rem;
-box-shadow: var(--shadow);
-}
-.nav-panel h3 {
-margin-bottom: 1.2rem;
-padding-bottom: 0.5rem;
-border-bottom: 1px solid var(--light);
-}
-.nav-item {
-padding: 0.8rem;
-margin-bottom: 0.5rem;
-border-radius: 5px;
-cursor: pointer;
-transition: var(--transition);
-}
-.nav-item:hover, .nav-item.active {
-background: var(--primary);
-color: white;
-}
-/* Main Content Area */
-.main-content-area {
-background: white;
-border-radius: 10px;
-padding: 2rem;
-box-shadow: var(--shadow);
-}
-.section-title {
-font-size: 1.5rem;
-color: var(--primary);
-margin-bottom: 1.5rem;
-padding-bottom: 0.5rem;
-border-bottom: 1px solid var(--light);
-}
-.skill-list {
-display: grid;
-grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-gap: 1.5rem;
-}
-.skill-card {
-border: 1px solid var(--light);
-border-radius: 8px;
-padding: 1.2rem;
-cursor: pointer;
-transition: var(--transition);
-}
-.skill-card:hover {
-border-color: var(--primary);
-transform: translateY(-3px);
-box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-}
-.skill-card h4 {
-margin-bottom: 0.5rem;
-color: var(--primary);
-}
-.skill-actions {
-margin-top: 1rem;
-display: flex;
-gap: 0.5rem;
-}
-.action-btn {
-padding: 0.4rem 0.8rem;
-border-radius: 4px;
-border: none;
-cursor: pointer;
-font-size: 0.9rem;
-}
-.edit-btn {
-background: var(--warning);
-color: white;
-}
-.delete-btn {
-background: var(--danger);
-color: white;
-}
-/* Edit Form */
-.edit-form {
-display: none;
-}
-.form-row {
-display: flex;
-gap: 1rem;
-margin-bottom: 1.2rem;
-}
-.form-col {
-flex: 1;
-}
-textarea {
-width: 100%;
-padding: 0.8rem;
-border: 1px solid #ddd;
-border-radius: 5px;
-resize: vertical;
-min-height: 100px;
-}
-.form-actions {
-display: flex;
-justify-content: flex-end;
-gap: 1rem;
-margin-top: 1.5rem;
-}
-/* Steps Editor */
-.steps-editor {
-margin-top: 1.5rem;
-}
-.step-item {
-border: 1px solid var(--light);
-border-radius: 5px;
-padding: 1rem;
-margin-bottom: 1rem;
-position: relative;
-}
-.step-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 0.8rem;
-}
-.step-content {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 1rem;
-}
-.add-step-btn {
-margin-top: 1rem;
-background: var(--success);
-color: white;
-}
-/* Quiz Editor */
-.quiz-editor {
-margin-top: 1.5rem;
-}
-.quiz-question {
-border: 1px solid var(--light);
-border-radius: 5px;
-padding: 1rem;
-margin-bottom: 1rem;
-position: relative;
-}
-.quiz-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 0.8rem;
-}
-.quiz-content {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 1rem;
-}
-.quiz-options {
-display: grid;
-grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-gap: 1rem;
-}
-.add-quiz-btn {
-margin-top: 1rem;
-background: var(--success);
-color: white;
-}
-/* Settings Tabs */
-.settings-tabs {
-display: flex;
-border-bottom: 1px solid var(--light);
-margin-bottom: 1.5rem;
-}
-.tab-button {
-padding: 0.75rem 1.5rem;
-background: none;
-border: none;
-border-bottom: 3px solid transparent;
-cursor: pointer;
-font-weight: 600;
-color: var(--gray);
-}
-.tab-button.active {
-border-bottom: 3px solid var(--primary);
-color: var(--primary);
-}
-.tab-content {
-display: none;
-}
-.tab-content.active {
-display: block;
-}
-/* User Interface */
-.user-interface {
-display: none;
-padding: 2rem 0;
-}
-/* Header Styles */
-header {
-background: linear-gradient(135deg, var(--primary), var(--secondary));
-color: white;
-padding: 2rem 0;
-text-align: center;
-margin-bottom: 2rem;
-}
-header h1 {
-font-size: 2.5rem;
-margin-bottom: 0.5rem;
-}
-header p {
-font-size: 1.1rem;
-opacity: 0.9;
-}
-/* Profile Button */
-.profile-btn {
-position: absolute;
-top: 20px;
-right: 120px;
-background: rgba(0,0,0,0.3);
-color: white;
-border: none;
-padding: 0.75rem 1.5rem;
-border-radius: 5px;
-cursor: pointer;
-font-weight: 600;
-transition: var(--transition);
-}
-.profile-btn:hover {
-background: rgba(0,0,0,0.5);
-}
-/* Admin Switch Button */
-.admin-switch {
-position: absolute;
-top: 20px;
-right: 20px;
-z-index: 100;
-}
-.admin-switch-btn {
-background: rgba(0,0,0,0.3);
-color: white;
-border: none;
-padding: 0.75rem 1.5rem;
-border-radius: 5px;
-cursor: pointer;
-font-weight: 600;
-transition: var(--transition);
-}
-.admin-switch-btn:hover {
-background: rgba(0,0,0,0.5);
-}
-/* Profile Popup */
-.profile-popup {
-position: fixed;
-top: 70px;
-right: 20px;
-width: 300px;
-background: white;
-border-radius: 10px;
-box-shadow: var(--shadow);
-z-index: 1000;
-display: none;
-}
-.profile-header {
-display: flex;
-align-items: center;
-padding: 1rem;
-border-bottom: 1px solid var(--light);
-}
-.profile-header i {
-font-size: 1.5rem;
-margin-right: 0.5rem;
-color: var(--primary);
-}
-.profile-header h3 {
-font-size: 1.2rem;
-margin: 0;
-}
-.profile-content {
-padding: 1rem;
-}
-.profile-info {
-margin-bottom: 1rem;
-}
-.info-item {
-margin-bottom: 0.5rem;
-}
-.info-label {
-font-weight: 600;
-color: var(--gray);
-font-size: 0.9rem;
-}
-.info-value {
-font-size: 1rem;
-}
-.change-rank-select {
-width: 100%;
-margin-bottom: 1rem;
-padding: 0.5rem;
-border: 1px solid #ddd;
-border-radius: 5px;
-}
-.update-rank-btn {
-width: 100%;
-margin-bottom: 0.5rem;
-}
-.close-profile-btn {
-width: 100%;
-background: var(--gray);
-}
-.close-profile-btn:hover {
-background: #5a6268;
-}
-.logout-btn-popup {
-width: 100%;
-background: var(--danger);
-}
-.logout-btn-popup:hover {
-background: #e53e3e;
-}
-/* User Management Section */
-.users-section {
-display: none;
-}
-.course-group {
-margin-bottom: 2rem;
-}
-.course-title {
-font-size: 1.3rem;
-color: var(--secondary);
-margin-bottom: 1rem;
-padding-bottom: 0.5rem;
-border-bottom: 1px solid var(--light);
-}
-.user-list {
-display: grid;
-grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-gap: 1rem;
-}
-.user-card {
-background: var(--light);
-border-radius: 8px;
-padding: 1rem;
-display: flex;
-justify-content: space-between;
-align-items: center;
-}
-.user-details {
-flex-grow: 1;
-}
-.user-name {
-font-weight: 600;
-margin-bottom: 0.25rem;
-}
-.user-rank {
-font-size: 0.9rem;
-color: var(--gray);
-}
-.user-course {
-font-size: 0.9rem;
-color: var(--primary);
-}
-.edit-user-btn {
-background: var(--warning);
-color: white;
-border: none;
-padding: 0.5rem 1rem;
-border-radius: 4px;
-cursor: pointer;
-}
-.edit-user-btn:hover {
-background: #e4bb0b;
-}
-/* Edit User Modal */
-.edit-user-modal {
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-background: rgba(0,0,0,0.7);
-display: flex;
-justify-content: center;
-align-items: center;
-z-index: 3000;
-display: none;
-}
-.edit-user-box {
-background: white;
-padding: 2rem;
-border-radius: 10px;
-box-shadow: var(--shadow);
-width: 100%;
-max-width: 500px;
-text-align: center;
-position: relative;
-}
-.edit-user-box h3 {
-margin-bottom: 1.5rem;
-color: var(--primary);
-}
-/* Settings Sections */
-.signup-settings-section {
-display: none;
-}
-.settings-controls {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 2rem;
-}
-.settings-column {
-background: var(--light);
-padding: 1.5rem;
-border-radius: 8px;
-}
-.setting-title {
-font-size: 1.2rem;
-margin-bottom: 1rem;
-color: var(--primary);
-}
-.setting-item {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 0.5rem;
-padding: 0.5rem 0;
-border-bottom: 1px solid rgba(0,0,0,0.1);
-}
-.setting-actions {
-display: flex;
-gap: 0.5rem;
-}
-.delete-btn-setting {
-background: var(--danger);
-color: white;
-border: none;
-padding: 0.25rem 0.5rem;
-border-radius: 4px;
-cursor: pointer;
-}
-.delete-btn-setting:hover {
-opacity: 0.9;
-}
-.add-item-input {
-display: flex;
-margin-top: 1rem;
-}
-.add-item-input input {
-flex: 1;
-margin-right: 0.5rem;
-}
-.add-item-input button {
-background: var(--success);
-color: white;
-border: none;
-padding: 0.5rem;
-border-radius: 4px;
-cursor: pointer;
-}
-/* Skill Grid */
-.skill-grid {
-display: grid;
-grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-gap: 1.5rem;
-margin-top: 2rem;
-}
-.skill-card-ui {
-background: white;
-border-radius: 10px;
-overflow: hidden;
-box-shadow: var(--shadow);
-transition: var(--transition);
-cursor: pointer;
-height: 100%;
-display: flex;
-flex-direction: column;
-}
-.skill-card-ui:hover {
-transform: translateY(-5px);
-box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-}
-.skill-icon {
-background: linear-gradient(135deg, var(--primary), var(--accent));
-color: white;
-font-size: 3rem;
-height: 150px;
-display: flex;
-align-items: center;
-justify-content: center;
-}
-.skill-content {
-padding: 1.5rem;
-flex-grow: 1;
-display: flex;
-flex-direction: column;
-}
-.skill-name {
-font-size: 1.5rem;
-margin-bottom: 0.75rem;
-color: var(--primary);
-}
-.skill-desc {
-color: var(--gray);
-flex-grow: 1;
-}
-.skill-btn {
-background: var(--primary);
-color: white;
-border: none;
-padding: 0.75rem;
-border-radius: 5px;
-cursor: pointer;
-font-weight: 600;
-margin-top: 1rem;
-transition: var(--transition);
-}
-.skill-btn:hover {
-background: var(--secondary);
-}
-/* Skill Detail */
-.skill-detail {
-background: white;
-border-radius: 10px;
-padding: 2rem;
-box-shadow: var(--shadow);
-margin-top: 1.5rem;
-display: none;
-}
-.skill-header {
-display: flex;
-align-items: center;
-margin-bottom: 2rem;
-padding-bottom: 1rem;
-border-bottom: 2px solid var(--light);
-}
-.skill-header i {
-font-size: 2.5rem;
-margin-right: 1rem;
-color: var(--primary);
-}
-.skill-header h2 {
-font-size: 2rem;
-color: var(--dark);
-}
-.skill-section {
-margin-bottom: 2.5rem;
-}
-.section-title-ui {
-font-size: 1.5rem;
-color: var(--primary);
-margin-bottom: 1rem;
-padding-bottom: 0.5rem;
-border-bottom: 1px solid var(--light);
-}
-/* Tools Section */
-.tools-grid {
-display: grid;
-grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-gap: 1rem;
-}
-.tool-item {
-background: var(--light);
-border-radius: 8px;
-padding: 1rem;
-text-align: center;
-transition: var(--transition);
-}
-.tool-item:hover {
-background: var(--primary);
-color: white;
-}
-.tool-item i {
-font-size: 1.8rem;
-margin-bottom: 0.5rem;
-color: var(--primary);
-}
-.tool-item:hover i {
-color: white;
-}
-/* Steps Section */
-.steps-container {
-display: flex;
-flex-direction: column;
-gap: 1.5rem;
-}
-.step-card {
-display: flex;
-gap: 1.5rem;
-background: var(--light);
-border-radius: 8px;
-overflow: hidden;
-}
-.step-image {
-width: 200px;
-height: 150px;
-object-fit: cover;
-}
-.step-content {
-padding: 1.2rem;
-flex-grow: 1;
-}
-.step-title {
-font-size: 1.2rem;
-margin-bottom: 0.5rem;
-color: var(--primary);
-}
-/* Theory Section */
-.theory-content {
-background: var(--light);
-padding: 1.5rem;
-border-radius: 8px;
-line-height: 1.8;
-}
-/* Quiz Section */
-.quiz-container {
-background: var(--light);
-padding: 1.5rem;
-border-radius: 8px;
-}
-.question {
-margin-bottom: 1.5rem;
-}
-.question-text {
-font-weight: 600;
-margin-bottom: 0.75rem;
-}
-.options {
-display: flex;
-flex-direction: column;
-gap: 0.5rem;
-}
-.option {
-display: flex;
-align-items: center;
-padding: 0.75rem;
-background: white;
-border-radius: 5px;
-cursor: pointer;
-transition: var(--transition);
-}
-.option:hover {
-background: #e9ecef;
-}
-.option.selected {
-background: var(--primary);
-color: white;
-}
-.quiz-result {
-margin-top: 1.5rem;
-padding: 1rem;
-border-radius: 5px;
-text-align: center;
-font-weight: 600;
-}
-.quiz-result.correct {
-background: var(--success);
-color: white;
-}
-.quiz-result.incorrect {
-background: var(--danger);
-color: white;
-}
-.quiz-nav {
-display: flex;
-justify-content: space-between;
-margin-top: 1.5rem;
-}
-.back-btn {
-background: var(--gray);
-color: white;
-border: none;
-padding: 0.75rem 1.5rem;
-border-radius: 5px;
-cursor: pointer;
-font-weight: 600;
-}
-/* Footer */
-footer {
-background: var(--dark);
-color: white;
-text-align: center;
-padding: 1.5rem 0;
-margin-top: 3rem;
-}
-/* Responsive Design */
-@media (max-width: 992px) {
-.admin-content {
-grid-template-columns: 1fr;
-}
-.nav-panel {
-margin-bottom: 2rem;
-}
-.settings-controls {
-grid-template-columns: 1fr;
-}
-.settings-tabs {
-flex-wrap: wrap;
-}
-.tab-button {
-padding: 0.5rem;
-}
-}
-@media (max-width: 768px) {
-.step-card {
-flex-direction: column;
-}
-.step-image {
-width: 100%;
-height: 200px;
-}
-.skill-header {
-flex-direction: column;
-text-align: center;
-}
-.skill-header i {
-margin-right: 0;
-margin-bottom: 1rem;
-}
-.form-row {
-flex-direction: column;
-gap: 0;
-}
-.profile-btn, .admin-switch {
-position: static;
-text-align: center;
-margin-top: 1rem;
-}
-.profile-btn {
-margin-right: 1rem;
-}
-.profile-popup {
-position: absolute;
-top: 50px;
-right: 10px;
-}
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+
+    <!-- Include Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Include Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding-top: 60px; /* Adjust based on your header height */
+            background-color: #f5f5f5;
+        }
+
+        .admin-container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .header-title {
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .logout-btn, .back-to-user-btn {
+            background-color: #e74c3c !important; /* Override default btn color */
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .logout-btn:hover, .back-to-user-btn:hover {
+            background-color: #c0392b !important; /* Darker shade on hover */
+        }
+
+        .admin-panel-tabs {
+            background-color: #ecf0f1;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .tab a {
+            color: #2c3e50 !important;
+            font-weight: bold;
+        }
+
+        .tab a.active {
+            color: #3498db !important; /* Active tab indicator color */
+            border-bottom: 3px solid #3498db;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .setting-section {
+            margin-bottom: 30px;
+        }
+
+        .setting-section h3 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+
+        .add-rank-course-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center; /* Align items vertically */
+        }
+
+        .add-rank-course-form input {
+            flex-grow: 1; /* Allow input to grow and take available space */
+            margin-right: 5px; /* Add some space between input and button */
+        }
+
+        .add-rank-course-form button {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .add-rank-course-form button:hover {
+            background-color: #219a52;
+        }
+
+        .settings-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            background-color: #fafafa;
+            margin-bottom: 5px;
+            border-radius: 4px;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-actions {
+            display: flex;
+            gap: 5px; /* Reduced gap between buttons */
+        }
+
+        /* --- NEW STYLES FOR UP/DOWN ARROWS --- */
+        .move-up-btn, .move-down-btn {
+            background-color: #3498db; /* Blue color for arrows */
+            color: white;
+            border: none;
+            padding: 5px 10px; /* Smaller padding for smaller buttons */
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.9em; /* Slightly smaller font */
+            min-width: 30px; /* Ensure consistent minimum width */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .move-up-btn:hover, .move-down-btn:hover {
+            background-color: #2980b9; /* Darker blue on hover */
+        }
+
+        .move-up-btn:disabled, .move-down-btn:disabled {
+            background-color: #bdc3c7; /* Grey out disabled buttons */
+            cursor: not-allowed; /* Show not-allowed cursor */
+        }
+
+        .move-up-btn:disabled:hover, .move-down-btn:disabled:hover {
+            background-color: #bdc3c7; /* Maintain grey color on hover when disabled */
+        }
+        /* --- END NEW STYLES FOR UP/DOWN ARROWS --- */
+
+        .delete-btn-setting {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px; /* Match padding with arrow buttons */
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.9em; /* Match font size */
+        }
+
+        .delete-btn-setting:hover {
+            background-color: #c0392b;
+        }
+
+        .users-table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #ecf0f1;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .edit-user-btn, .remove-admin-btn, .grant-admin-btn {
+            margin: 0 2px; /* Small margin around buttons */
+            padding: 5px 10px; /* Smaller padding */
+            font-size: 0.9em; /* Smaller font */
+        }
+
+        .grant-admin-btn {
+            background-color: #27ae60 !important;
+        }
+
+        .remove-admin-btn {
+            background-color: #f39c12 !important;
+        }
+
+        .edit-user-btn {
+            background-color: #3498db !important;
+        }
+
+        .grant-admin-btn:hover {
+            background-color: #219a52 !important;
+        }
+
+        .remove-admin-btn:hover {
+            background-color: #d35400 !important;
+        }
+
+        .edit-user-btn:hover {
+            background-color: #2980b9 !important;
+        }
+
+        .status-cell {
+            text-transform: uppercase; /* Example: Make status text uppercase */
+        }
+
+        .parade-state-container {
+            margin-top: 20px;
+        }
+
+        .parade-state-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .parade-state-controls select, .parade-state-controls input, .parade-state-controls button {
+            margin-right: 5px;
+        }
+
+        .parade-state-table-container {
+            overflow-x: auto;
+        }
+
+        .attendance-summary-container {
+            margin-top: 20px;
+        }
+
+        .attendance-summary-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .attendance-summary-table th,
+        .attendance-summary-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center; /* Center text in summary table */
+        }
+
+        .attendance-summary-table th {
+            background-color: #ecf0f1;
+            font-weight: bold;
+        }
+
+        .attendance-summary-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .export-btn {
+            background-color: #8e44ad; /* Purple color */
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        .export-btn:hover {
+            background-color: #7d3c98; /* Darker purple on hover */
+        }
+
+        .admin-only {
+            display: none; /* Initially hidden */
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3; /* Light grey */
+            border-top: 4px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 10px;
+            }
+            .header-controls {
+                margin-top: 10px;
+                width: 100%;
+                justify-content: space-between;
+            }
+            .admin-container {
+                padding: 10px;
+            }
+            .add-rank-course-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .add-rank-course-form input, .add-rank-course-form button {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+            .setting-actions {
+                 /* On small screens, maybe stack the buttons vertically if needed */
+                 /* flex-direction: column; */
+                 /* gap: 2px; */ /* Smaller gap if stacked */
+            }
+        }
+    </style>
 </head>
 <body>
-<header>
-<div class="container">
-<h1><i class="fas fa-tools"></i> Hand Skills Learning Platform</h1>
-<p>Master essential hands-on skills with step-by-step guidance</p>
-</div>
-<button class="profile-btn" id="profileBtn" onclick="toggleProfilePopup()" style="display: none;">
-<i class="fas fa-user"></i> Profile
-</button>
-<button class="admin-switch-btn" id="adminSwitchBtn" onclick="switchToUserInterface()" style="display: none;">
-<i class="fas fa-user-graduate"></i> User View
-</button>
-<button class="admin-switch-btn" id="adminBackBtn" onclick="switchToAdminInterface()" style="display: none;">
-<i class="fas fa-lock"></i> Admin View
-</button>
-<button class="profile-btn" id="loginBtn" onclick="openLoginPopup()" style="display: none;">
-    <i class="fas fa-sign-in-alt"></i> Login
-</button>
-</header>
 
-<!-- Profile Popup -->
-<div class="profile-popup" id="profilePopup">
-<div class="profile-header">
-<i class="fas fa-user-circle"></i>
-<h3>User Profile</h3>
-</div>
-<div class="profile-content">
-<div class="profile-info">
-<div class="info-item">
-<span class="info-label">Name</span>
-<div class="info-value" id="popup-name-display"></div>
-</div>
-<div class="info-item">
-<span class="info-label">Rank</span>
-<div class="info-value" id="popup-rank-display"></div>
-</div>
-<div class="info-item">
-<span class="info-label">Course</span>
-<div class="info-value" id="popup-course-display"></div>
-</div>
-<div class="info-item">
-<span class="info-label">Email</span>
-<div class="info-value" id="popup-email-display"></div>
-</div>
-</div>
-<div class="form-group">
-<label for="edit-rank">Change Rank</label>
-<select id="edit-rank" class="change-rank-select">
-<!-- Options will be loaded dynamically -->
-</select>
-</div>
-<button class="btn update-rank-btn" onclick="updateOwnRank()">Update Rank</button>
-<button class="btn close-profile-btn" onclick="toggleProfilePopup()">Close</button>
-<button class="btn logout-btn-popup" onclick="logout()">Logout</button>
-</div>
+<div class="header">
+    <h1 class="header-title">Admin Dashboard</h1>
+    <div class="header-controls">
+        <button class="btn waves-effect waves-light back-to-user-btn" onclick="switchToUserView()">Back to User View</button>
+        <button class="btn waves-effect waves-light logout-btn" onclick="logout()">Logout</button>
+    </div>
 </div>
 
-<!-- Login Popup -->
-<div class="login-popup" id="loginPopup">
-<div class="login-box">
-<span class="close-btn" onclick="closeLoginPopup()">&times;</span>
-<h2><i class="fas fa-lock"></i> Login</h2>
-<div id="loginForm">
-<div class="form-group">
-<label for="email">Email</label>
-<input type="email" id="email" placeholder="Enter your email">
-</div>
-<div class="form-group">
-<label for="password">Password</label>
-<input type="password" id="password" placeholder="Enter password">
-</div>
-<button class="btn" onclick="login()">Login</button>
-<button class="btn google-btn" onclick="googleLogin()">
-<i class="fab fa-google"></i> Sign in with Google
-</button>
-<div class="auth-toggle">
-<a href="#" onclick="toggleAuthMode()">New User? Sign Up</a> |
-<a href="#" onclick="showForgotPassword()">Forgot Password?</a>
-</div>
+<div class="admin-container">
+    <ul class="tabs admin-panel-tabs">
+        <li class="tab"><a href="#manage-users" class="active">Manage Users</a></li>
+        <li class="tab"><a href="#attendance-tracking">Attendance Tracking</a></li>
+        <li class="tab"><a href="#settings">Settings</a></li> <!-- Link to Settings Tab -->
+        <li class="tab"><a href="#attendance-summary">Attendance Summary</a></li>
+    </ul>
+
+    <div id="manage-users" class="tab-content active">
+        <h2>Manage Users</h2>
+        <div class="users-table-container">
+            <table id="usersTable">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Name</th>
+                        <th>Rank</th>
+                        <th>Course</th>
+                        <th>Admin Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <!-- User rows will be populated here by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="attendance-tracking" class="tab-content">
+        <h2>Attendance Tracking</h2>
+        <div class="parade-state-container">
+            <div class="parade-state-controls">
+                <select id="filterCourseSelect">
+                    <option value="">All Courses</option>
+                    <!-- Course options will be populated dynamically -->
+                </select>
+                <input type="date" id="filterDateInput">
+                <button class="btn waves-effect waves-light" onclick="applyFilters()">Apply Filters</button>
+                <button class="btn waves-effect waves-light" onclick="clearFilters()">Clear Filters</button>
+            </div>
+            <div class="parade-state-table-container">
+                <table id="paradeStateTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Rank</th>
+                            <th>Course</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Details</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paradeStateTableBody">
+                         <!-- Parade state rows will be populated here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="settings" class="tab-content">
+        <h2>Settings</h2>
+        <!-- Signup Settings Section -->
+        <div class="setting-section">
+            <h3>Signup Settings</h3>
+
+            <div class="add-rank-course-form">
+                <input type="text" id="newRankInput" placeholder="Enter new rank (e.g., ME1T)">
+                <button onclick="addRank()">Add Rank</button>
+            </div>
+            <ul id="ranksList" class="settings-list">
+                <!-- Ranks will be listed here dynamically -->
+            </ul>
+
+            <div class="add-rank-course-form">
+                <input type="text" id="newCourseInput" placeholder="Enter new course (e.g., 56th Mech)">
+                <button onclick="addCourse()">Add Course</button>
+            </div>
+            <ul id="coursesList" class="settings-list">
+                <!-- Courses will be listed here dynamically -->
+            </ul>
+        </div>
+
+        <!-- Other Settings Sections (e.g., Admin Management) would go here -->
+        <div class="setting-section">
+            <h3>Admin Management</h3>
+            <div class="add-rank-course-form">
+                <input type="email" id="newAdminEmailInput" placeholder="Enter email to grant admin access">
+                <button onclick="grantAdminAccess()">Grant Admin Access</button>
+            </div>
+            <ul id="adminsList" class="settings-list">
+                <!-- Admin emails will be listed here dynamically -->
+            </ul>
+        </div>
+
+    </div> <!-- End of #settings tab content -->
+
+    <div id="attendance-summary" class="tab-content">
+        <h2>Attendance Summary</h2>
+        <div class="attendance-summary-container">
+            <div class="parade-state-controls">
+                <label for="summaryStartDate">Start Date:</label>
+                <input type="date" id="summaryStartDate">
+                <label for="summaryEndDate">End Date:</label>
+                <input type="date" id="summaryEndDate">
+                <button class="btn waves-effect waves-light" onclick="generateAttendanceSummary()">Generate Summary</button>
+            </div>
+            <div class="parade-state-table-container">
+                <table id="attendanceSummaryTable" class="attendance-summary-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Total Days</th>
+                            <th>Present</th>
+                            <th>Absent</th>
+                            <th>Late</th>
+                            <th>On Duty (OD)</th>
+                            <th>Medical Leave (ML)</th>
+                            <th>Annual Leave (AL)</th>
+                            <th>Percentage Present</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendanceSummaryTableBody">
+                        <!-- Summary rows will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+            <button class="btn waves-effect waves-light export-btn" onclick="exportAttendanceSummaryToCSV()">Export to CSV</button>
+        </div>
+    </div>
+
 </div>
 
-<div id="signupForm" style="display: none;">
-<div class="form-group">
-<label for="signup-email">Email</label>
-<input type="email" id="signup-email" placeholder="Enter your email">
-</div>
-<div class="form-group">
-<label for="signup-password">Password</label>
-<input type="password" id="signup-password" placeholder="Create a password">
-</div>
-<div class="form-group">
-<label for="rank">Rank</label>
-<select id="rank">
-<option value="">Select Rank</option>
-<!-- Options will be loaded dynamically -->
-</select>
-</div>
-<div class="form-group">
-<label for="course">Course</label>
-<select id="course">
-<option value="">Select Course</option>
-<!-- Options will be loaded dynamically -->
-</select>
-</div>
-<div class="form-group">
-<label for="name">Full Name</label>
-<input type="text" id="name" placeholder="Enter your full name">
-</div>
-<button class="btn" onclick="signup()">Sign Up</button>
-<div class="auth-toggle">
-<a href="#" onclick="toggleAuthMode()">Already have an account? Login</a>
-</div>
-</div>
-
-<div id="forgotPasswordForm" style="display: none;">
-<div class="form-group">
-<label for="forgot-email">Email</label>
-<input type="email" id="forgot-email" placeholder="Enter your email">
-</div>
-<button class="btn" onclick="sendPasswordReset()">Send Reset Email</button>
-<div class="auth-toggle">
-<a href="#" onclick="toggleAuthMode()">Back to Login</a>
-</div>
-</div>
-
-<div id="profileForm" style="display: none;">
-<h3>Complete Your Profile</h3>
-<div class="form-group">
-<label for="profile-rank">Rank</label>
-<select id="profile-rank">
-<!-- Options will be loaded dynamically -->
-</select>
-</div>
-<div class="form-group">
-<label for="profile-course">Course</label>
-<select id="profile-course">
-<!-- Options will be loaded dynamically -->
-</select>
-</div>
-<div class="form-group">
-<label for="profile-name">Full Name</label>
-<input type="text" id="profile-name" placeholder="Enter your full name">
-</div>
-<button class="btn" onclick="completeProfile()">Save Profile</button>
-</div>
-
-<div class="error-message" id="auth-error"></div>
-</div>
-</div>
-
-<!-- Admin Dashboard -->
-<div class="admin-dashboard" id="adminDashboard">
-<div class="container">
-<div class="admin-header">
-<h1><i class="fas fa-tools"></i> Hand Skills Learning Platform - Admin Panel</h1>
-<button class="logout-btn" onclick="logout()">Logout</button>
-</div>
-<div class="admin-content">
-<div class="nav-panel">
-<h3>Navigation</h3>
-<div class="nav-item active" onclick="showSection('dashboard')">Dashboard</div>
-<div class="nav-item" onclick="showSection('skills')">Manage Skills</div>
-<div class="nav-item" onclick="showSection('users')">Manage Users</div>
-<div class="nav-item" onclick="showSection('settings')">Settings</div>
-</div>
-<div class="main-content-area">
-<!-- Dashboard Section -->
-<div id="dashboard-section" class="section">
-<h2 class="section-title">Dashboard Overview</h2>
-<p>Welcome to the Hand Skills Learning Platform Admin Panel. From here you can manage skills, content, and user access.</p>
-<div style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
-<div style="background: var(--light); padding: 1.5rem; border-radius: 8px; text-align: center;">
-<i class="fas fa-tools" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem;"></i>
-<h3 id="total-skills">0</h3>
-<p>Total skills in the system</p>
-</div>
-</div>
-</div>
-<!-- Skills Management Section -->
-<div id="skills-section" class="section" style="display: none;">
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-<h2 class="section-title">Manage Skills</h2>
-<button class="btn" onclick="addNewSkill()" style="background: var(--success);">Add New Skill</button>
-</div>
-<div class="skill-list" id="skillsList">
-<!-- Skills will be loaded here -->
-</div>
-</div>
-<!-- Users Management Section -->
-<div id="users-section" class="section users-section">
-<h2 class="section-title">Manage Users</h2>
-<div id="usersContent">
-<!-- User groups will be loaded here -->
-</div>
-</div>
-<!-- Settings Section -->
-<div id="settings-section" class="section" style="display: none;">
-<h2 class="section-title">System Settings</h2>
-<div class="settings-tabs">
-<button class="tab-button active" data-tab="signupSettings">Signup Settings</button>
-<button class="tab-button" data-tab="adminAccess">Admin Access</button>
-</div>
-<div id="signupSettingsTab" class="tab-content active">
-<div class="settings-controls">
-<div class="settings-column">
-<h3 class="setting-title">Manage Ranks</h3>
-<div id="ranksList">
-<!-- Ranks will be loaded here -->
-</div>
-<div class="add-item-input">
-<input type="text" id="newRankInput" placeholder="New rank name">
-<button onclick="addRank()">Add Rank</button>
-</div>
-<div class="operation-message" id="rankMessage"></div>
-</div>
-<div class="settings-column">
-<h3 class="setting-title">Manage Courses</h3>
-<div id="coursesList">
-<!-- Courses will be loaded here -->
-</div>
-<div class="add-item-input">
-<input type="text" id="newCourseInput" placeholder="New course name">
-<button onclick="addCourse()">Add Course</button>
-</div>
-<div class="operation-message" id="courseMessage"></div>
-</div>
-</div>
-</div>
-<div id="adminAccessTab" class="tab-content">
-<h3 class="section-title">Admin Access Management</h3>
-<div class="admin-access-form">
-<div class="form-group">
-<label for="admin-email">Email Address</label>
-<input type="email" id="admin-email" placeholder="Enter email address">
-</div>
-<button class="btn" onclick="grantAdminAccess()">Grant Admin Access</button>
-</div>
-<div id="adminList">
-<!-- Admin list will be loaded here -->
-</div>
-</div>
-</div>
-</div>
-<!-- Edit Skill Form -->
-<div id="edit-skill-form" class="edit-form">
-<h2 class="section-title">Edit Skill</h2>
-<div class="form-row">
-<div class="form-col">
-<label for="edit-skill-name">Skill Name</label>
-<input type="text" id="edit-skill-name" placeholder="Enter skill name">
-</div>
-<div class="form-col">
-<label for="edit-skill-icon">Icon Class</label>
-<input type="text" id="edit-skill-icon" placeholder="e.g., fas fa-hammer">
-</div>
-</div>
-<div class="form-row">
-<div class="form-col">
-<label for="edit-skill-description">Description</label>
-<textarea id="edit-skill-description" placeholder="Enter skill description"></textarea>
-</div>
-</div>
-<div class="form-row">
-<div class="form-col">
-<label for="edit-tools">Tools Required (comma separated)</label>
-<textarea id="edit-tools" placeholder="Enter required tools"></textarea>
-</div>
-</div>
-<div class="form-row">
-<div class="form-col">
-<label for="edit-theory">Theory Section</label>
-<textarea id="edit-theory" placeholder="Enter theoretical content"></textarea>
-</div>
-</div>
-<div class="steps-editor">
-<h3>Steps</h3>
-<div id="steps-container">
-<!-- Steps will be added here -->
-</div>
-<button class="btn add-step-btn" onclick="addStep()">Add Step</button>
-</div>
-<div class="quiz-editor">
-<h3>Quiz Questions</h3>
-<div id="quiz-container">
-<!-- Quiz questions will be added here -->
-</div>
-<button class="btn add-quiz-btn" onclick="addQuizQuestion()">Add Question</button>
-</div>
-<div class="form-actions">
-<button class="btn btn-secondary" onclick="cancelEdit()">Cancel</button>
-<button class="btn" onclick="saveSkill()">Save Changes</button>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-
-<!-- Edit User Modal -->
-<div class="edit-user-modal" id="editUserModal">
-<div class="edit-user-box">
-<span class="close-btn" onclick="closeEditUserModal()">&times;</span>
-<h3>Edit User</h3>
-<div class="form-group">
-<label for="edit-user-name">Name</label>
-<input type="text" id="edit-user-name" placeholder="Enter user name">
-</div>
-<div class="form-group">
-<label for="edit-user-rank">Rank</label>
-<select id="edit-user-rank">
-<!-- Options will be loaded dynamically -->
-</select>
-</div>
-<div class="form-group">
-<label for="edit-user-course">Course</label>
-<select id="edit-user-course">
-<!-- Options will be loaded dynamically -->
-</select>
-</div>
-<button class="btn" onclick="saveEditedUser()">Save Changes</button>
-</div>
-</div>
-
-<!-- User Interface -->
-<div class="user-interface" id="userInterface">
-<main class="container">
-<div id="main-content">
-<div class="skill-grid" id="skill-grid">
-<!-- Skills will be loaded here -->
-</div>
-<div id="skill-detail" class="skill-detail">
-<!-- Skill details will be loaded here -->
-</div>
-</div>
-</main>
-<footer>
-<div class="container">
-<p>&copy; 2026 Hand Skills Learning Platform | Master Essential Hands-On Skills</p>
-</div>
-</footer>
-</div>
+<!-- Include Materialize JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<!-- Include Firebase App, Firestore, Auth SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 
 <script>
-// Initialize Firebase
-const firebaseConfig = {
-apiKey: "AIzaSyA6ZdINHlRF583T3HL5RsA4q2fmHeBcB_g",
-authDomain: "hand-skills-platform.firebaseapp.com",
-projectId: "hand-skills-platform",
-storageBucket: "hand-skills-platform.firebasestorage.app",
-messagingSenderId: "1021058690748",
-appId: "1:1021058690748:web:40fd86d1060d90bbe1eab9",
-measurementId: "G-R2J40EVW18"
-};
+    // Your Firebase configuration object
+    const firebaseConfig = {
+        // Paste your config here
+    };
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
 
-// Global variables
-let skillsData = [];
-let usersData = [];
-let currentEditingSkill = null;
-let currentUser = null;
-let originalEditingSkill = null; // Store original skill data
-let currentAuthMode = 'login'; // 'login', 'signup', 'forgot', 'profile'
-let editingUserId = null; // Track user being edited
-let isAdmin = false; // Track if current user is admin
-let ranksData = []; // Store ranks from Firestore
-let coursesData = []; // Store courses from Firestore
-let wasInAdminView = false; // Track if we were in admin view before switching
+    let currentUserEmail = null;
+    let currentUserName = null;
+    let currentUserRank = null;
+    let currentUserCourse = null;
+    let isAdmin = false;
 
-// Initialize the app
-// Initialize the app
-window.onload = function() {
-    // Check if user is already logged in
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            // User is logged in
-            loadUserData(user.uid);
-            // Hide the login button if user is logged in
-            document.getElementById('loginBtn').style.display = 'none'; 
-        } else {
-            // User is not logged in
-            // Show user interface by default
-            document.getElementById('userInterface').style.display = 'block';
-            loadSkillsFromFirebase();
-            
-            // Hide the login popup initially
-            document.getElementById('loginPopup').style.display = 'none'; 
-            // Show the login button in the header
-            document.getElementById('loginBtn').style.display = 'block'; 
-        }
-    });
-    
-    // Load ranks and courses from Firestore
-    loadRanksAndCourses();
-};
+    // DOM Elements
+    const manageUsersTab = document.getElementById('manage-users');
+    const attendanceTrackingTab = document.getElementById('attendance-tracking');
+    const settingsTab = document.getElementById('settings');
+    const attendanceSummaryTab = document.getElementById('attendance-summary');
 
-// Load ranks and courses from Firestore
-async function loadRanksAndCourses() {
-try {
-// Load ranks
-const ranksSnapshot = await db.collection("ranks").orderBy("order").get();
-ranksData = [];
-ranksSnapshot.forEach(doc => {
-ranksData.push({ id: doc.id, ...doc.data() });
-});
+    // ... (previous code remains unchanged until setupFirestoreListeners) ...
 
-// Load courses
-const coursesSnapshot = await db.collection("courses").orderBy("order").get();
-coursesData = [];
-coursesSnapshot.forEach(doc => {
-coursesData.push({ id: doc.id, ...doc.data() });
-});
+    // Modify the loadSignupSettings function
+    async function loadSignupSettings() {
+        try {
+            // Load ranks
+            const ranksSnapshot = await db.collection("ranks").orderBy("order").get();
+            const ranksList = document.getElementById('ranksList');
+            ranksList.innerHTML = ''; // Clear previous list
+            ranksSnapshot.forEach((doc, index) => { // Use index from forEach
+                const rank = doc.data();
+                // Calculate indices for up/down actions
+                const canMoveUp = index > 0;
+                const canMoveDown = index < ranksSnapshot.size - 1;
 
-// Update dropdowns in signup and profile forms
-updateDropdowns();
-} catch (error) {
-console.error("Error loading ranks/courses: ", error);
-}
-}
-
-// Update dropdowns in forms
-function updateDropdowns() {
-// Update signup form rank dropdown
-const rankSelect = document.getElementById('rank');
-rankSelect.innerHTML = '<option value="">Select Rank</option>';
-ranksData.forEach(rank => {
-const option = document.createElement('option');
-option.value = rank.name;
-option.textContent = rank.name;
-rankSelect.appendChild(option);
-});
-
-// Update signup form course dropdown
-const courseSelect = document.getElementById('course');
-courseSelect.innerHTML = '<option value="">Select Course</option>';
-coursesData.forEach(course => {
-const option = document.createElement('option');
-option.value = course.name;
-option.textContent = course.name;
-courseSelect.appendChild(option);
-});
-
-// Update profile form rank dropdown
-const profileRankSelect = document.getElementById('profile-rank');
-profileRankSelect.innerHTML = '<option value="">Select Rank</option>';
-ranksData.forEach(rank => {
-const option = document.createElement('option');
-option.value = rank.name;
-option.textContent = rank.name;
-profileRankSelect.appendChild(option);
-});
-
-// Update profile form course dropdown
-const profileCourseSelect = document.getElementById('profile-course');
-profileCourseSelect.innerHTML = '<option value="">Select Course</option>';
-coursesData.forEach(course => {
-const option = document.createElement('option');
-option.value = course.name;
-option.textContent = course.name;
-profileCourseSelect.appendChild(option);
-});
-
-// Update edit user form dropdowns
-const editRankSelect = document.getElementById('edit-user-rank');
-editRankSelect.innerHTML = '';
-ranksData.forEach(rank => {
-const option = document.createElement('option');
-option.value = rank.name;
-option.textContent = rank.name;
-editRankSelect.appendChild(option);
-});
-
-const editCourseSelect = document.getElementById('edit-user-course');
-editCourseSelect.innerHTML = '';
-coursesData.forEach(course => {
-const option = document.createElement('option');
-option.value = course.name;
-option.textContent = course.name;
-editCourseSelect.appendChild(option);
-});
-
-// Update profile popup rank dropdown
-const profilePopupRankSelect = document.getElementById('edit-rank');
-profilePopupRankSelect.innerHTML = '';
-ranksData.forEach(rank => {
-const option = document.createElement('option');
-option.value = rank.name;
-option.textContent = rank.name;
-if (currentUser && rank.name === currentUser.rank) {
-option.selected = true;
-}
-profilePopupRankSelect.appendChild(option);
-});
-}
-
-// Load user data from Firestore
-async function loadUserData(userId) {
-try {
-const userDoc = await db.collection("users").doc(userId).get();
-if (userDoc.exists) {
-currentUser = userDoc.data();
-currentUser.id = userId;
-
-// Check if user is admin
-const adminDoc = await db.collection("admins").doc(userId).get();
-if (adminDoc.exists) {
-isAdmin = true;
-// Show admin dashboard
-document.getElementById('adminDashboard').style.display = 'block';
-document.getElementById('userInterface').style.display = 'none';
-document.getElementById('loginPopup').style.display = 'none';
-document.getElementById('profileBtn').style.display = 'block';
-document.getElementById('adminSwitchBtn').style.display = 'block';
-document.getElementById('adminBackBtn').style.display = 'none';
-setupFirestoreListeners();
-showSection('dashboard');
-} else {
-isAdmin = false;
-// Show user interface
-document.getElementById('userInterface').style.display = 'block';
-document.getElementById('adminDashboard').style.display = 'none';
-document.getElementById('loginPopup').style.display = 'none';
-document.getElementById('profileBtn').style.display = 'block';
-document.getElementById('adminSwitchBtn').style.display = 'none';
-document.getElementById('adminBackBtn').style.display = 'none';
-loadSkillsFromFirebase();
-}
-} else {
-// New user - prompt for profile completion
-showProfileCompletion();
-}
-} catch (error) {
-console.error("Error loading user  ", error);
-}
-}
-
-// Show profile completion form
-function showProfileCompletion() {
-document.getElementById('loginForm').style.display = 'none';
-document.getElementById('signupForm').style.display = 'none';
-document.getElementById('forgotPasswordForm').style.display = 'none';
-document.getElementById('profileForm').style.display = 'block';
-document.getElementById('auth-error').textContent = '';
-}
-
-// Complete profile after signup/google login
-async function completeProfile() {
-const rank = document.getElementById('profile-rank').value;
-const course = document.getElementById('profile-course').value;
-const name = document.getElementById('profile-name').value.toUpperCase();
-
-if (!rank || !course || !name) {
-document.getElementById('auth-error').textContent = 'Please fill in all fields';
-return;
-}
-
-try {
-// Get current user UID
-const user = auth.currentUser;
-if (!user) throw new Error('No authenticated user');
-
-// Save profile to Firestore
-await db.collection("users").doc(user.uid).set({
-rank: rank,
-course: course,
-name: name,
-email: user.email,
-completedSkills: [],
-lastLogin: new Date()
-});
-
-// Reload user data
-loadUserData(user.uid);
-} catch (error) {
-console.error("Error completing profile: ", error);
-document.getElementById('auth-error').textContent = error.message;
-}
-}
-
-// Toggle between login/signup/forgot forms
-function toggleAuthMode() {
-if (currentAuthMode === 'login') {
-document.getElementById('loginForm').style.display = 'none';
-document.getElementById('signupForm').style.display = 'block';
-currentAuthMode = 'signup';
-} else if (currentAuthMode === 'signup') {
-document.getElementById('signupForm').style.display = 'none';
-document.getElementById('loginForm').style.display = 'block';
-currentAuthMode = 'login';
-}
-document.getElementById('auth-error').textContent = '';
-}
-
-function showForgotPassword() {
-document.getElementById('loginForm').style.display = 'none';
-document.getElementById('forgotPasswordForm').style.display = 'block';
-currentAuthMode = 'forgot';
-document.getElementById('auth-error').textContent = '';
-}
-
-// Login function
-function login() {
-const email = document.getElementById('email').value;
-const password = document.getElementById('password').value;
-
-if (!email || !password) {
-document.getElementById('auth-error').textContent = 'Please enter both email and password';
-return;
-}
-
-auth.signInWithEmailAndPassword(email, password)
-.then(userCredential => {
-loadUserData(userCredential.user.uid);
-})
-.catch(error => {
-document.getElementById('auth-error').textContent = error.message;
-});
-}
-
-// Signup function
-function signup() {
-const email = document.getElementById('signup-email').value;
-const password = document.getElementById('signup-password').value;
-const rank = document.getElementById('rank').value;
-const course = document.getElementById('course').value;
-const name = document.getElementById('name').value.toUpperCase();
-
-if (!email || !password || !rank || !course || !name) {
-document.getElementById('auth-error').textContent = 'Please fill in all fields';
-return;
-}
-
-auth.createUserWithEmailAndPassword(email, password)
-.then(userCredential => {
-// Save profile data to Firestore
-db.collection("users").doc(userCredential.user.uid).set({
-rank: rank,
-course: course,
-name: name,
-email: email,
-completedSkills: [],
-lastLogin: new Date()
-});
-loadUserData(userCredential.user.uid);
-})
-.catch(error => {
-document.getElementById('auth-error').textContent = error.message;
-});
-}
-
-// Google login function
-function googleLogin() {
-const provider = new firebase.auth.GoogleAuthProvider();
-auth.signInWithPopup(provider)
-.then(result => {
-const user = result.user;
-// Check if user exists in Firestore
-db.collection("users").doc(user.uid).get().then(doc => {
-if (doc.exists) {
-// User already exists, load data
-loadUserData(user.uid);
-} else {
-// New user via Google, prompt for profile completion
-showProfileCompletion();
-}
-});
-})
-.catch(error => {
-document.getElementById('auth-error').textContent = error.message;
-});
-}
-
-// Send password reset email
-function sendPasswordReset() {
-const email = document.getElementById('forgot-email').value;
-if (!email) {
-document.getElementById('auth-error').textContent = 'Please enter your email';
-return;
-}
-
-auth.sendPasswordResetEmail(email)
-.then(() => {
-alert('Password reset email sent!');
-toggleAuthMode();
-})
-.catch(error => {
-document.getElementById('auth-error').textContent = error.message;
-});
-}
-
-// Close login popup
-// Close login popup
-function closeLoginPopup() {
-    document.getElementById('loginPopup').style.display = 'none';
-    // Show the login button in the header when popup is closed while logged out
-    document.getElementById('loginBtn').style.display = 'block'; 
-}
-
-// Open login popup
-// Open login popup
-function openLoginPopup() {
-    document.getElementById('loginPopup').style.display = 'flex';
-    // Hide the login button when the popup opens
-    document.getElementById('loginBtn').style.display = 'none'; 
-}
-
-// Toggle profile popup
-function toggleProfilePopup() {
-const popup = document.getElementById('profilePopup');
-if (popup.style.display === 'block') {
-popup.style.display = 'none';
-} else {
-popup.style.display = 'block';
-// Update profile info in popup
-document.getElementById('popup-name-display').textContent = currentUser.name;
-document.getElementById('popup-rank-display').textContent = currentUser.rank;
-document.getElementById('popup-course-display').textContent = currentUser.course;
-document.getElementById('popup-email-display').textContent = currentUser.email;
-// Update rank dropdown in popup
-updateDropdowns();
-}
-}
-
-// Switch to user interface (from admin)
-function switchToUserInterface() {
-wasInAdminView = true;
-document.getElementById('adminDashboard').style.display = 'none';
-document.getElementById('userInterface').style.display = 'block';
-document.getElementById('adminSwitchBtn').style.display = 'none';
-document.getElementById('adminBackBtn').style.display = 'block';
-// Load skills for user view
-loadSkillsFromFirebase();
-}
-
-// Switch to admin interface (from user)
-function switchToAdminInterface() {
-wasInAdminView = false;
-document.getElementById('userInterface').style.display = 'none';
-document.getElementById('adminDashboard').style.display = 'block';
-document.getElementById('adminSwitchBtn').style.display = 'block';
-document.getElementById('adminBackBtn').style.display = 'none';
-}
-
-// Update own rank in profile popup
-async function updateOwnRank() {
-const newRank = document.getElementById('edit-rank').value;
-if (!newRank) {
-alert('Please select a rank');
-return;
-}
-
-try {
-await db.collection("users").doc(currentUser.id).update({
-rank: newRank
-});
-currentUser.rank = newRank;
-document.getElementById('popup-rank-display').textContent = newRank;
-// Update dropdown in popup
-updateDropdowns();
-alert('Rank updated successfully!');
-} catch (error) {
-console.error("Error updating rank: ", error);
-alert('Error updating rank: ' + error.message);
-}
-}
-
-// Setup Firestore listeners to sync data in real-time
-function setupFirestoreListeners() {
-// Listen for changes in skills collection
-db.collection("skills").onSnapshot((snapshot) => {
-skillsData = [];
-snapshot.forEach(doc => {
-skillsData.push({ id: doc.id, ...doc.data() });
-});
-updateCounters();
-
-// Update user interface if visible
-if (document.getElementById('userInterface').style.display === 'block') {
-loadSkillGrid();
-}
-
-// Update admin list if currently viewing the skills section
-if (document.getElementById('skills-section').style.display === 'block') {
-loadSkillsList();
-}
-
-// Update user preview if currently viewing
-if (document.getElementById('user-preview-section').style.display === 'block') {
-loadSkillGrid();
-}
-});
-
-// Listen for changes in users collection
-db.collection("users").onSnapshot((snapshot) => {
-usersData = [];
-snapshot.forEach(doc => {
-usersData.push({ id: doc.id, ...doc.data() });
-});
-// Refresh user management section if currently active
-if (document.getElementById('users-section').style.display === 'block') {
-loadUsersManagement();
-}
-});
-
-// Listen for changes in admins collection
-db.collection("admins").onSnapshot((snapshot) => {
-// Refresh admin access section if currently active
-if (document.getElementById('adminAccessTab').style.display === 'block') {
-loadAdminList();
-}
-});
-
-// Listen for changes in ranks collection
-db.collection("ranks").onSnapshot((snapshot) => {
-loadRanksAndCourses(); // Reload ranks and courses
-// Refresh signup settings section if currently active
-if (document.getElementById('settings-section').style.display === 'block') {
-loadSignupSettings();
-}
-});
-
-// Listen for changes in courses collection
-db.collection("courses").onSnapshot((snapshot) => {
-loadRanksAndCourses(); // Reload ranks and courses
-// Refresh signup settings section if currently active
-if (document.getElementById('settings-section').style.display === 'block') {
-loadSignupSettings();
-}
-});
-}
-
-// Grant admin access to another user
-async function grantAdminAccess() {
-const email = document.getElementById('admin-email').value;
-if (!email) {
-alert('Please enter an email address');
-return;
-}
-
-try {
-// Find user by email
-const userQuery = await db.collection("users").where("email", "==", email).get();
-if (userQuery.empty) {
-alert('User not found');
-return;
-}
-
-const userDoc = userQuery.docs[0];
-const userId = userDoc.id;
-
-// Add user to admins collection
-await db.collection("admins").doc(userId).set({
-email: email,
-grantedBy: currentUser.email,
-date: new Date()
-});
-
-// Clear the input field
-document.getElementById('admin-email').value = '';
-alert('Admin access granted successfully!');
-} catch (error) {
-console.error("Error granting admin access: ", error);
-alert('Error granting admin access: ' + error.message);
-}
-}
-
-// Load admin list
-// Load admin list
-async function loadAdminList() {
-    try {
-        const snapshot = await db.collection("admins").get();
-        const adminList = document.getElementById('adminList');
-        // --- IMPROVED CONTENT GENERATION ---
-        let adminItemsHTML = '<h3 class="section-title">Current Admins</h3>';
-
-        if (snapshot.empty) {
-            adminItemsHTML += '<p>No admins found.</p>';
-        } else {
-            // Fetch user details for each admin UID to get email/name if needed
-            const adminPromises = snapshot.docs.map(async (doc) => {
-                const adminId = doc.id; // This is the user UID
-                const userData = await db.collection("users").doc(adminId).get();
-                if (userData.exists) {
-                     return { uid: adminId, email: userData.data().email, name: userData.data().name }; // Include name if desired
-                } else {
-                     // Fallback if user doesn't exist in users collection anymore
-                     const adminData = doc.data();
-                     return { uid: adminId, email: adminData.email || 'Unknown Email', name: 'Unknown User' };
-                }
-            });
-
-            const adminDetails = await Promise.all(adminPromises);
-
-            adminDetails.forEach(admin => {
-                adminItemsHTML += `
-                    <div style="background: var(--light); padding: 1rem; margin: 0.5rem 0; border-radius: 5px; display: flex; justify-content: space-between; align-items: center;">
-                        <span>${admin.email} (${admin.name})</span> <!-- Display email and name -->
-                        <button class="btn btn-secondary" onclick="revokeAdminAccess('${admin.uid}', '${admin.email}')" style="width: auto; padding: 0.5rem 1rem;">Revoke</button>
+                const rankItem = document.createElement('div');
+                rankItem.className = 'setting-item';
+                rankItem.innerHTML = `
+                    <span>${rank.name}</span>
+                    <div class="setting-actions">
+                        <button class="move-up-btn" ${canMoveUp ? '' : 'disabled'} onclick="moveRankUp('${doc.id}', ${rank.order})">↑</button>
+                        <button class="move-down-btn" ${canMoveDown ? '' : 'disabled'} onclick="moveRankDown('${doc.id}', ${rank.order})">↓</button>
+                        <button class="delete-btn-setting" onclick="deleteRank('${doc.id}', '${rank.name}')">Delete</button>
                     </div>
                 `;
+                ranksList.appendChild(rankItem);
             });
+
+            // Load courses
+            const coursesSnapshot = await db.collection("courses").orderBy("order").get();
+            const coursesList = document.getElementById('coursesList');
+            coursesList.innerHTML = ''; // Clear previous list
+            coursesSnapshot.forEach((doc, index) => { // Use index from forEach
+                const course = doc.data();
+                // Calculate indices for up/down actions
+                const canMoveUp = index > 0;
+                const canMoveDown = index < coursesSnapshot.size - 1;
+
+                const courseItem = document.createElement('div');
+                courseItem.className = 'setting-item';
+                courseItem.innerHTML = `
+                    <span>${course.name}</span>
+                    <div class="setting-actions">
+                        <button class="move-up-btn" ${canMoveUp ? '' : 'disabled'} onclick="moveCourseUp('${doc.id}', ${course.order})">↑</button>
+                        <button class="move-down-btn" ${canMoveDown ? '' : 'disabled'} onclick="moveCourseDown('${doc.id}', ${course.order})">↓</button>
+                        <button class="delete-btn-setting" onclick="deleteCourse('${doc.id}', '${course.name}')">Delete</button>
+                    </div>
+                `;
+                coursesList.appendChild(courseItem);
+            });
+        } catch (error) {
+            console.error("Error loading signup settings: ", error);
         }
-        adminList.innerHTML = adminItemsHTML;
-        // --- END OF IMPROVEMENT ---
-    } catch (error) {
-        console.error("Error loading admin list: ", error);
-        document.getElementById('adminList').innerHTML = '<p>Error loading admin list.</p>';
     }
-}
-// Revoke admin access
-async function revokeAdminAccess(adminId, email) {
-if (!confirm(`Are you sure you want to revoke admin access for ${email}?`)) {
-return;
-}
 
-try {
-await db.collection("admins").doc(adminId).delete();
-alert('Admin access revoked successfully!');
-} catch (error) {
-console.error("Error revoking admin access: ", error);
-alert('Error revoking admin access: ' + error.message);
-}
-}
+    // Add the moveRankUp function
+    async function moveRankUp(rankId, currentOrder) {
+        if (currentOrder <= 0) return; // Cannot move up if already at the top
 
-// Load signup settings
-async function loadSignupSettings() {
-try {
-// Load ranks
-const ranksSnapshot = await db.collection("ranks").orderBy("order").get();
-const ranksList = document.getElementById('ranksList');
-ranksList.innerHTML = '';
-ranksSnapshot.forEach(doc => {
-const rank = doc.data();
-ranksList.innerHTML += `
-<div class="setting-item">
-<span>${rank.name}</span>
-<div class="setting-actions">
-<button class="delete-btn-setting" onclick="deleteRank('${doc.id}', '${rank.name}')">Delete</button>
-</div>
-</div>
-`;
-});
+        const targetOrder = currentOrder - 1;
+        try {
+            // Fetch the item that is currently at the target position
+            const targetItemSnapshot = await db.collection("ranks")
+                .where("order", "==", targetOrder)
+                .limit(1)
+                .get();
 
-// Load courses
-const coursesSnapshot = await db.collection("courses").orderBy("order").get();
-const coursesList = document.getElementById('coursesList');
-coursesList.innerHTML = '';
-coursesSnapshot.forEach(doc => {
-const course = doc.data();
-coursesList.innerHTML += `
-<div class="setting-item">
-<span>${course.name}</span>
-<div class="setting-actions">
-<button class="delete-btn-setting" onclick="deleteCourse('${doc.id}', '${course.name}')">Delete</button>
-</div>
-</div>
-`;
-});
-} catch (error) {
-console.error("Error loading signup settings: ", error);
-}
-}
+            if (!targetItemSnapshot.empty) {
+                const targetDoc = targetItemSnapshot.docs[0];
+                const targetDocId = targetDoc.id;
+
+                // Perform a batch write to swap the orders atomically
+                const batch = db.batch();
+
+                // Swap the order of the current item to the target's order
+                batch.update(db.collection("ranks").doc(rankId), { order: targetOrder });
+                // Swap the order of the target item to the current item's original order
+                batch.update(db.collection("ranks").doc(targetDocId), { order: currentOrder });
+
+                await batch.commit();
+                console.log("Rank moved up successfully.");
+            } else {
+                 console.error("Target rank for swapping not found.");
+            }
+        } catch (error) {
+            console.error("Error moving rank up: ", error);
+        }
+    }
+
+    // Add the moveRankDown function
+    async function moveRankDown(rankId, currentOrder) {
+        // Need to find the maximum order number to determine if we can move down
+        const snapshot = await db.collection("ranks").orderBy("order").get();
+        const maxOrder = snapshot.size - 1;
+        if (currentOrder >= maxOrder) return; // Cannot move down if already at the bottom
+
+        const targetOrder = currentOrder + 1;
+        try {
+            // Fetch the item that is currently at the target position
+            const targetItemSnapshot = await db.collection("ranks")
+                .where("order", "==", targetOrder)
+                .limit(1)
+                .get();
+
+            if (!targetItemSnapshot.empty) {
+                const targetDoc = targetItemSnapshot.docs[0];
+                const targetDocId = targetDoc.id;
+
+                // Perform a batch write to swap the orders atomically
+                const batch = db.batch();
+
+                // Swap the order of the current item to the target's order
+                batch.update(db.collection("ranks").doc(rankId), { order: targetOrder });
+                // Swap the order of the target item to the current item's original order
+                batch.update(db.collection("ranks").doc(targetDocId), { order: currentOrder });
+
+                await batch.commit();
+                console.log("Rank moved down successfully.");
+            } else {
+                 console.error("Target rank for swapping not found.");
+            }
+        } catch (error) {
+            console.error("Error moving rank down: ", error);
+        }
+    }
+
+    // Add the moveCourseUp function
+    async function moveCourseUp(courseId, currentOrder) {
+        if (currentOrder <= 0) return; // Cannot move up if already at the top
+
+        const targetOrder = currentOrder - 1;
+        try {
+            // Fetch the item that is currently at the target position
+            const targetItemSnapshot = await db.collection("courses")
+                .where("order", "==", targetOrder)
+                .limit(1)
+                .get();
+
+            if (!targetItemSnapshot.empty) {
+                const targetDoc = targetItemSnapshot.docs[0];
+                const targetDocId = targetDoc.id;
+
+                // Perform a batch write to swap the orders atomically
+                const batch = db.batch();
+
+                // Swap the order of the current item to the target's order
+                batch.update(db.collection("courses").doc(courseId), { order: targetOrder });
+                // Swap the order of the target item to the current item's original order
+                batch.update(db.collection("courses").doc(targetDocId), { order: currentOrder });
+
+                await batch.commit();
+                console.log("Course moved up successfully.");
+            } else {
+                 console.error("Target course for swapping not found.");
+            }
+        } catch (error) {
+            console.error("Error moving course up: ", error);
+        }
+    }
+
+    // Add the moveCourseDown function
+    async function moveCourseDown(courseId, currentOrder) {
+        // Need to find the maximum order number to determine if we can move down
+        const snapshot = await db.collection("courses").orderBy("order").get();
+        const maxOrder = snapshot.size - 1;
+        if (currentOrder >= maxOrder) return; // Cannot move down if already at the bottom
+
+        const targetOrder = currentOrder + 1;
+        try {
+            // Fetch the item that is currently at the target position
+            const targetItemSnapshot = await db.collection("courses")
+                .where("order", "==", targetOrder)
+                .limit(1)
+                .get();
+
+            if (!targetItemSnapshot.empty) {
+                const targetDoc = targetItemSnapshot.docs[0];
+                const targetDocId = targetDoc.id;
+
+                // Perform a batch write to swap the orders atomically
+                const batch = db.batch();
+
+                // Swap the order of the current item to the target's order
+                batch.update(db.collection("courses").doc(courseId), { order: targetOrder });
+                // Swap the order of the target item to the current item's original order
+                batch.update(db.collection("courses").doc(targetDocId), { order: currentOrder });
+
+                await batch.commit();
+                console.log("Course moved down successfully.");
+            } else {
+                 console.error("Target course for swapping not found.");
+            }
+        } catch (error) {
+            console.error("Error moving course down: ", error);
+        }
+    }
 
 // Add a new rank
 async function addRank() {
@@ -2710,4 +1563,5 @@ document.querySelectorAll('.tab-button').forEach(button => {
 </script>
 </body>
 </html>
+
 
