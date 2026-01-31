@@ -925,7 +925,7 @@ right: 10px;
     position: fixed;
     top: 20px;
     right: 20px;
-    z-index: 3001; /* Ensure it's above other elements like modals */
+    z-index: 3500; /* Lower than the confirmation modal but higher than other UI elements */
     display: flex;
     flex-direction: column;
     gap: 10px; /* Space between notifications if multiple appear */
@@ -984,7 +984,7 @@ right: 10px;
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 3002; /* Ensure it's above notifications and other modals */
+    z-index: 4000; /* Increased z-index to ensure it's on top of everything */
     display: none; /* Hidden by default */
 }
 
@@ -1367,7 +1367,7 @@ right: 10px;
         <h3>Confirm Action</h3>
         <p id="confirmationMessage">Are you sure you want to perform this action?</p>
         <div class="confirmation-actions">
-            <button class="btn btn-confirm" id="confirmActionBtn" onclick="executePendingAction()">Confirm</button> <!-- Added onclick handler -->
+            <button class="btn btn-confirm" id="confirmActionBtn" onclick="executePendingAction()">Confirm</button>
             <button class="btn btn-cancel" onclick="closeConfirmationModal()">Cancel</button>
         </div>
     </div>
@@ -3178,6 +3178,7 @@ loadAdminList(); // Load admin list specifically when the Admin Access tab is cl
 </script>
 </body>
 </html>
+
 
 
 
