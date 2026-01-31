@@ -1781,34 +1781,48 @@ alert('Error granting admin access: ' + error.message);
 }
 
 // Load admin list
+// Load admin list
 async function loadAdminList() {
-try {
-const snapshot = await db.collection("admins").get();
-const adminList = document.getElementById('adminList');
-adminList.innerHTML = '<h3 class="section-title">Current Admins</h3>';
+    try {
+        const snapshot = await db.collection("admins").get();
+        const adminList = document.getElementById('adminList');
+        // --- IMPROVED CONTENT GENERATION ---
+        let adminItemsHTML = '<h3 class="section-title">Current Admins</h3>';
 
-if (snapshot.empty) {
-adminList.innerHTML += '<p>No admins found.</p>';
-return;
+        if (snapshot.empty) {
+            adminItemsHTML += '<p>No admins found.</p>';
+        } else {
+            // Fetch user details for each admin UID to get email/name if needed
+            const adminPromises = snapshot.docs.map(async (doc) => {
+                const adminId = doc.id; // This is the user UID
+                const userData = await db.collection("users").doc(adminId).get();
+                if (userData.exists) {
+                     return { uid: adminId, email: userData.data().email, name: userData.data().name }; // Include name if desired
+                } else {
+                     // Fallback if user doesn't exist in users collection anymore
+                     const adminData = doc.data();
+                     return { uid: adminId, email: adminData.email || 'Unknown Email', name: 'Unknown User' };
+                }
+            });
+
+            const adminDetails = await Promise.all(adminPromises);
+
+            adminDetails.forEach(admin => {
+                adminItemsHTML += `
+                    <div style="background: var(--light); padding: 1rem; margin: 0.5rem 0; border-radius: 5px; display: flex; justify-content: space-between; align-items: center;">
+                        <span>${admin.email} (${admin.name})</span> <!-- Display email and name -->
+                        <button class="btn btn-secondary" onclick="revokeAdminAccess('${admin.uid}', '${admin.email}')" style="width: auto; padding: 0.5rem 1rem;">Revoke</button>
+                    </div>
+                `;
+            });
+        }
+        adminList.innerHTML = adminItemsHTML;
+        // --- END OF IMPROVEMENT ---
+    } catch (error) {
+        console.error("Error loading admin list: ", error);
+        document.getElementById('adminList').innerHTML = '<p>Error loading admin list.</p>';
+    }
 }
-
-const adminItems = [];
-snapshot.forEach(doc => {
-const adminData = doc.data();
-adminItems.push(`
-<div style="background: var(--light); padding: 1rem; margin: 0.5rem 0; border-radius: 5px; display: flex; justify-content: space-between; align-items: center;">
-<span>${adminData.email}</span>
-<button class="btn btn-secondary" onclick="revokeAdminAccess('${doc.id}', '${adminData.email}')" style="width: auto; padding: 0.5rem 1rem;">Revoke</button>
-</div>
-`);
-});
-
-adminList.innerHTML += adminItems.join('');
-} catch (error) {
-console.error("Error loading admin list: ", error);
-}
-}
-
 // Revoke admin access
 async function revokeAdminAccess(adminId, email) {
 if (!confirm(`Are you sure you want to revoke admin access for ${email}?`)) {
@@ -2022,36 +2036,42 @@ function logout() {
 }
 
 // Show different sections in admin panel
+// Show different sections in admin panel
 function showSection(section) {
-// Hide all sections
-document.querySelectorAll('.section').forEach(el => el.style.display = 'none');
-document.getElementById('edit-skill-form').style.display = 'none';
+    // Hide all sections
+    document.querySelectorAll('.section').forEach(el => el.style.display = 'none');
+    document.getElementById('edit-skill-form').style.display = 'none';
 
-// Remove active class from all nav items
-document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    // Remove active class from all nav items
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
 
-// Show selected section and highlight nav item
-document.getElementById(`${section}-section`).style.display = 'block';
-document.querySelector(`.nav-item[onclick="showSection('${section}')"]`).classList.add('active');
+    // Show selected section and highlight nav item
+    document.getElementById(`${section}-section`).style.display = 'block';
+    document.querySelector(`.nav-item[onclick="showSection('${section}')"]`).classList.add('active');
 
-if (section === 'dashboard') {
-updateCounters();
-}
+    if (section === 'dashboard') {
+        updateCounters();
+    }
+    // IMPORTANT: Always reload skills list when showing skills section
+    if (section === 'skills') {
+        loadSkillsList();
+    }
+    // Load users management when showing users section
+    if (section === 'users') {
+        loadUsersManagement();
+    }
+    // Load settings content when showing settings section
+    if (section === 'settings') {
+        // Load signup settings by default or the active tab
+        const activeTabButton = document.querySelector('.tab-button.active');
+        const activeTabId = activeTabButton ? activeTabButton.getAttribute('data-tab') : 'signupSettings';
 
-// IMPORTANT: Always reload skills list when showing skills section
-if (section === 'skills') {
-loadSkillsList();
-}
-
-// Load users management when showing users section
-if (section === 'users') {
-loadUsersManagement();
-}
-
-// Load signup settings when showing settings section
-if (section === 'settings') {
-loadSignupSettings();
-}
+        if (activeTabId === 'signupSettings') {
+            loadSignupSettings();
+        } else if (activeTabId === 'adminAccess') {
+            loadAdminList(); // Call loadAdminList when Admin Access tab is active
+        }
+    }
 }
 
 // Load skills list in admin panel
@@ -2081,46 +2101,52 @@ skillsList.appendChild(skillCard);
 
 // Load users management in admin panel
 function loadUsersManagement() {
-const usersContent = document.getElementById('usersContent');
-usersContent.innerHTML = '';
+    const usersContent = document.getElementById('usersContent');
+    usersContent.innerHTML = '';
 
-// Group users by course
-const courses = {};
-usersData.forEach(user => {
-if (!courses[user.course]) {
-courses[user.course] = [];
-}
-courses[user.course].push(user);
-});
+    // Group users by course
+    const courses = {};
+    usersData.forEach(user => {
+        if (!courses[user.course]) {
+            courses[user.course] = [];
+        }
+        courses[user.course].push(user);
+    });
 
-// Render each course group
-Object.keys(courses).forEach(course => {
-const courseGroup = document.createElement('div');
-courseGroup.className = 'course-group';
-courseGroup.innerHTML = `
-<h3 class="course-title">${course}</h3>
-<div class="user-list" id="course-${course.replace(/\s+/g, '-')}">
-<!-- Users will be added here -->
-</div>
-`;
-usersContent.appendChild(courseGroup);
+    // Render each course group
+    Object.keys(courses).forEach(course => {
+        const courseGroup = document.createElement('div');
+        courseGroup.className = 'course-group';
+        courseGroup.innerHTML = `
+            <h3 class="course-title">${course}</h3>
+            <div class="user-list" id="course-${course.replace(/\s+/g, '-')}">
+                <!-- Users will be added here -->
+            </div>
+        `;
+        usersContent.appendChild(courseGroup);
 
-// Add users to this course
-const userList = document.getElementById(`course-${course.replace(/\s+/g, '-')}`);
-courses[course].forEach(user => {
-const userCard = document.createElement('div');
-userCard.className = 'user-card';
-userCard.innerHTML = `
-<div class="user-details">
-<div class="user-name">${user.name}</div>
-<div class="user-rank">${user.rank}</div>
-<div class="user-course">${user.course}</div>
-</div>
-<button class="edit-user-btn" onclick="editUser('${user.id}')">Edit</button>
-`;
-userList.appendChild(userCard);
-});
-});
+        // Add users to this course
+        const userList = document.getElementById(`course-${course.replace(/\s+/g, '-')}`);
+        courses[course].forEach(user => {
+            const userCard = document.createElement('div');
+            userCard.className = 'user-card';
+            // --- MODIFICATION STARTS HERE ---
+            userCard.innerHTML = `
+                <div class="user-details">
+                    <div class="user-name">${user.name}</div>
+                    <div class="user-rank">${user.rank}</div>
+                    <div class="user-course">${user.course}</div>
+                    <div class="user-email">${user.email}</div> <!-- Optional: Display email -->
+                </div>
+                <div> <!-- Wrap buttons in a div -->
+                    <button class="edit-user-btn" onclick="editUser('${user.id}')">Edit</button>
+                    <button class="action-btn delete-btn" onclick="deleteUser('${user.id}', '${user.name}')">Delete</button> <!-- Add Delete Button -->
+                </div>
+            `;
+            // --- MODIFICATION ENDS HERE ---
+            userList.appendChild(userCard);
+        });
+    });
 }
 
 // Edit user function
@@ -2165,7 +2191,41 @@ alert('Error updating user: ' + error.message);
 function closeEditUserModal() {
 document.getElementById('editUserModal').style.display = 'none';
 }
+// Close edit user modal
+function closeEditUserModal() {
+    document.getElementById('editUserModal').style.display = 'none';
+}
 
+// --- ADD THIS NEW FUNCTION ---
+// Delete a user
+async function deleteUser(userId, userName) {
+    if (!confirm(`Are you sure you want to delete the user "${userName}"? This action cannot be undone.`)) {
+        return;
+    }
+
+    try {
+        // Delete user document from 'users' collection
+        await db.collection("users").doc(userId).delete();
+
+        // Also remove from 'admins' collection if they were an admin
+        await db.collection("admins").doc(userId).delete().catch(error => {
+             // Ignore error if the user wasn't an admin
+             if (error.code !== 'not-found') {
+                 console.error("Error removing user from admins during deletion: ", error);
+             }
+        });
+
+        alert(`User "${userName}" has been deleted successfully.`);
+        // Optionally, refresh the user list to reflect the deletion
+        if (document.getElementById('users-section').style.display === 'block') {
+             loadUsersManagement(); // Reload the user list if currently viewing
+        }
+    } catch (error) {
+        console.error("Error deleting user: ", error);
+        alert('Error deleting user: ' + error.message);
+    }
+}
+// --- END OF NEW FUNCTION ---
 // Update dashboard counters
 function updateCounters() {
 document.getElementById('total-skills').textContent = skillsData.length;
@@ -2627,25 +2687,28 @@ You need at least 70% to pass. Try again!`);
 }
 }
 
-// Go back to skill grid
-function goBackToGrid() {
-document.getElementById('skill-grid').style.display = 'grid';
-document.getElementById('skill-detail').style.display = 'none';
-}
-
 // Settings tab functionality
 document.querySelectorAll('.tab-button').forEach(button => {
-button.addEventListener('click', function() {
-const tabName = this.getAttribute('data-tab');
-// Remove active class from all buttons and tabs
-document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-// Add active class to clicked button and corresponding tab
-this.classList.add('active');
-document.getElementById(`${tabName}Tab`).classList.add('active');
-});
+    button.addEventListener('click', function() {
+        const tabName = this.getAttribute('data-tab');
+
+        // Remove active class from all buttons and tabs
+        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+
+        // Add active class to clicked button and corresponding tab
+        this.classList.add('active');
+        document.getElementById(`${tabName}Tab`).classList.add('active');
+
+        // --- ADD THIS CONDITIONAL CALL ---
+        if (tabName === 'adminAccess') {
+            loadAdminList(); // Load admin list specifically when the Admin Access tab is clicked
+        }
+        // --- END OF ADDITION ---
+    });
 });
 </script>
 </body>
 </html>
+
 
