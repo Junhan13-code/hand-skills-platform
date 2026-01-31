@@ -616,6 +616,17 @@ cursor: pointer;
 .delete-btn-setting:hover {
 opacity: 0.9;
 }
+.move-up-btn, .move-down-btn {
+background: var(--primary);
+color: white;
+border: none;
+padding: 0.25rem 0.5rem;
+border-radius: 4px;
+cursor: pointer;
+}
+.move-up-btn:hover, .move-down-btn:hover {
+opacity: 0.9;
+}
 .add-item-input {
 display: flex;
 margin-top: 1rem;
@@ -927,10 +938,9 @@ right: 10px;
 <i class="fas fa-lock"></i> Admin View
 </button>
 <button class="profile-btn" id="loginBtn" onclick="openLoginPopup()" style="display: none;">
-    <i class="fas fa-sign-in-alt"></i> Login
+<i class="fas fa-sign-in-alt"></i> Login
 </button>
 </header>
-
 <!-- Profile Popup -->
 <div class="profile-popup" id="profilePopup">
 <div class="profile-header">
@@ -967,7 +977,6 @@ right: 10px;
 <button class="btn logout-btn-popup" onclick="logout()">Logout</button>
 </div>
 </div>
-
 <!-- Login Popup -->
 <div class="login-popup" id="loginPopup">
 <div class="login-box">
@@ -991,16 +1000,7 @@ right: 10px;
 <a href="#" onclick="showForgotPassword()">Forgot Password?</a>
 </div>
 </div>
-
 <div id="signupForm" style="display: none;">
-<div class="form-group">
-<label for="signup-email">Email</label>
-<input type="email" id="signup-email" placeholder="Enter your email">
-</div>
-<div class="form-group">
-<label for="signup-password">Password</label>
-<input type="password" id="signup-password" placeholder="Create a password">
-</div>
 <div class="form-group">
 <label for="rank">Rank</label>
 <select id="rank">
@@ -1024,7 +1024,6 @@ right: 10px;
 <a href="#" onclick="toggleAuthMode()">Already have an account? Login</a>
 </div>
 </div>
-
 <div id="forgotPasswordForm" style="display: none;">
 <div class="form-group">
 <label for="forgot-email">Email</label>
@@ -1035,7 +1034,6 @@ right: 10px;
 <a href="#" onclick="toggleAuthMode()">Back to Login</a>
 </div>
 </div>
-
 <div id="profileForm" style="display: none;">
 <h3>Complete Your Profile</h3>
 <div class="form-group">
@@ -1056,11 +1054,9 @@ right: 10px;
 </div>
 <button class="btn" onclick="completeProfile()">Save Profile</button>
 </div>
-
 <div class="error-message" id="auth-error"></div>
 </div>
 </div>
-
 <!-- Admin Dashboard -->
 <div class="admin-dashboard" id="adminDashboard">
 <div class="container">
@@ -1207,8 +1203,6 @@ right: 10px;
 </div>
 </div>
 </div>
-</div>
-
 <!-- Edit User Modal -->
 <div class="edit-user-modal" id="editUserModal">
 <div class="edit-user-box">
@@ -1233,7 +1227,6 @@ right: 10px;
 <button class="btn" onclick="saveEditedUser()">Save Changes</button>
 </div>
 </div>
-
 <!-- User Interface -->
 <div class="user-interface" id="userInterface">
 <main class="container">
@@ -1252,7 +1245,6 @@ right: 10px;
 </div>
 </footer>
 </div>
-
 <script>
 // Initialize Firebase
 const firebaseConfig = {
@@ -1264,12 +1256,10 @@ messagingSenderId: "1021058690748",
 appId: "1:1021058690748:web:40fd86d1060d90bbe1eab9",
 measurementId: "G-R2J40EVW18"
 };
-
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
-
 // Global variables
 let skillsData = [];
 let usersData = [];
@@ -1282,34 +1272,30 @@ let isAdmin = false; // Track if current user is admin
 let ranksData = []; // Store ranks from Firestore
 let coursesData = []; // Store courses from Firestore
 let wasInAdminView = false; // Track if we were in admin view before switching
-
 // Initialize the app
 // Initialize the app
 window.onload = function() {
-    // Check if user is already logged in
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            // User is logged in
-            loadUserData(user.uid);
-            // Hide the login button if user is logged in
-            document.getElementById('loginBtn').style.display = 'none'; 
-        } else {
-            // User is not logged in
-            // Show user interface by default
-            document.getElementById('userInterface').style.display = 'block';
-            loadSkillsFromFirebase();
-            
-            // Hide the login popup initially
-            document.getElementById('loginPopup').style.display = 'none'; 
-            // Show the login button in the header
-            document.getElementById('loginBtn').style.display = 'block'; 
-        }
-    });
-    
-    // Load ranks and courses from Firestore
-    loadRanksAndCourses();
+// Check if user is already logged in
+auth.onAuthStateChanged(user => {
+if (user) {
+// User is logged in
+loadUserData(user.uid);
+// Hide the login button if user is logged in
+document.getElementById('loginBtn').style.display = 'none';
+} else {
+// User is not logged in
+// Show user interface by default
+document.getElementById('userInterface').style.display = 'block';
+loadSkillsFromFirebase();
+// Hide the login popup initially
+document.getElementById('loginPopup').style.display = 'none';
+// Show the login button in the header
+document.getElementById('loginBtn').style.display = 'block';
+}
+});
+// Load ranks and courses from Firestore
+loadRanksAndCourses();
 };
-
 // Load ranks and courses from Firestore
 async function loadRanksAndCourses() {
 try {
@@ -1319,21 +1305,18 @@ ranksData = [];
 ranksSnapshot.forEach(doc => {
 ranksData.push({ id: doc.id, ...doc.data() });
 });
-
 // Load courses
 const coursesSnapshot = await db.collection("courses").orderBy("order").get();
 coursesData = [];
 coursesSnapshot.forEach(doc => {
 coursesData.push({ id: doc.id, ...doc.data() });
 });
-
 // Update dropdowns in signup and profile forms
 updateDropdowns();
 } catch (error) {
 console.error("Error loading ranks/courses: ", error);
 }
 }
-
 // Update dropdowns in forms
 function updateDropdowns() {
 // Update signup form rank dropdown
@@ -1345,7 +1328,6 @@ option.value = rank.name;
 option.textContent = rank.name;
 rankSelect.appendChild(option);
 });
-
 // Update signup form course dropdown
 const courseSelect = document.getElementById('course');
 courseSelect.innerHTML = '<option value="">Select Course</option>';
@@ -1355,7 +1337,6 @@ option.value = course.name;
 option.textContent = course.name;
 courseSelect.appendChild(option);
 });
-
 // Update profile form rank dropdown
 const profileRankSelect = document.getElementById('profile-rank');
 profileRankSelect.innerHTML = '<option value="">Select Rank</option>';
@@ -1365,7 +1346,6 @@ option.value = rank.name;
 option.textContent = rank.name;
 profileRankSelect.appendChild(option);
 });
-
 // Update profile form course dropdown
 const profileCourseSelect = document.getElementById('profile-course');
 profileCourseSelect.innerHTML = '<option value="">Select Course</option>';
@@ -1375,7 +1355,6 @@ option.value = course.name;
 option.textContent = course.name;
 profileCourseSelect.appendChild(option);
 });
-
 // Update edit user form dropdowns
 const editRankSelect = document.getElementById('edit-user-rank');
 editRankSelect.innerHTML = '';
@@ -1385,7 +1364,6 @@ option.value = rank.name;
 option.textContent = rank.name;
 editRankSelect.appendChild(option);
 });
-
 const editCourseSelect = document.getElementById('edit-user-course');
 editCourseSelect.innerHTML = '';
 coursesData.forEach(course => {
@@ -1394,7 +1372,6 @@ option.value = course.name;
 option.textContent = course.name;
 editCourseSelect.appendChild(option);
 });
-
 // Update profile popup rank dropdown
 const profilePopupRankSelect = document.getElementById('edit-rank');
 profilePopupRankSelect.innerHTML = '';
@@ -1408,7 +1385,6 @@ option.selected = true;
 profilePopupRankSelect.appendChild(option);
 });
 }
-
 // Load user data from Firestore
 async function loadUserData(userId) {
 try {
@@ -1416,7 +1392,6 @@ const userDoc = await db.collection("users").doc(userId).get();
 if (userDoc.exists) {
 currentUser = userDoc.data();
 currentUser.id = userId;
-
 // Check if user is admin
 const adminDoc = await db.collection("admins").doc(userId).get();
 if (adminDoc.exists) {
@@ -1449,7 +1424,6 @@ showProfileCompletion();
 console.error("Error loading user  ", error);
 }
 }
-
 // Show profile completion form
 function showProfileCompletion() {
 document.getElementById('loginForm').style.display = 'none';
@@ -1458,23 +1432,19 @@ document.getElementById('forgotPasswordForm').style.display = 'none';
 document.getElementById('profileForm').style.display = 'block';
 document.getElementById('auth-error').textContent = '';
 }
-
 // Complete profile after signup/google login
 async function completeProfile() {
 const rank = document.getElementById('profile-rank').value;
 const course = document.getElementById('profile-course').value;
 const name = document.getElementById('profile-name').value.toUpperCase();
-
 if (!rank || !course || !name) {
 document.getElementById('auth-error').textContent = 'Please fill in all fields';
 return;
 }
-
 try {
 // Get current user UID
 const user = auth.currentUser;
 if (!user) throw new Error('No authenticated user');
-
 // Save profile to Firestore
 await db.collection("users").doc(user.uid).set({
 rank: rank,
@@ -1484,7 +1454,6 @@ email: user.email,
 completedSkills: [],
 lastLogin: new Date()
 });
-
 // Reload user data
 loadUserData(user.uid);
 } catch (error) {
@@ -1492,7 +1461,6 @@ console.error("Error completing profile: ", error);
 document.getElementById('auth-error').textContent = error.message;
 }
 }
-
 // Toggle between login/signup/forgot forms
 function toggleAuthMode() {
 if (currentAuthMode === 'login') {
@@ -1506,24 +1474,20 @@ currentAuthMode = 'login';
 }
 document.getElementById('auth-error').textContent = '';
 }
-
 function showForgotPassword() {
 document.getElementById('loginForm').style.display = 'none';
 document.getElementById('forgotPasswordForm').style.display = 'block';
 currentAuthMode = 'forgot';
 document.getElementById('auth-error').textContent = '';
 }
-
 // Login function
 function login() {
 const email = document.getElementById('email').value;
 const password = document.getElementById('password').value;
-
 if (!email || !password) {
 document.getElementById('auth-error').textContent = 'Please enter both email and password';
 return;
 }
-
 auth.signInWithEmailAndPassword(email, password)
 .then(userCredential => {
 loadUserData(userCredential.user.uid);
@@ -1532,7 +1496,6 @@ loadUserData(userCredential.user.uid);
 document.getElementById('auth-error').textContent = error.message;
 });
 }
-
 // Signup function
 function signup() {
 const email = document.getElementById('signup-email').value;
@@ -1540,12 +1503,10 @@ const password = document.getElementById('signup-password').value;
 const rank = document.getElementById('rank').value;
 const course = document.getElementById('course').value;
 const name = document.getElementById('name').value.toUpperCase();
-
 if (!email || !password || !rank || !course || !name) {
 document.getElementById('auth-error').textContent = 'Please fill in all fields';
 return;
 }
-
 auth.createUserWithEmailAndPassword(email, password)
 .then(userCredential => {
 // Save profile data to Firestore
@@ -1563,7 +1524,6 @@ loadUserData(userCredential.user.uid);
 document.getElementById('auth-error').textContent = error.message;
 });
 }
-
 // Google login function
 function googleLogin() {
 const provider = new firebase.auth.GoogleAuthProvider();
@@ -1585,7 +1545,6 @@ showProfileCompletion();
 document.getElementById('auth-error').textContent = error.message;
 });
 }
-
 // Send password reset email
 function sendPasswordReset() {
 const email = document.getElementById('forgot-email').value;
@@ -1593,7 +1552,6 @@ if (!email) {
 document.getElementById('auth-error').textContent = 'Please enter your email';
 return;
 }
-
 auth.sendPasswordResetEmail(email)
 .then(() => {
 alert('Password reset email sent!');
@@ -1603,23 +1561,20 @@ toggleAuthMode();
 document.getElementById('auth-error').textContent = error.message;
 });
 }
-
 // Close login popup
 // Close login popup
 function closeLoginPopup() {
-    document.getElementById('loginPopup').style.display = 'none';
-    // Show the login button in the header when popup is closed while logged out
-    document.getElementById('loginBtn').style.display = 'block'; 
+document.getElementById('loginPopup').style.display = 'none';
+// Show the login button in the header when popup is closed while logged out
+document.getElementById('loginBtn').style.display = 'block';
 }
-
 // Open login popup
 // Open login popup
 function openLoginPopup() {
-    document.getElementById('loginPopup').style.display = 'flex';
-    // Hide the login button when the popup opens
-    document.getElementById('loginBtn').style.display = 'none'; 
+document.getElementById('loginPopup').style.display = 'flex';
+// Hide the login button when the popup opens
+document.getElementById('loginBtn').style.display = 'none';
 }
-
 // Toggle profile popup
 function toggleProfilePopup() {
 const popup = document.getElementById('profilePopup');
@@ -1636,7 +1591,6 @@ document.getElementById('popup-email-display').textContent = currentUser.email;
 updateDropdowns();
 }
 }
-
 // Switch to user interface (from admin)
 function switchToUserInterface() {
 wasInAdminView = true;
@@ -1647,7 +1601,6 @@ document.getElementById('adminBackBtn').style.display = 'block';
 // Load skills for user view
 loadSkillsFromFirebase();
 }
-
 // Switch to admin interface (from user)
 function switchToAdminInterface() {
 wasInAdminView = false;
@@ -1656,7 +1609,6 @@ document.getElementById('adminDashboard').style.display = 'block';
 document.getElementById('adminSwitchBtn').style.display = 'block';
 document.getElementById('adminBackBtn').style.display = 'none';
 }
-
 // Update own rank in profile popup
 async function updateOwnRank() {
 const newRank = document.getElementById('edit-rank').value;
@@ -1664,7 +1616,6 @@ if (!newRank) {
 alert('Please select a rank');
 return;
 }
-
 try {
 await db.collection("users").doc(currentUser.id).update({
 rank: newRank
@@ -1679,7 +1630,6 @@ console.error("Error updating rank: ", error);
 alert('Error updating rank: ' + error.message);
 }
 }
-
 // Setup Firestore listeners to sync data in real-time
 function setupFirestoreListeners() {
 // Listen for changes in skills collection
@@ -1689,23 +1639,19 @@ snapshot.forEach(doc => {
 skillsData.push({ id: doc.id, ...doc.data() });
 });
 updateCounters();
-
 // Update user interface if visible
 if (document.getElementById('userInterface').style.display === 'block') {
 loadSkillGrid();
 }
-
 // Update admin list if currently viewing the skills section
 if (document.getElementById('skills-section').style.display === 'block') {
 loadSkillsList();
 }
-
 // Update user preview if currently viewing
 if (document.getElementById('user-preview-section').style.display === 'block') {
 loadSkillGrid();
 }
 });
-
 // Listen for changes in users collection
 db.collection("users").onSnapshot((snapshot) => {
 usersData = [];
@@ -1717,7 +1663,6 @@ if (document.getElementById('users-section').style.display === 'block') {
 loadUsersManagement();
 }
 });
-
 // Listen for changes in admins collection
 db.collection("admins").onSnapshot((snapshot) => {
 // Refresh admin access section if currently active
@@ -1725,7 +1670,6 @@ if (document.getElementById('adminAccessTab').style.display === 'block') {
 loadAdminList();
 }
 });
-
 // Listen for changes in ranks collection
 db.collection("ranks").onSnapshot((snapshot) => {
 loadRanksAndCourses(); // Reload ranks and courses
@@ -1734,7 +1678,6 @@ if (document.getElementById('settings-section').style.display === 'block') {
 loadSignupSettings();
 }
 });
-
 // Listen for changes in courses collection
 db.collection("courses").onSnapshot((snapshot) => {
 loadRanksAndCourses(); // Reload ranks and courses
@@ -1744,7 +1687,6 @@ loadSignupSettings();
 }
 });
 }
-
 // Grant admin access to another user
 async function grantAdminAccess() {
 const email = document.getElementById('admin-email').value;
@@ -1752,7 +1694,6 @@ if (!email) {
 alert('Please enter an email address');
 return;
 }
-
 try {
 // Find user by email
 const userQuery = await db.collection("users").where("email", "==", email).get();
@@ -1760,17 +1701,14 @@ if (userQuery.empty) {
 alert('User not found');
 return;
 }
-
 const userDoc = userQuery.docs[0];
 const userId = userDoc.id;
-
 // Add user to admins collection
 await db.collection("admins").doc(userId).set({
 email: email,
 grantedBy: currentUser.email,
 date: new Date()
 });
-
 // Clear the input field
 document.getElementById('admin-email').value = '';
 alert('Admin access granted successfully!');
@@ -1779,56 +1717,51 @@ console.error("Error granting admin access: ", error);
 alert('Error granting admin access: ' + error.message);
 }
 }
-
 // Load admin list
 // Load admin list
 async function loadAdminList() {
-    try {
-        const snapshot = await db.collection("admins").get();
-        const adminList = document.getElementById('adminList');
-        // --- IMPROVED CONTENT GENERATION ---
-        let adminItemsHTML = '<h3 class="section-title">Current Admins</h3>';
-
-        if (snapshot.empty) {
-            adminItemsHTML += '<p>No admins found.</p>';
-        } else {
-            // Fetch user details for each admin UID to get email/name if needed
-            const adminPromises = snapshot.docs.map(async (doc) => {
-                const adminId = doc.id; // This is the user UID
-                const userData = await db.collection("users").doc(adminId).get();
-                if (userData.exists) {
-                     return { uid: adminId, email: userData.data().email, name: userData.data().name }; // Include name if desired
-                } else {
-                     // Fallback if user doesn't exist in users collection anymore
-                     const adminData = doc.data();
-                     return { uid: adminId, email: adminData.email || 'Unknown Email', name: 'Unknown User' };
-                }
-            });
-
-            const adminDetails = await Promise.all(adminPromises);
-
-            adminDetails.forEach(admin => {
-                adminItemsHTML += `
-                    <div style="background: var(--light); padding: 1rem; margin: 0.5rem 0; border-radius: 5px; display: flex; justify-content: space-between; align-items: center;">
-                        <span>${admin.email} (${admin.name})</span> <!-- Display email and name -->
-                        <button class="btn btn-secondary" onclick="revokeAdminAccess('${admin.uid}', '${admin.email}')" style="width: auto; padding: 0.5rem 1rem;">Revoke</button>
-                    </div>
-                `;
-            });
-        }
-        adminList.innerHTML = adminItemsHTML;
-        // --- END OF IMPROVEMENT ---
-    } catch (error) {
-        console.error("Error loading admin list: ", error);
-        document.getElementById('adminList').innerHTML = '<p>Error loading admin list.</p>';
-    }
+try {
+const snapshot = await db.collection("admins").get();
+const adminList = document.getElementById('adminList');
+// --- IMPROVED CONTENT GENERATION ---
+let adminItemsHTML = '<h3 class="section-title">Current Admins</h3>';
+if (snapshot.empty) {
+adminItemsHTML += '<p>No admins found.</p>';
+} else {
+// Fetch user details for each admin UID to get email/name if needed
+const adminPromises = snapshot.docs.map(async (doc) => {
+const adminId = doc.id; // This is the user UID
+const userData = await db.collection("users").doc(adminId).get();
+if (userData.exists) {
+return { uid: adminId, email: userData.data().email, name: userData.data().name }; // Include name if desired
+} else {
+// Fallback if user doesn't exist in users collection anymore
+const adminData = doc.data();
+return { uid: adminId, email: adminData.email || 'Unknown Email', name: 'Unknown User' };
+}
+});
+const adminDetails = await Promise.all(adminPromises);
+adminDetails.forEach(admin => {
+adminItemsHTML += `
+<div style="background: var(--light); padding: 1rem; margin: 0.5rem 0; border-radius: 5px; display: flex; justify-content: space-between; align-items: center;">
+<span>${admin.email} (${admin.name})</span> <!-- Display email and name -->
+<button class="btn btn-secondary" onclick="revokeAdminAccess('${admin.uid}', '${admin.email}')" style="width: auto; padding: 0.5rem 1rem;">Revoke</button>
+</div>
+`;
+});
+}
+adminList.innerHTML = adminItemsHTML;
+// --- END OF IMPROVEMENT ---
+} catch (error) {
+console.error("Error loading admin list: ", error);
+document.getElementById('adminList').innerHTML = '<p>Error loading admin list.</p>';
+}
 }
 // Revoke admin access
 async function revokeAdminAccess(adminId, email) {
 if (!confirm(`Are you sure you want to revoke admin access for ${email}?`)) {
 return;
 }
-
 try {
 await db.collection("admins").doc(adminId).delete();
 alert('Admin access revoked successfully!');
@@ -1837,44 +1770,217 @@ console.error("Error revoking admin access: ", error);
 alert('Error revoking admin access: ' + error.message);
 }
 }
-
 // Load signup settings
 async function loadSignupSettings() {
-try {
-// Load ranks
-const ranksSnapshot = await db.collection("ranks").orderBy("order").get();
-const ranksList = document.getElementById('ranksList');
-ranksList.innerHTML = '';
-ranksSnapshot.forEach(doc => {
-const rank = doc.data();
-ranksList.innerHTML += `
-<div class="setting-item">
-<span>${rank.name}</span>
-<div class="setting-actions">
-<button class="delete-btn-setting" onclick="deleteRank('${doc.id}', '${rank.name}')">Delete</button>
-</div>
-</div>
-`;
-});
+    try {
+        // Load ranks
+        const ranksSnapshot = await db.collection("ranks").orderBy("order").get();
+        const ranksList = document.getElementById('ranksList');
+        ranksList.innerHTML = '';
 
-// Load courses
-const coursesSnapshot = await db.collection("courses").orderBy("order").get();
-const coursesList = document.getElementById('coursesList');
-coursesList.innerHTML = '';
-coursesSnapshot.forEach(doc => {
-const course = doc.data();
-coursesList.innerHTML += `
-<div class="setting-item">
-<span>${course.name}</span>
-<div class="setting-actions">
-<button class="delete-btn-setting" onclick="deleteCourse('${doc.id}', '${course.name}')">Delete</button>
-</div>
-</div>
-`;
-});
-} catch (error) {
-console.error("Error loading signup settings: ", error);
+        let rankItemsHTML = '';
+        ranksSnapshot.forEach((doc, index) => {
+            const rank = doc.data();
+            const isTop = index === 0;
+            const isBottom = index === ranksSnapshot.size - 1;
+
+            rankItemsHTML += `
+                <div class="setting-item">
+                    <span>${rank.name}</span>
+                    <div class="setting-actions">
+                        <button class="move-up-btn" ${isTop ? 'disabled' : ''} onclick="moveRankUp('${doc.id}', ${rank.order})" title="Move Up">
+                            <i class="fas fa-arrow-up"></i>
+                        </button>
+                        <button class="move-down-btn" ${isBottom ? 'disabled' : ''} onclick="moveRankDown('${doc.id}', ${rank.order})" title="Move Down">
+                            <i class="fas fa-arrow-down"></i>
+                        </button>
+                        <button class="delete-btn-setting" onclick="deleteRank('${doc.id}', '${rank.name}')">Delete</button>
+                    </div>
+                </div>
+            `;
+        });
+        ranksList.innerHTML = rankItemsHTML;
+
+        // Load courses
+        const coursesSnapshot = await db.collection("courses").orderBy("order").get();
+        const coursesList = document.getElementById('coursesList');
+        coursesList.innerHTML = '';
+
+        let courseItemsHTML = '';
+        coursesSnapshot.forEach((doc, index) => {
+            const course = doc.data();
+            const isTop = index === 0;
+            const isBottom = index === coursesSnapshot.size - 1;
+
+            courseItemsHTML += `
+                <div class="setting-item">
+                    <span>${course.name}</span>
+                    <div class="setting-actions">
+                        <button class="move-up-btn" ${isTop ? 'disabled' : ''} onclick="moveCourseUp('${doc.id}', ${course.order})" title="Move Up">
+                            <i class="fas fa-arrow-up"></i>
+                        </button>
+                        <button class="move-down-btn" ${isBottom ? 'disabled' : ''} onclick="moveCourseDown('${doc.id}', ${course.order})" title="Move Down">
+                            <i class="fas fa-arrow-down"></i>
+                        </button>
+                        <button class="delete-btn-setting" onclick="deleteCourse('${doc.id}', '${course.name}')">Delete</button>
+                    </div>
+                </div>
+            `;
+        });
+        coursesList.innerHTML = courseItemsHTML;
+    } catch (error) {
+        console.error("Error loading signup settings: ", error);
+    }
 }
+
+// Move Rank Up
+async function moveRankUp(rankId, currentOrder) {
+    if (currentOrder <= 0) return; // Already at the top
+    const targetOrder = currentOrder - 1;
+
+    try {
+        // Find the rank that currently has the target order
+        const targetRankSnapshot = await db.collection("ranks")
+            .where("order", "==", targetOrder)
+            .limit(1)
+            .get();
+
+        if (targetRankSnapshot.empty) {
+            console.error("Target rank for swapping not found for order:", targetOrder);
+            return;
+        }
+
+        const targetRankDoc = targetRankSnapshot.docs[0];
+        const targetRankId = targetRankDoc.id;
+
+        // Perform batch write to swap orders atomically
+        const batch = db.batch();
+        batch.update(db.collection("ranks").doc(rankId), { order: targetOrder });
+        batch.update(db.collection("ranks").doc(targetRankId), { order: currentOrder });
+        await batch.commit();
+
+        console.log("Rank moved up successfully");
+        // Reload the settings list to reflect changes
+        loadSignupSettings();
+    } catch (error) {
+        console.error("Error moving rank up: ", error);
+        alert("Failed to move rank up: " + error.message);
+    }
+}
+
+// Move Rank Down
+async function moveRankDown(rankId, currentOrder) {
+    // Need to find the highest order to know if this is the bottom
+    const allRanksSnapshot = await db.collection("ranks").orderBy("order").get();
+    const ranksArray = allRanksSnapshot.docs.map(d => d.data());
+    const maxOrder = Math.max(...ranksArray.map(r => r.order));
+
+    if (currentOrder >= maxOrder) return; // Already at the bottom
+    const targetOrder = currentOrder + 1;
+
+    try {
+        // Find the rank that currently has the target order
+        const targetRankSnapshot = await db.collection("ranks")
+            .where("order", "==", targetOrder)
+            .limit(1)
+            .get();
+
+        if (targetRankSnapshot.empty) {
+            console.error("Target rank for swapping not found for order:", targetOrder);
+            return;
+        }
+
+        const targetRankDoc = targetRankSnapshot.docs[0];
+        const targetRankId = targetRankDoc.id;
+
+        // Perform batch write to swap orders atomically
+        const batch = db.batch();
+        batch.update(db.collection("ranks").doc(rankId), { order: targetOrder });
+        batch.update(db.collection("ranks").doc(targetRankId), { order: currentOrder });
+        await batch.commit();
+
+        console.log("Rank moved down successfully");
+        // Reload the settings list to reflect changes
+        loadSignupSettings();
+    } catch (error) {
+        console.error("Error moving rank down: ", error);
+        alert("Failed to move rank down: " + error.message);
+    }
+}
+
+// Move Course Up
+async function moveCourseUp(courseId, currentOrder) {
+    if (currentOrder <= 0) return; // Already at the top
+    const targetOrder = currentOrder - 1;
+
+    try {
+        // Find the course that currently has the target order
+        const targetCourseSnapshot = await db.collection("courses")
+            .where("order", "==", targetOrder)
+            .limit(1)
+            .get();
+
+        if (targetCourseSnapshot.empty) {
+            console.error("Target course for swapping not found for order:", targetOrder);
+            return;
+        }
+
+        const targetCourseDoc = targetCourseSnapshot.docs[0];
+        const targetCourseId = targetCourseDoc.id;
+
+        // Perform batch write to swap orders atomically
+        const batch = db.batch();
+        batch.update(db.collection("courses").doc(courseId), { order: targetOrder });
+        batch.update(db.collection("courses").doc(targetCourseId), { order: currentOrder });
+        await batch.commit();
+
+        console.log("Course moved up successfully");
+        // Reload the settings list to reflect changes
+        loadSignupSettings();
+    } catch (error) {
+        console.error("Error moving course up: ", error);
+        alert("Failed to move course up: " + error.message);
+    }
+}
+
+// Move Course Down
+async function moveCourseDown(courseId, currentOrder) {
+    // Need to find the highest order to know if this is the bottom
+    const allCoursesSnapshot = await db.collection("courses").orderBy("order").get();
+    const coursesArray = allCoursesSnapshot.docs.map(d => d.data());
+    const maxOrder = Math.max(...coursesArray.map(r => r.order));
+
+    if (currentOrder >= maxOrder) return; // Already at the bottom
+    const targetOrder = currentOrder + 1;
+
+    try {
+        // Find the course that currently has the target order
+        const targetCourseSnapshot = await db.collection("courses")
+            .where("order", "==", targetOrder)
+            .limit(1)
+            .get();
+
+        if (targetCourseSnapshot.empty) {
+            console.error("Target course for swapping not found for order:", targetOrder);
+            return;
+        }
+
+        const targetCourseDoc = targetCourseSnapshot.docs[0];
+        const targetCourseId = targetCourseDoc.id;
+
+        // Perform batch write to swap orders atomically
+        const batch = db.batch();
+        batch.update(db.collection("courses").doc(courseId), { order: targetOrder });
+        batch.update(db.collection("courses").doc(targetCourseId), { order: currentOrder });
+        await batch.commit();
+
+        console.log("Course moved down successfully");
+        // Reload the settings list to reflect changes
+        loadSignupSettings();
+    } catch (error) {
+        console.error("Error moving course down: ", error);
+        alert("Failed to move course down: " + error.message);
+    }
 }
 
 // Add a new rank
@@ -1888,7 +1994,6 @@ document.getElementById('rankMessage').textContent = '';
 }, 3000);
 return;
 }
-
 try {
 // Check if rank already exists
 const existingRank = ranksData.find(r => r.name === newRank);
@@ -1899,13 +2004,13 @@ document.getElementById('rankMessage').textContent = '';
 }, 3000);
 return;
 }
-
+// Calculate the new order value based on the current number of ranks
+const newOrder = ranksData.length;
 // Add new rank to Firestore
 await db.collection("ranks").add({
 name: newRank,
-order: ranksData.length
+order: newOrder
 });
-
 // Clear input
 newRankInput.value = '';
 document.getElementById('rankMessage').textContent = 'Rank added successfully!';
@@ -1920,13 +2025,11 @@ document.getElementById('rankMessage').textContent = '';
 }, 3000);
 }
 }
-
 // Delete a rank
 async function deleteRank(rankId, rankName) {
 if (!confirm(`Are you sure you want to delete the rank "${rankName}"?`)) {
 return;
 }
-
 try {
 await db.collection("ranks").doc(rankId).delete();
 document.getElementById('rankMessage').textContent = 'Rank deleted successfully!';
@@ -1941,7 +2044,6 @@ document.getElementById('rankMessage').textContent = '';
 }, 3000);
 }
 }
-
 // Add a new course
 async function addCourse() {
 const newCourseInput = document.getElementById('newCourseInput');
@@ -1953,7 +2055,6 @@ document.getElementById('courseMessage').textContent = '';
 }, 3000);
 return;
 }
-
 try {
 // Check if course already exists
 const existingCourse = coursesData.find(c => c.name === newCourse);
@@ -1964,13 +2065,13 @@ document.getElementById('courseMessage').textContent = '';
 }, 3000);
 return;
 }
-
+// Calculate the new order value based on the current number of courses
+const newOrder = coursesData.length;
 // Add new course to Firestore
 await db.collection("courses").add({
 name: newCourse,
-order: coursesData.length
+order: newOrder
 });
-
 // Clear input
 newCourseInput.value = '';
 document.getElementById('courseMessage').textContent = 'Course added successfully!';
@@ -1985,13 +2086,11 @@ document.getElementById('courseMessage').textContent = '';
 }, 3000);
 }
 }
-
 // Delete a course
 async function deleteCourse(courseId, courseName) {
 if (!confirm(`Are you sure you want to delete the course "${courseName}"?`)) {
 return;
 }
-
 try {
 await db.collection("courses").doc(courseId).delete();
 document.getElementById('courseMessage').textContent = 'Course deleted successfully!';
@@ -2006,84 +2105,70 @@ document.getElementById('courseMessage').textContent = '';
 }, 3000);
 }
 }
-
 // Logout function
 function logout() {
-    auth.signOut().then(() => {
-        currentUser = null;
-        isAdmin = false;
-        
-        // Hide interfaces
-        document.getElementById('adminDashboard').style.display = 'none';
-        document.getElementById('userInterface').style.display = 'block';
-        document.getElementById('profilePopup').style.display = 'none';
-        
-        // Hide profile/admin buttons
-        document.getElementById('profileBtn').style.display = 'none';
-        document.getElementById('adminSwitchBtn').style.display = 'none';
-        document.getElementById('adminBackBtn').style.display = 'none';
-        
-        // Hide the login popup if it happens to be open
-        document.getElementById('loginPopup').style.display = 'none'; 
-        
-         // Show the login button again after logging out
-        document.getElementById('loginBtn').style.display = 'block'; 
-        
-        loadSkillsFromFirebase();
-    }).catch(error => {
-        console.error("Error signing out: ", error);
-    });
+auth.signOut().then(() => {
+currentUser = null;
+isAdmin = false;
+// Hide interfaces
+document.getElementById('adminDashboard').style.display = 'none';
+document.getElementById('userInterface').style.display = 'block';
+document.getElementById('profilePopup').style.display = 'none';
+// Hide profile/admin buttons
+document.getElementById('profileBtn').style.display = 'none';
+document.getElementById('adminSwitchBtn').style.display = 'none';
+document.getElementById('adminBackBtn').style.display = 'none';
+// Hide the login popup if it happens to be open
+document.getElementById('loginPopup').style.display = 'none';
+// Show the login button again after logging out
+document.getElementById('loginBtn').style.display = 'block';
+loadSkillsFromFirebase();
+}).catch(error => {
+console.error("Error signing out: ", error);
+});
 }
-
 // Show different sections in admin panel
 // Show different sections in admin panel
 function showSection(section) {
-    // Hide all sections
-    document.querySelectorAll('.section').forEach(el => el.style.display = 'none');
-    document.getElementById('edit-skill-form').style.display = 'none';
-
-    // Remove active class from all nav items
-    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-
-    // Show selected section and highlight nav item
-    document.getElementById(`${section}-section`).style.display = 'block';
-    document.querySelector(`.nav-item[onclick="showSection('${section}')"]`).classList.add('active');
-
-    if (section === 'dashboard') {
-        updateCounters();
-    }
-    // IMPORTANT: Always reload skills list when showing skills section
-    if (section === 'skills') {
-        loadSkillsList();
-    }
-    // Load users management when showing users section
-    if (section === 'users') {
-        loadUsersManagement();
-    }
-    // Load settings content when showing settings section
-    if (section === 'settings') {
-        // Load signup settings by default or the active tab
-        const activeTabButton = document.querySelector('.tab-button.active');
-        const activeTabId = activeTabButton ? activeTabButton.getAttribute('data-tab') : 'signupSettings';
-
-        if (activeTabId === 'signupSettings') {
-            loadSignupSettings();
-        } else if (activeTabId === 'adminAccess') {
-            loadAdminList(); // Call loadAdminList when Admin Access tab is active
-        }
-    }
+// Hide all sections
+document.querySelectorAll('.section').forEach(el => el.style.display = 'none');
+document.getElementById('edit-skill-form').style.display = 'none';
+// Remove active class from all nav items
+document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+// Show selected section and highlight nav item
+document.getElementById(`${section}-section`).style.display = 'block';
+document.querySelector(`.nav-item[onclick="showSection('${section}')"]`).classList.add('active');
+if (section === 'dashboard') {
+updateCounters();
 }
-
+// IMPORTANT: Always reload skills list when showing skills section
+if (section === 'skills') {
+loadSkillsList();
+}
+// Load users management when showing users section
+if (section === 'users') {
+loadUsersManagement();
+}
+// Load settings content when showing settings section
+if (section === 'settings') {
+// Load signup settings by default or the active tab
+const activeTabButton = document.querySelector('.tab-button.active');
+const activeTabId = activeTabButton ? activeTabButton.getAttribute('data-tab') : 'signupSettings';
+if (activeTabId === 'signupSettings') {
+loadSignupSettings();
+} else if (activeTabId === 'adminAccess') {
+loadAdminList(); // Call loadAdminList when Admin Access tab is active
+}
+}
+}
 // Load skills list in admin panel
 function loadSkillsList() {
 const skillsList = document.getElementById('skillsList');
 skillsList.innerHTML = '';
-
 if (skillsData.length === 0) {
 skillsList.innerHTML = '<p>No skills available.</p>';
 return;
 }
-
 skillsData.forEach(skill => {
 const skillCard = document.createElement('div');
 skillCard.className = 'skill-card';
@@ -2098,81 +2183,71 @@ skillCard.innerHTML = `
 skillsList.appendChild(skillCard);
 });
 }
-
 // Load users management in admin panel
 function loadUsersManagement() {
-    const usersContent = document.getElementById('usersContent');
-    usersContent.innerHTML = '';
-
-    // Group users by course
-    const courses = {};
-    usersData.forEach(user => {
-        if (!courses[user.course]) {
-            courses[user.course] = [];
-        }
-        courses[user.course].push(user);
-    });
-
-    // Render each course group
-    Object.keys(courses).forEach(course => {
-        const courseGroup = document.createElement('div');
-        courseGroup.className = 'course-group';
-        courseGroup.innerHTML = `
-            <h3 class="course-title">${course}</h3>
-            <div class="user-list" id="course-${course.replace(/\s+/g, '-')}">
-                <!-- Users will be added here -->
-            </div>
-        `;
-        usersContent.appendChild(courseGroup);
-
-        // Add users to this course
-        const userList = document.getElementById(`course-${course.replace(/\s+/g, '-')}`);
-        courses[course].forEach(user => {
-            const userCard = document.createElement('div');
-            userCard.className = 'user-card';
-            // --- MODIFICATION STARTS HERE ---
-            userCard.innerHTML = `
-                <div class="user-details">
-                    <div class="user-name">${user.name}</div>
-                    <div class="user-rank">${user.rank}</div>
-                    <div class="user-course">${user.course}</div>
-                    <div class="user-email">${user.email}</div> <!-- Optional: Display email -->
-                </div>
-                <div> <!-- Wrap buttons in a div -->
-                    <button class="edit-user-btn" onclick="editUser('${user.id}')">Edit</button>
-                    <button class="action-btn delete-btn" onclick="deleteUser('${user.id}', '${user.name}')">Delete</button> <!-- Add Delete Button -->
-                </div>
-            `;
-            // --- MODIFICATION ENDS HERE ---
-            userList.appendChild(userCard);
-        });
-    });
+const usersContent = document.getElementById('usersContent');
+usersContent.innerHTML = '';
+// Group users by course
+const courses = {};
+usersData.forEach(user => {
+if (!courses[user.course]) {
+courses[user.course] = [];
 }
-
+courses[user.course].push(user);
+});
+// Render each course group
+Object.keys(courses).forEach(course => {
+const courseGroup = document.createElement('div');
+courseGroup.className = 'course-group';
+courseGroup.innerHTML = `
+<h3 class="course-title">${course}</h3>
+<div class="user-list" id="course-${course.replace(/\s+/g, '-')}">
+<!-- Users will be added here -->
+</div>
+`;
+usersContent.appendChild(courseGroup);
+// Add users to this course
+const userList = document.getElementById(`course-${course.replace(/\s+/g, '-')}`);
+courses[course].forEach(user => {
+const userCard = document.createElement('div');
+userCard.className = 'user-card';
+// --- MODIFICATION STARTS HERE ---
+userCard.innerHTML = `
+<div class="user-details">
+<div class="user-name">${user.name}</div>
+<div class="user-rank">${user.rank}</div>
+<div class="user-course">${user.course}</div>
+<div class="user-email">${user.email}</div> <!-- Optional: Display email -->
+</div>
+<div> <!-- Wrap buttons in a div -->
+<button class="edit-user-btn" onclick="editUser('${user.id}')">Edit</button>
+<button class="action-btn delete-btn" onclick="deleteUser('${user.id}', '${user.name}')">Delete</button> <!-- Add Delete Button -->
+</div>
+`;
+// --- MODIFICATION ENDS HERE ---
+userList.appendChild(userCard);
+});
+});
+}
 // Edit user function
 function editUser(userId) {
 editingUserId = userId;
 const user = usersData.find(u => u.id === userId);
 if (!user) return;
-
 document.getElementById('edit-user-name').value = user.name;
 document.getElementById('edit-user-rank').value = user.rank;
 document.getElementById('edit-user-course').value = user.course;
-
 document.getElementById('editUserModal').style.display = 'flex';
 }
-
 // Save edited user
 async function saveEditedUser() {
 const name = document.getElementById('edit-user-name').value.toUpperCase();
 const rank = document.getElementById('edit-user-rank').value;
 const course = document.getElementById('edit-user-course').value;
-
 if (!name || !rank || !course) {
 alert('Please fill in all fields');
 return;
 }
-
 try {
 await db.collection("users").doc(editingUserId).update({
 name: name,
@@ -2186,51 +2261,45 @@ console.error("Error updating user: ", error);
 alert('Error updating user: ' + error.message);
 }
 }
-
 // Close edit user modal
 function closeEditUserModal() {
 document.getElementById('editUserModal').style.display = 'none';
 }
 // Close edit user modal
 function closeEditUserModal() {
-    document.getElementById('editUserModal').style.display = 'none';
+document.getElementById('editUserModal').style.display = 'none';
 }
-
 // --- ADD THIS NEW FUNCTION ---
 // Delete a user
 async function deleteUser(userId, userName) {
-    if (!confirm(`Are you sure you want to delete the user "${userName}"? This action cannot be undone.`)) {
-        return;
-    }
-
-    try {
-        // Delete user document from 'users' collection
-        await db.collection("users").doc(userId).delete();
-
-        // Also remove from 'admins' collection if they were an admin
-        await db.collection("admins").doc(userId).delete().catch(error => {
-             // Ignore error if the user wasn't an admin
-             if (error.code !== 'not-found') {
-                 console.error("Error removing user from admins during deletion: ", error);
-             }
-        });
-
-        alert(`User "${userName}" has been deleted successfully.`);
-        // Optionally, refresh the user list to reflect the deletion
-        if (document.getElementById('users-section').style.display === 'block') {
-             loadUsersManagement(); // Reload the user list if currently viewing
-        }
-    } catch (error) {
-        console.error("Error deleting user: ", error);
-        alert('Error deleting user: ' + error.message);
-    }
+if (!confirm(`Are you sure you want to delete the user "${userName}"? This action cannot be undone.`)) {
+return;
+}
+try {
+// Delete user document from 'users' collection
+await db.collection("users").doc(userId).delete();
+// Also remove from 'admins' collection if they were an admin
+await db.collection("admins").doc(userId).delete().catch(error => {
+// Ignore error if the user wasn't an admin
+if (error.code !== 'not-found') {
+console.error("Error removing user from admins during deletion: ", error);
+}
+});
+alert(`User "${userName}" has been deleted successfully.`);
+// Optionally, refresh the user list to reflect the deletion
+if (document.getElementById('users-section').style.display === 'block') {
+loadUsersManagement(); // Reload the user list if currently viewing
+}
+} catch (error) {
+console.error("Error deleting user: ", error);
+alert('Error deleting user: ' + error.message);
+}
 }
 // --- END OF NEW FUNCTION ---
 // Update dashboard counters
 function updateCounters() {
 document.getElementById('total-skills').textContent = skillsData.length;
 }
-
 // Add new skill
 function addNewSkill() {
 currentEditingSkill = {
@@ -2246,7 +2315,6 @@ quiz: []
 originalEditingSkill = JSON.parse(JSON.stringify(currentEditingSkill)); // Store original data
 showEditForm();
 }
-
 // Edit existing skill
 function editSkill(skillId) {
 currentEditingSkill = skillsData.find(skill => skill.id === skillId);
@@ -2255,7 +2323,6 @@ if (currentEditingSkill) {
 showEditForm();
 }
 }
-
 // Show edit form
 function showEditForm() {
 document.getElementById('edit-skill-name').value = currentEditingSkill.name || '';
@@ -2263,7 +2330,6 @@ document.getElementById('edit-skill-icon').value = currentEditingSkill.icon || '
 document.getElementById('edit-skill-description').value = currentEditingSkill.description || '';
 document.getElementById('edit-tools').value = Array.isArray(currentEditingSkill.tools) ? currentEditingSkill.tools.join(', ') : '';
 document.getElementById('edit-theory').value = currentEditingSkill.theory || '';
-
 // Clear and populate steps
 const stepsContainer = document.getElementById('steps-container');
 stepsContainer.innerHTML = '';
@@ -2272,7 +2338,6 @@ currentEditingSkill.steps.forEach((step, index) => {
 addStepToForm(index, step);
 });
 }
-
 // Clear and populate quiz
 const quizContainer = document.getElementById('quiz-container');
 quizContainer.innerHTML = '';
@@ -2281,28 +2346,23 @@ currentEditingSkill.quiz.forEach((question, index) => {
 addQuizQuestionToForm(index, question);
 });
 }
-
 // Show form
 document.getElementById('skills-section').style.display = 'none';
 document.getElementById('edit-skill-form').style.display = 'block';
 }
-
 // Cancel edit and restore original data
 function cancelEdit() {
 // Restore original skill data
 currentEditingSkill = JSON.parse(JSON.stringify(originalEditingSkill));
-
 // Return to skills list
 document.getElementById('edit-skill-form').style.display = 'none';
 document.getElementById('skills-section').style.display = 'block';
 }
-
 // Add step to form
 function addStepToForm(index, step = null) {
 const stepsContainer = document.getElementById('steps-container');
 const stepId = index !== undefined ? index : (currentEditingSkill.steps ? currentEditingSkill.steps.length : 0);
 const stepObj = step || { title: '', description: '', image: '' };
-
 const stepElement = document.createElement('div');
 stepElement.className = 'step-item';
 stepElement.id = `step-${stepId}`;
@@ -2328,21 +2388,18 @@ stepElement.innerHTML = `
 `;
 stepsContainer.appendChild(stepElement);
 }
-
 // Add new step
 function addStep() {
 if (!currentEditingSkill.steps) currentEditingSkill.steps = [];
 currentEditingSkill.steps.push({ title: '', description: '', image: '' });
 addStepToForm();
 }
-
 // Update step field
 function updateStepField(index, field, value) {
 if (currentEditingSkill.steps && currentEditingSkill.steps[index]) {
 currentEditingSkill.steps[index][field] = value;
 }
 }
-
 // Remove step
 function removeStep(index) {
 if (currentEditingSkill.steps && currentEditingSkill.steps[index]) {
@@ -2355,13 +2412,11 @@ addStepToForm(idx, step);
 });
 }
 }
-
 // Add quiz question to form
 function addQuizQuestionToForm(index, question = null) {
 const quizContainer = document.getElementById('quiz-container');
 const questionId = index !== undefined ? index : (currentEditingSkill.quiz ? currentEditingSkill.quiz.length : 0);
 const q = question || { question: '', options: ['', '', '', ''], answer: 0 };
-
 const questionElement = document.createElement('div');
 questionElement.className = 'quiz-question';
 questionElement.id = `question-${questionId}`;
@@ -2401,30 +2456,26 @@ questionElement.innerHTML = `
 `;
 quizContainer.appendChild(questionElement);
 }
-
 // Add new quiz question
 function addQuizQuestion() {
 if (!currentEditingSkill.quiz) currentEditingSkill.quiz = [];
 currentEditingSkill.quiz.push({ question: '', options: ['', '', '', ''], answer: 0 });
 addQuizQuestionToForm();
 }
-
 // Update quiz field
 function updateQuizField(questionId, field, value) {
 if (currentEditingSkill.quiz && currentEditingSkill.quiz[questionId]) {
 currentEditingSkill.quiz[questionId][field] = value;
 }
 }
-
 // Update quiz option
 function updateQuizOption(questionId, optionIndex, value) {
-if (currentEditingSkill.quiz && 
-currentEditingSkill.quiz[questionId] && 
+if (currentEditingSkill.quiz &&
+currentEditingSkill.quiz[questionId] &&
 currentEditingSkill.quiz[questionId].options[optionIndex] !== undefined) {
 currentEditingSkill.quiz[questionId].options[optionIndex] = value;
 }
 }
-
 // Remove quiz question
 function removeQuizQuestion(index) {
 if (currentEditingSkill.quiz && currentEditingSkill.quiz[index]) {
@@ -2437,7 +2488,6 @@ addQuizQuestionToForm(idx, question);
 });
 }
 }
-
 // Save skill
 function saveSkill() {
 // Update current skill with form values
@@ -2446,7 +2496,6 @@ currentEditingSkill.icon = document.getElementById('edit-skill-icon').value;
 currentEditingSkill.description = document.getElementById('edit-skill-description').value;
 currentEditingSkill.tools = document.getElementById('edit-tools').value.split(',').map(t => t.trim()).filter(t => t);
 currentEditingSkill.theory = document.getElementById('edit-theory').value;
-
 // If it's a new skill, add to Firestore
 if (!currentEditingSkill.id) {
 db.collection("skills").add(currentEditingSkill)
@@ -2475,7 +2524,6 @@ alert('Error saving skill');
 });
 }
 }
-
 // Delete skill
 function deleteSkill(skillId) {
 if (!skillId) {
@@ -2483,7 +2531,6 @@ console.warn("Attempted to delete a skill with an invalid or empty ID:", skillId
 alert("Cannot delete skill: Invalid ID.");
 return;
 }
-
 if (confirm('Are you sure you want to delete this skill?')) {
 db.collection("skills").doc(skillId).delete()
 .then(() => {
@@ -2494,7 +2541,6 @@ console.error("Error removing skill with ID '" + skillId + "': ", error);
 });
 }
 }
-
 // Load skills from Firebase
 async function loadSkillsFromFirebase() {
 try {
@@ -2508,7 +2554,6 @@ loadSkillGrid();
 console.error("Error loading skills: ", error);
 }
 }
-
 // Load skill grid for user interface
 function loadSkillGrid() {
 const gridElement = document.getElementById('skill-grid');
@@ -2533,7 +2578,6 @@ ${isCompleted ? 'Review' : 'Start'} Learning
 });
 gridElement.innerHTML = html;
 }
-
 // Load detail view for a specific skill
 function loadSkillDetail(skillId) {
 document.getElementById('skill-grid').style.display = 'none';
@@ -2631,7 +2675,6 @@ this.classList.add('selected');
 });
 });
 }
-
 // Check quiz answers
 function checkQuiz(skillId) {
 const skill = skillsData.find(s => s.id === skillId);
@@ -2686,28 +2729,23 @@ Score: ${score}/${totalQuestions} (${percentage}%)
 You need at least 70% to pass. Try again!`);
 }
 }
-
 // Settings tab functionality
 document.querySelectorAll('.tab-button').forEach(button => {
-    button.addEventListener('click', function() {
-        const tabName = this.getAttribute('data-tab');
-
-        // Remove active class from all buttons and tabs
-        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-
-        // Add active class to clicked button and corresponding tab
-        this.classList.add('active');
-        document.getElementById(`${tabName}Tab`).classList.add('active');
-
-        // --- ADD THIS CONDITIONAL CALL ---
-        if (tabName === 'adminAccess') {
-            loadAdminList(); // Load admin list specifically when the Admin Access tab is clicked
-        }
-        // --- END OF ADDITION ---
-    });
+button.addEventListener('click', function() {
+const tabName = this.getAttribute('data-tab');
+// Remove active class from all buttons and tabs
+document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+// Add active class to clicked button and corresponding tab
+this.classList.add('active');
+document.getElementById(`${tabName}Tab`).classList.add('active');
+// --- ADD THIS CONDITIONAL CALL ---
+if (tabName === 'adminAccess') {
+loadAdminList(); // Load admin list specifically when the Admin Access tab is clicked
+}
+// --- END OF ADDITION ---
+});
 });
 </script>
 </body>
 </html>
-
