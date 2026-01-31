@@ -920,122 +920,6 @@ top: 50px;
 right: 10px;
 }
 }
-/* Notification Container */
-.notification-container {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 3500; /* Lower than the confirmation modal but higher than other UI elements */
-    display: flex;
-    flex-direction: column;
-    gap: 10px; /* Space between notifications if multiple appear */
-}
-
-/* Individual Notification Style */
-.notification {
-    padding: 15px 20px;
-    border-radius: 5px;
-    color: white;
-    font-weight: 500;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    opacity: 0;
-    transform: translateX(100%);
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    max-width: 300px; /* Limit width */
-    word-wrap: break-word;
-}
-
-/* Fade-in and slide-in animation */
-.notification.show {
-    opacity: 1;
-    transform: translateX(0);
-}
-
-/* Success Notification Color */
-.notification.success {
-    background-color: var(--success); /* Use your defined success color */
-}
-
-/* Error/Info Notification Color */
-.notification.error {
-    background-color: var(--danger); /* Use your defined danger color */
-}
-
-/* Warning Notification Color (optional) */
-.notification.warning {
-    background-color: var(--warning); /* Use your defined warning color */
-}
-
-/* Close button for notifications (optional) */
-.notification .close-btn {
-    float: right;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 1.2em;
-}
-/* Confirmation Modal Overlay */
-.confirmation-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 4000; /* Increased z-index to ensure it's on top of everything */
-    display: none; /* Hidden by default */
-}
-
-/* Confirmation Modal Box */
-.confirmation-modal {
-    background: white;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: var(--shadow);
-    width: 100%;
-    max-width: 450px;
-    text-align: center;
-    position: relative;
-}
-
-.confirmation-modal h3 {
-    margin-bottom: 1.5rem;
-    color: var(--danger); /* Use danger color for warnings */
-}
-
-.confirmation-modal p {
-    margin-bottom: 1.5rem;
-    color: var(--dark);
-}
-
-.confirmation-actions {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-}
-
-.confirmation-actions .btn {
-    flex: 1;
-    max-width: 150px; /* Limit button width */
-}
-
-.confirmation-actions .btn-confirm {
-    background: var(--danger); /* Use danger color for confirm */
-}
-
-.confirmation-actions .btn-confirm:hover {
-    background: #e53e3e; /* Darker danger on hover */
-}
-
-.confirmation-actions .btn-cancel {
-    background: var(--gray); /* Use gray for cancel */
-}
-
-.confirmation-actions .btn-cancel:hover {
-    background: #5a6268; /* Darker gray on hover */
-}
 </style>
 </head>
 <body>
@@ -1360,18 +1244,6 @@ right: 10px;
 <p>&copy; 2026 Hand Skills Learning Platform | Master Essential Hands-On Skills</p>
 </div>
 </footer>
-<!-- Notification Container -->
-<div class="notification-container" id="notificationContainer"></div>
-<div class="confirmation-overlay" id="confirmationOverlay">
-    <div class="confirmation-modal">
-        <h3>Confirm Action</h3>
-        <p id="confirmationMessage">Are you sure you want to perform this action?</p>
-        <div class="confirmation-actions">
-            <button class="btn btn-confirm" id="confirmActionBtn" onclick="executePendingAction()">Confirm</button>
-            <button class="btn btn-cancel" onclick="closeConfirmationModal()">Cancel</button>
-        </div>
-    </div>
-</div>
 </div>
 <script>
 // Initialize Firebase
@@ -1400,7 +1272,7 @@ let isAdmin = false; // Track if current user is admin
 let ranksData = []; // Store ranks from Firestore
 let coursesData = []; // Store courses from Firestore
 let wasInAdminView = false; // Track if we were in admin view before switching
-let pendingRevokeAction = null; // Variable to hold the action to perform after confirmation
+// Initialize the app
 // Initialize the app
 window.onload = function() {
 // Check if user is already logged in
@@ -1424,79 +1296,6 @@ document.getElementById('loginBtn').style.display = 'block';
 // Load ranks and courses from Firestore
 loadRanksAndCourses();
 };
-
-// Function to show a notification popup
-// Function to show a notification popup
-function showNotification(message, type = 'info') { // Default type is 'info', can be 'success', 'error', 'warning'
-    const container = document.getElementById('notificationContainer');
-
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-
-    // Optional close button
-    const closeButton = document.createElement('span');
-    closeButton.className = 'close-btn';
-    closeButton.innerHTML = '&times;';
-    closeButton.onclick = () => removeNotification(notification);
-    notification.appendChild(closeButton);
-
-    const textNode = document.createTextNode(' ' + message); // Add space after close button
-    notification.appendChild(textNode);
-
-    container.appendChild(notification);
-
-    // Trigger the show animation after a brief delay to allow the element to be added to the DOM
-    setTimeout(() => {
-        notification.classList.add('show');
-    }, 10);
-
-    // Auto-remove the notification after a delay (e.g., 5 seconds)
-    setTimeout(() => {
-        removeNotification(notification);
-    }, 5000); // 5000 milliseconds = 5 seconds
-}
-
-// Function to remove a notification with fade-out animation
-function removeNotification(notificationElement) {
-    notificationElement.classList.remove('show');
-    setTimeout(() => {
-        if (notificationElement.parentNode) {
-            notificationElement.parentNode.removeChild(notificationElement);
-        }
-    }, 300); // Match the transition duration for smooth removal
-}
-
-// Function to show the confirmation modal
-function showConfirmationModal(message, actionCallback) {
-    const overlay = document.getElementById('confirmationOverlay');
-    const messageElement = document.getElementById('confirmationMessage');
-    const confirmBtn = document.getElementById('confirmActionBtn');
-
-    messageElement.textContent = message;
-    pendingRevokeAction = actionCallback; // Store the action to call if confirmed
-
-    overlay.style.display = 'flex'; // Show the modal
-    console.log("Show confirmation modal called"); // Debug log
-}
-
-// Function to hide the confirmation modal
-function closeConfirmationModal() {
-    const overlay = document.getElementById('confirmationOverlay');
-    overlay.style.display = 'none'; // Hide the modal
-    pendingRevokeAction = null; // Clear the pending action
-    console.log("Close confirmation modal called"); // Debug log
-}
-
-// Function to handle the confirmed action (e.g., revoking admin access)
-function executePendingAction() {
-    console.log("Execute pending action called, pending action exists:", !!pendingRevokeAction); // Debug log
-    if (pendingRevokeAction && typeof pendingRevokeAction === 'function') {
-        pendingRevokeAction(); // Execute the stored action
-        closeConfirmationModal(); // Close the modal after execution
-    } else {
-        console.warn("No pending action to execute or it's not a function.");
-    }
-}
 // Load ranks and courses from Firestore
 async function loadRanksAndCourses() {
 try {
@@ -1902,15 +1701,14 @@ function setupFirestoreListeners() {
 async function grantAdminAccess() {
     const email = document.getElementById('admin-email').value;
     if (!email) {
-        // Use the new notification system for errors too
-        showNotification('Please enter an email address', 'error');
+        alert('Please enter an email address');
         return;
     }
     try {
         // Find user by email
         const userQuery = await db.collection("users").where("email", "==", email).get();
         if (userQuery.empty) {
-            showNotification('User not found', 'error');
+            alert('User not found');
             return;
         }
         const userDoc = userQuery.docs[0];
@@ -1925,87 +1723,74 @@ async function grantAdminAccess() {
 
         // Clear the input field
         document.getElementById('admin-email').value = '';
-        // Use the new notification system
-        showNotification('Admin access granted successfully!', 'success');
+        alert('Admin access granted successfully!');
 
-        // Reload the admin list immediately
-        loadAdminList();
+        // --- ADD THIS LINE ---
+        loadAdminList(); // Reload the admin list immediately
+        // --- END OF ADDITION ---
 
     } catch (error) {
         console.error("Error granting admin access: ", error);
-        // Use the new notification system for errors
-        showNotification('Error granting admin access: ' + error.message, 'error');
+        alert('Error granting admin access: ' + error.message);
     }
 }
 // Load admin list
 async function loadAdminList() {
+try {
+const snapshot = await db.collection("admins").get();
+const adminList = document.getElementById('adminList');
+// --- IMPROVED CONTENT GENERATION ---
+let adminItemsHTML = '<h3 class="section-title">Current Admins</h3>';
+if (snapshot.empty) {
+adminItemsHTML += '<p>No admins found.</p>';
+} else {
+// Fetch user details for each admin UID to get email/name if needed
+const adminPromises = snapshot.docs.map(async (doc) => {
+const adminId = doc.id; // This is the user UID
+const userData = await db.collection("users").doc(adminId).get();
+if (userData.exists) {
+return { uid: adminId, email: userData.data().email, name: userData.data().name }; // Include name if desired
+} else {
+// Fallback if user doesn't exist in users collection anymore
+const adminData = doc.data();
+return { uid: adminId, email: adminData.email || 'Unknown Email', name: 'Unknown User' };
+}
+});
+const adminDetails = await Promise.all(adminPromises);
+adminDetails.forEach(admin => {
+adminItemsHTML += `
+<div style="background: var(--light); padding: 1rem; margin: 0.5rem 0; border-radius: 5px; display: flex; justify-content: space-between; align-items: center;">
+<span>${admin.email} (${admin.name})</span> <!-- Display email and name -->
+<button class="btn btn-secondary" onclick="revokeAdminAccess('${admin.uid}', '${admin.email}')" style="width: auto; padding: 0.5rem 1rem;">Revoke</button>
+</div>
+`;
+});
+}
+adminList.innerHTML = adminItemsHTML;
+// --- END OF IMPROVEMENT ---
+} catch (error) {
+console.error("Error loading admin list: ", error);
+document.getElementById('adminList').innerHTML = '<p>Error loading admin list.</p>';
+}
+}
+// Revoke admin access
+async function revokeAdminAccess(adminId, email) {
+    if (!confirm(`Are you sure you want to revoke admin access for ${email}?`)) {
+        return;
+    }
     try {
-        const snapshot = await db.collection("admins").get();
-        const adminList = document.getElementById('adminList');
-        // --- IMPROVED CONTENT GENERATION ---
-        let adminItemsHTML = '<h3 class="section-title">Current Admins</h3>';
-        if (snapshot.empty) {
-            adminItemsHTML += '<p>No admins found.</p>';
-        } else {
-            // Fetch user details for each admin UID to get email/name if needed
-            const adminPromises = snapshot.docs.map(async (doc) => {
-                const adminId = doc.id; // This is the user UID
-                const userData = await db.collection("users").doc(adminId).get();
-                if (userData.exists) {
-                    return { uid: adminId, email: userData.data().email, name: userData.data().name }; // Include name if desired
-                } else {
-                    // Fallback if user doesn't exist in users collection anymore
-                    const adminData = doc.data();
-                    return { uid: adminId, email: adminData.email || 'Unknown Email', name: 'Unknown User' };
-                }
-            });
-            const adminDetails = await Promise.all(adminPromises);
+        await db.collection("admins").doc(adminId).delete();
+        alert('Admin access revoked successfully!');
 
-            adminDetails.forEach(admin => {
-                // --- CORRECTED ONCLICK CALL ---
-                // The onclick now correctly calls the NEW revokeAdminAccess function
-                adminItemsHTML += `
-                    <div style="background: var(--light); padding: 1rem; margin: 0.5rem 0; border-radius: 5px; display: flex; justify-content: space-between; align-items: center;">
-                        <span>${admin.email} (${admin.name})</span> <!-- Display email and name -->
-                        <button class="btn btn-secondary" onclick="revokeAdminAccess('${admin.uid}', '${admin.email}')" style="width: auto; padding: 0.5rem 1rem;">Revoke</button>
-                    </div>
-                `;
-                // --- END OF CORRECTION ---
-            });
-        }
-        adminList.innerHTML = adminItemsHTML;
-        // --- END OF IMPROVEMENT ---
+        // --- ADD THIS LINE ---
+        loadAdminList(); // Reload the admin list immediately
+        // --- END OF ADDITION ---
+
     } catch (error) {
-        console.error("Error loading admin list: ", error);
-        document.getElementById('adminList').innerHTML = '<p>Error loading admin list.</p>';
+        console.error("Error revoking admin access: ", error);
+        alert('Error revoking admin access: ' + error.message);
     }
 }
-// Revoke admin access - MODIFIED TO USE CONFIRMATION MODAL AND NOTIFICATIONS
-async function revokeAdminAccess(adminId, email) {
-    // Prepare the confirmation message
-    const confirmationMessage = `Are you sure you want to revoke admin access for ${email}?`;
-
-    // Prepare the action to perform if confirmed
-    const revokeAction = async () => {
-        try {
-            await db.collection("admins").doc(adminId).delete();
-            // Use the new notification system
-            showNotification('Admin access revoked successfully!', 'success');
-
-            // Reload the admin list immediately
-            loadAdminList();
-
-        } catch (error) {
-            console.error("Error revoking admin access: ", error);
-            // Use the new notification system for errors
-            showNotification('Error revoking admin access: ' + error.message, 'error');
-        }
-    };
-
-    // Show the confirmation modal with the message and action
-    showConfirmationModal(confirmationMessage, revokeAction);
-}
-
 // Load signup settings
 async function loadSignupSettings() {
     try {
@@ -3178,14 +2963,3 @@ loadAdminList(); // Load admin list specifically when the Admin Access tab is cl
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
