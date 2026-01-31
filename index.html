@@ -1934,42 +1934,46 @@ async function grantAdminAccess() {
 }
 // Load admin list
 async function loadAdminList() {
-try {
-const snapshot = await db.collection("admins").get();
-const adminList = document.getElementById('adminList');
-// --- IMPROVED CONTENT GENERATION ---
-let adminItemsHTML = '<h3 class="section-title">Current Admins</h3>';
-if (snapshot.empty) {
-adminItemsHTML += '<p>No admins found.</p>';
-} else {
-// Fetch user details for each admin UID to get email/name if needed
-const adminPromises = snapshot.docs.map(async (doc) => {
-const adminId = doc.id; // This is the user UID
-const userData = await db.collection("users").doc(adminId).get();
-if (userData.exists) {
-return { uid: adminId, email: userData.data().email, name: userData.data().name }; // Include name if desired
-} else {
-// Fallback if user doesn't exist in users collection anymore
-const adminData = doc.data();
-return { uid: adminId, email: adminData.email || 'Unknown Email', name: 'Unknown User' };
-}
-});
-const adminDetails = await Promise.all(adminPromises);
-adminDetails.forEach(admin => {
-adminItemsHTML += `
-<div style="background: var(--light); padding: 1rem; margin: 0.5rem 0; border-radius: 5px; display: flex; justify-content: space-between; align-items: center;">
-<span>${admin.email} (${admin.name})</span> <!-- Display email and name -->
-<button class="btn btn-secondary" onclick="revokeAdminAccess('${admin.uid}', '${admin.email}')" style="width: auto; padding: 0.5rem 1rem;">Revoke</button>
-</div>
-`;
-});
-}
-adminList.innerHTML = adminItemsHTML;
-// --- END OF IMPROVEMENT ---
-} catch (error) {
-console.error("Error loading admin list: ", error);
-document.getElementById('adminList').innerHTML = '<p>Error loading admin list.</p>';
-}
+    try {
+        const snapshot = await db.collection("admins").get();
+        const adminList = document.getElementById('adminList');
+        // --- IMPROVED CONTENT GENERATION ---
+        let adminItemsHTML = '<h3 class="section-title">Current Admins</h3>';
+        if (snapshot.empty) {
+            adminItemsHTML += '<p>No admins found.</p>';
+        } else {
+            // Fetch user details for each admin UID to get email/name if needed
+            const adminPromises = snapshot.docs.map(async (doc) => {
+                const adminId = doc.id; // This is the user UID
+                const userData = await db.collection("users").doc(adminId).get();
+                if (userData.exists) {
+                    return { uid: adminId, email: userData.data().email, name: userData.data().name }; // Include name if desired
+                } else {
+                    // Fallback if user doesn't exist in users collection anymore
+                    const adminData = doc.data();
+                    return { uid: adminId, email: adminData.email || 'Unknown Email', name: 'Unknown User' };
+                }
+            });
+            const adminDetails = await Promise.all(adminPromises);
+
+            adminDetails.forEach(admin => {
+                // --- CORRECTED ONCLICK CALL ---
+                // The onclick now correctly calls the NEW revokeAdminAccess function
+                adminItemsHTML += `
+                    <div style="background: var(--light); padding: 1rem; margin: 0.5rem 0; border-radius: 5px; display: flex; justify-content: space-between; align-items: center;">
+                        <span>${admin.email} (${admin.name})</span> <!-- Display email and name -->
+                        <button class="btn btn-secondary" onclick="revokeAdminAccess('${admin.uid}', '${admin.email}')" style="width: auto; padding: 0.5rem 1rem;">Revoke</button>
+                    </div>
+                `;
+                // --- END OF CORRECTION ---
+            });
+        }
+        adminList.innerHTML = adminItemsHTML;
+        // --- END OF IMPROVEMENT ---
+    } catch (error) {
+        console.error("Error loading admin list: ", error);
+        document.getElementById('adminList').innerHTML = '<p>Error loading admin list.</p>';
+    }
 }
 // Revoke admin access - MODIFIED TO USE CONFIRMATION MODAL
 async function revokeAdminAccess(adminId, email) {
@@ -3169,6 +3173,7 @@ loadAdminList(); // Load admin list specifically when the Admin Access tab is cl
 </script>
 </body>
 </html>
+
 
 
 
