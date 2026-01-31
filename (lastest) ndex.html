@@ -773,20 +773,16 @@ border-radius: 8px;
 padding: 1rem;
 text-align: center;
 transition: var(--transition);
-display: flex;
-flex-direction: column;
-align-items: center;
 }
 .tool-item:hover {
 background: var(--primary);
 color: white;
 }
 .tool-item img { /* New selector for tool image in detail view */
-width: 80px; /* Increased size */
-height: 80px;
+width: 50px; /* Adjust size as needed */
+height: 50px;
 object-fit: cover;
 margin-bottom: 0.5rem;
-border-radius: 5px; /* Optional: round the image corners */
 }
 .tool-item:hover img { /* Adjust hover color if needed */
 opacity: 0.8; /* Example hover effect */
@@ -1271,6 +1267,7 @@ z-index: 3001; /* Ensure it's above other modals */
 <div class="form-actions">
 <button class="btn btn-secondary" onclick="cancelEdit()">Cancel</button>
 <button class="btn" onclick="saveSkill()">Save Changes</button>
+</div>
 </div>
 </div>
 </div>
@@ -2862,85 +2859,99 @@ addQuizQuestionToForm(idx, question);
 }
 }
 // Save skill
+// Save skill
 async function saveSkill() {
-// Update current skill with form values
-currentEditingSkill.name = document.getElementById('edit-skill-name').value;
+    // Update current skill with form values
+    currentEditingSkill.name = document.getElementById('edit-skill-name').value;
 
-// --- HANDLE SKILL IMAGE UPLOAD ---
-const skillImageFile = document.getElementById('edit-skill-image').files[0];
-let skillImageUrl = document.getElementById('edit-skill-image-url').value; // Get existing URL
-if (skillImageFile) {
-skillImageUrl = await uploadSkillImage(skillImageFile); // Upload new file if selected
-if (!skillImageUrl) {
-alert("Error uploading skill image. Skill not saved.");
-return; // Stop saving if upload fails
+    // --- HANDLE SKILL IMAGE UPLOAD ---
+    const skillImageFile = document.getElementById('edit-skill-image').files[0]; // This gets the file object
+    let skillImageUrl = document.getElementById('edit-skill-image-url').value; // Get existing URL
+    if (skillImageFile) { // If a new file is selected
+        console.log("Uploading new skill image..."); // Debug log
+        skillImageUrl = await uploadSkillImage(skillImageFile); // Upload new file if selected
+        if (!skillImageUrl) {
+            alert("Error uploading skill image. Skill not saved.");
+            console.error("Failed to get skill image URL from uploadSkillImage"); // Debug log
+            return; // Stop saving if upload fails
+        }
+    } else {
+        // If no new file selected, keep the existing URL stored in the hidden field
+        console.log("No new skill image selected, keeping existing URL:", skillImageUrl); // Debug log
+    }
+    currentEditingSkill.imageUrl = skillImageUrl; // Store the final URL (existing or new)
+
+    // --- HANDLE TOOLS UPLOAD ---
+    const toolsContainer = document.getElementById('tools-container');
+    currentEditingSkill.tools = []; // Reset tools array
+    let toolIndex = 0;
+    while (true) { // Loop through potential tool inputs until one doesn't exist
+        const toolNameInput = document.getElementById(`tool-name-${toolIndex}`);
+        const toolImageFileInput = document.getElementById(`tool-image-${toolIndex}`);
+        const toolImageUrlHidden = document.getElementById(`tool-image-url-${toolIndex}`); // Get the hidden input for existing URL
+
+        if (!toolNameInput) break; // No more tool inputs found
+
+        let toolImageUrl = toolImageUrlHidden ? toolImageUrlHidden.value : ''; // Get existing URL from hidden input
+        const toolImageFile = toolImageFileInput ? toolImageFileInput.files[0] : null; // Get the file object if input exists
+
+        if (toolImageFile) { // If a new file is selected for this tool
+            console.log(`Uploading new image for tool ${toolIndex + 1}...`); // Debug log
+            toolImageUrl = await uploadToolImage(toolImageFile); // Upload new file if selected
+            if (!toolImageUrl) {
+                alert(`Error uploading image for tool ${toolIndex + 1}. Skill not saved.`);
+                console.error(`Failed to get tool image URL for tool ${toolIndex + 1}`); // Debug log
+                return; // Stop saving if upload fails
+            }
+        } else {
+             // If no new file selected for this tool, keep the existing URL from the hidden input
+             console.log(`No new image for tool ${toolIndex + 1}, keeping existing URL:`, toolImageUrl); // Debug log
+        }
+
+        currentEditingSkill.tools.push({
+            name: toolNameInput.value,
+            imageUrl: toolImageUrl
+        });
+
+        toolIndex++;
+    }
+
+    currentEditingSkill.description = document.getElementById('edit-skill-description').value;
+    // currentEditingSkill.tools handled above
+    currentEditingSkill.theory = document.getElementById('edit-theory').value;
+
+    console.log("Attempting to save skill to Firestore:", currentEditingSkill); // Debug log
+
+    // If it's a new skill, add to Firestore
+    if (!currentEditingSkill.id) {
+        db.collection("skills").add(currentEditingSkill)
+            .then((docRef) => {
+                console.log("Skill added with ID: ", docRef.id); // Debug log
+                alert('Skill saved successfully!');
+                document.getElementById('edit-skill-form').style.display = 'none';
+                document.getElementById('skills-section').style.display = 'block';
+                showSection('skills'); // This will trigger loadSkillsList
+            })
+            .catch((error) => {
+                console.error("Error adding skill to Firestore: ", error); // More specific error log
+                alert('Error saving skill to database: ' + error.message);
+            });
+    } else {
+        // Update existing skill in Firestore
+        db.collection("skills").doc(currentEditingSkill.id).set(currentEditingSkill)
+            .then(() => {
+                console.log("Skill updated with ID: ", currentEditingSkill.id); // Debug log
+                alert('Skill updated successfully!');
+                document.getElementById('edit-skill-form').style.display = 'none';
+                document.getElementById('skills-section').style.display = 'block';
+                showSection('skills'); // This will trigger loadSkillsList
+            })
+            .catch((error) => {
+                console.error("Error updating skill in Firestore: ", error); // More specific error log
+                alert('Error saving skill to database: ' + error.message);
+            });
+    }
 }
-}
-currentEditingSkill.imageUrl = skillImageUrl; // Store the final URL
-
-// --- HANDLE TOOLS UPLOAD ---
-const toolsContainer = document.getElementById('tools-container');
-currentEditingSkill.tools = []; // Reset tools array
-let toolIndex = 0;
-while (true) { // Loop through potential tool inputs until one doesn't exist
-const toolNameInput = document.getElementById(`tool-name-${toolIndex}`);
-const toolImageFileInput = document.getElementById(`tool-image-${toolIndex}`);
-const toolImageUrlHidden = document.getElementById(`tool-image-url-${toolIndex}`);
-
-if (!toolNameInput) break; // No more tool inputs found
-
-let toolImageUrl = toolImageUrlHidden ? toolImageUrlHidden.value : ''; // Get existing URL
-if (toolImageFileInput && toolImageFileInput.files[0]) {
-toolImageUrl = await uploadToolImage(toolImageFileInput.files[0]); // Upload new file if selected
-if (!toolImageUrl) {
-alert(`Error uploading image for tool ${toolIndex + 1}. Skill not saved.`);
-return; // Stop saving if upload fails
-}
-}
-
-currentEditingSkill.tools.push({
-name: toolNameInput.value,
-imageUrl: toolImageUrl
-});
-
-toolIndex++;
-}
-
-// --- END HANDLE TOOLS UPLOAD ---
-
-currentEditingSkill.description = document.getElementById('edit-skill-description').value;
-// currentEditingSkill.tools handled above
-currentEditingSkill.theory = document.getElementById('edit-theory').value;
-
-// If it's a new skill, add to Firestore
-if (!currentEditingSkill.id) {
-db.collection("skills").add(currentEditingSkill)
-.then((docRef) => {
-alert('Skill saved successfully!');
-document.getElementById('edit-skill-form').style.display = 'none';
-document.getElementById('skills-section').style.display = 'block';
-showSection('skills'); // This will trigger loadSkillsList
-})
-.catch((error) => {
-console.error("Error adding skill: ", error);
-alert('Error saving skill');
-});
-} else {
-// Update existing skill in Firestore
-db.collection("skills").doc(currentEditingSkill.id).set(currentEditingSkill)
-.then(() => {
-alert('Skill updated successfully!');
-document.getElementById('edit-skill-form').style.display = 'none';
-document.getElementById('skills-section').style.display = 'block';
-showSection('skills'); // This will trigger loadSkillsList
-})
-.catch((error) => {
-console.error("Error updating skill: ", error);
-alert('Error saving skill');
-});
-}
-}
-
 // Delete skill
 function deleteSkill(skillId) {
 if (!skillId) {
@@ -3104,12 +3115,6 @@ this.classList.add('selected');
 });
 });
 }
-// --- NEW FUNCTION: Go Back to Skills Grid ---
-function goBackToGrid() {
-document.getElementById('skill-detail').style.display = 'none';
-document.getElementById('skill-grid').style.display = 'block';
-}
-// --- END NEW FUNCTION ---
 // Check quiz answers
 function checkQuiz(skillId) {
 const skill = skillsData.find(s => s.id === skillId);
@@ -3185,3 +3190,4 @@ loadAdminList(); // Load admin list specifically when the Admin Access tab is cl
 </script>
 </body>
 </html>
+
