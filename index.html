@@ -1631,7 +1631,6 @@ alert('Error updating rank: ' + error.message);
 }
 }
 // Setup Firestore listeners to sync data in real-time
-// Setup Firestore listeners to sync data in real-time
 function setupFirestoreListeners() {
     // Listen for changes in skills collection
     db.collection("skills").onSnapshot((snapshot) => {
@@ -1663,43 +1662,41 @@ function setupFirestoreListeners() {
         //     loadSkillGrid(); // This might also use sorted skillsData
         // }
     });
-    // ... rest of the listeners remain the same ...
-}
-// Listen for changes in users collection
-db.collection("users").onSnapshot((snapshot) => {
-usersData = [];
-snapshot.forEach(doc => {
-usersData.push({ id: doc.id, ...doc.data() });
-});
-// Refresh user management section if currently active
-if (document.getElementById('users-section').style.display === 'block') {
-loadUsersManagement();
-}
-});
-// Listen for changes in admins collection
-db.collection("admins").onSnapshot((snapshot) => {
-// Refresh admin access section if currently active
-if (document.getElementById('adminAccessTab').style.display === 'block') {
-loadAdminList();
-}
-});
-// Listen for changes in ranks collection
-db.collection("ranks").onSnapshot((snapshot) => {
-loadRanksAndCourses(); // Reload ranks and courses
-// Refresh signup settings section if currently active
-if (document.getElementById('settings-section').style.display === 'block') {
-loadSignupSettings();
-}
-});
-// Listen for changes in courses collection
-db.collection("courses").onSnapshot((snapshot) => {
-loadRanksAndCourses(); // Reload ranks and courses
-// Refresh signup settings section if currently active
-if (document.getElementById('settings-section').style.display === 'block') {
-loadSignupSettings();
-}
-});
-}
+    // Listen for changes in users collection
+    db.collection("users").onSnapshot((snapshot) => {
+        usersData = [];
+        snapshot.forEach(doc => {
+            usersData.push({ id: doc.id, ...doc.data() });
+        });
+        // Refresh user management section if currently active
+        if (document.getElementById('users-section').style.display === 'block') {
+            loadUsersManagement();
+        }
+    });
+    // Listen for changes in admins collection
+    db.collection("admins").onSnapshot((snapshot) => {
+        // Refresh admin access section if currently active
+        if (document.getElementById('adminAccessTab').style.display === 'block') {
+            loadAdminList();
+        }
+    });
+    // Listen for changes in ranks collection
+    db.collection("ranks").onSnapshot((snapshot) => {
+        loadRanksAndCourses(); // Reload ranks and courses
+        // Refresh signup settings section if currently active
+        if (document.getElementById('settings-section').style.display === 'block') {
+            loadSignupSettings();
+        }
+    });
+    // Listen for changes in courses collection
+    db.collection("courses").onSnapshot((snapshot) => {
+        loadRanksAndCourses(); // Reload ranks and courses
+        // Refresh signup settings section if currently active
+        if (document.getElementById('settings-section').style.display === 'block') {
+            loadSignupSettings();
+        }
+    });
+} // <-- This closing brace was missing!
 // Grant admin access to another user
 async function grantAdminAccess() {
     const email = document.getElementById('admin-email').value;
