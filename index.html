@@ -920,6 +920,14 @@ top: 50px;
 right: 10px;
 }
 }
+
+/* Confirmation Modal */
+.login-popup.confirmation-modal {
+    /* Inherits basic styles from .login-popup */
+    z-index: 3001; /* Ensure it's above other modals */
+}
+/* No specific additional styling needed unless customization is desired */
+
 </style>
 </head>
 <body>
@@ -1057,6 +1065,21 @@ right: 10px;
 <div class="error-message" id="auth-error"></div>
 </div>
 </div>
+
+<!-- Confirmation Modal for Revoking Admin Access -->
+<div class="login-popup confirmation-modal" id="confirmRevokeModal" style="display: none;">
+    <div class="login-box">
+        <span class="close-btn" onclick="closeConfirmRevokeModal()">&times;</span>
+        <h2><i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i> Confirm Revoke</h2>
+        <p id="confirm-revoke-message">Are you sure you want to revoke admin access?</p>
+        <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+            <button class="btn btn-secondary" onclick="closeConfirmRevokeModal()" style="flex: 1;">Cancel</button>
+            <button class="btn" style="background: var(--danger); flex: 1;" onclick="performRevokeAdmin()">Revoke</button>
+        </div>
+        <div class="error-message" id="revoke-confirm-error"></div>
+    </div>
+</div>
+
 <!-- Admin Dashboard -->
 <div class="admin-dashboard" id="adminDashboard">
 <div class="container">
@@ -1272,8 +1295,13 @@ let isAdmin = false; // Track if current user is admin
 let ranksData = []; // Store ranks from Firestore
 let coursesData = []; // Store courses from Firestore
 let wasInAdminView = false; // Track if we were in admin view before switching
-let pendingRevokeAdminId = null; // To store the ID of the admin to potentially revoke
-let pendingRevokeAdminEmail = null; // To store the email of the admin to potentially revoke
+
+// --- NEW VARIABLES FOR REVOKE CONFIRMATION ---
+let pendingRevokeAdminId = null;
+let pendingRevokeAdminEmail = null;
+// --- END NEW VARIABLES ---
+
+// Initialize the app
 // Initialize the app
 window.onload = function() {
 // Check if user is already logged in
@@ -1633,107 +1661,102 @@ alert('Error updating rank: ' + error.message);
 }
 // Setup Firestore listeners to sync data in real-time
 function setupFirestoreListeners() {
-    // Listen for changes in skills collection
-    db.collection("skills").onSnapshot((snapshot) => {
-        skillsData = [];
-        snapshot.forEach(doc => {
-            skillsData.push({ id: doc.id, ...doc.data() });
-        });
-        // --- CORRECTED SORTING LOGIC ---
-        // Sort by 'order' field, handling potentially missing 'order' values gracefully
-        // Assign a high default value (like the current length) if 'order' is missing or null/undefined
-        skillsData.sort((a, b) => {
-            const orderA = a.order !== undefined && a.order !== null ? a.order : Infinity; // Or use a large number
-            const orderB = b.order !== undefined && b.order !== null ? b.order : Infinity;
-            return orderA - orderB;
-        });
-        // --- END OF CORRECTION ---
-
-        updateCounters();
-        // Update user interface if visible
-        if (document.getElementById('userInterface').style.display === 'block') {
-            loadSkillGrid(); // This will now use the sorted skillsData
-        }
-        // Update admin list if currently viewing the skills section
-        if (document.getElementById('skills-section').style.display === 'block') {
-            loadSkillsList(); // This will also use the sorted skillsData
-        }
-        // Update user preview if currently viewing (if applicable)
-        // if (document.getElementById('user-preview-section').style.display === 'block') {
-        //     loadSkillGrid(); // This might also use sorted skillsData
-        // }
-    });
-    // Listen for changes in users collection
-    db.collection("users").onSnapshot((snapshot) => {
-        usersData = [];
-        snapshot.forEach(doc => {
-            usersData.push({ id: doc.id, ...doc.data() });
-        });
-        // Refresh user management section if currently active
-        if (document.getElementById('users-section').style.display === 'block') {
-            loadUsersManagement();
-        }
-    });
-    // Listen for changes in admins collection
-    db.collection("admins").onSnapshot((snapshot) => {
-        // Refresh admin access section if currently active
-        if (document.getElementById('adminAccessTab').style.display === 'block') {
-            loadAdminList();
-        }
-    });
-    // Listen for changes in ranks collection
-    db.collection("ranks").onSnapshot((snapshot) => {
-        loadRanksAndCourses(); // Reload ranks and courses
-        // Refresh signup settings section if currently active
-        if (document.getElementById('settings-section').style.display === 'block') {
-            loadSignupSettings();
-        }
-    });
-    // Listen for changes in courses collection
-    db.collection("courses").onSnapshot((snapshot) => {
-        loadRanksAndCourses(); // Reload ranks and courses
-        // Refresh signup settings section if currently active
-        if (document.getElementById('settings-section').style.display === 'block') {
-            loadSignupSettings();
-        }
-    });
+// Listen for changes in skills collection
+db.collection("skills").onSnapshot((snapshot) => {
+skillsData = [];
+snapshot.forEach(doc => {
+skillsData.push({ id: doc.id, ...doc.data() });
+});
+// --- CORRECTED SORTING LOGIC ---
+// Sort by 'order' field, handling potentially missing 'order' values gracefully
+// Assign a high default value (like the current length) if 'order' is missing or null/undefined
+skillsData.sort((a, b) => {
+const orderA = a.order !== undefined && a.order !== null ? a.order : Infinity; // Or use a large number
+const orderB = b.order !== undefined && b.order !== null ? b.order : Infinity;
+return orderA - orderB;
+});
+// --- END OF CORRECTION ---
+updateCounters();
+// Update user interface if visible
+if (document.getElementById('userInterface').style.display === 'block') {
+loadSkillGrid(); // This will now use the sorted skillsData
+}
+// Update admin list if currently viewing the skills section
+if (document.getElementById('skills-section').style.display === 'block') {
+loadSkillsList(); // This will also use the sorted skillsData
+}
+// Update user preview if currently viewing (if applicable)
+// if (document.getElementById('user-preview-section').style.display === 'block') {
+//     loadSkillGrid(); // This might also use sorted skillsData
+// }
+});
+// Listen for changes in users collection
+db.collection("users").onSnapshot((snapshot) => {
+usersData = [];
+snapshot.forEach(doc => {
+usersData.push({ id: doc.id, ...doc.data() });
+});
+// Refresh user management section if currently active
+if (document.getElementById('users-section').style.display === 'block') {
+loadUsersManagement();
+}
+});
+// Listen for changes in admins collection
+db.collection("admins").onSnapshot((snapshot) => {
+// Refresh admin access section if currently active
+if (document.getElementById('adminAccessTab').style.display === 'block') {
+loadAdminList();
+}
+});
+// Listen for changes in ranks collection
+db.collection("ranks").onSnapshot((snapshot) => {
+loadRanksAndCourses(); // Reload ranks and courses
+// Refresh signup settings section if currently active
+if (document.getElementById('settings-section').style.display === 'block') {
+loadSignupSettings();
+}
+});
+// Listen for changes in courses collection
+db.collection("courses").onSnapshot((snapshot) => {
+loadRanksAndCourses(); // Reload ranks and courses
+// Refresh signup settings section if currently active
+if (document.getElementById('settings-section').style.display === 'block') {
+loadSignupSettings();
+}
+});
 } // <-- This closing brace was missing!
 // Grant admin access to another user
 async function grantAdminAccess() {
-    const email = document.getElementById('admin-email').value;
-    if (!email) {
-        alert('Please enter an email address');
-        return;
-    }
-    try {
-        // Find user by email
-        const userQuery = await db.collection("users").where("email", "==", email).get();
-        if (userQuery.empty) {
-            alert('User not found');
-            return;
-        }
-        const userDoc = userQuery.docs[0];
-        const userId = userDoc.id;
-
-        // Add user to admins collection
-        await db.collection("admins").doc(userId).set({
-            email: email,
-            grantedBy: currentUser.email,
-            date: new Date()
-        });
-
-        // Clear the input field
-        document.getElementById('admin-email').value = '';
-        alert('Admin access granted successfully!');
-
-        // --- ADD THIS LINE ---
-        loadAdminList(); // Reload the admin list immediately
-        // --- END OF ADDITION ---
-
-    } catch (error) {
-        console.error("Error granting admin access: ", error);
-        alert('Error granting admin access: ' + error.message);
-    }
+const email = document.getElementById('admin-email').value;
+if (!email) {
+alert('Please enter an email address');
+return;
+}
+try {
+// Find user by email
+const userQuery = await db.collection("users").where("email", "==", email).get();
+if (userQuery.empty) {
+alert('User not found');
+return;
+}
+const userDoc = userQuery.docs[0];
+const userId = userDoc.id;
+// Add user to admins collection
+await db.collection("admins").doc(userId).set({
+email: email,
+grantedBy: currentUser.email,
+date: new Date()
+});
+// Clear the input field
+document.getElementById('admin-email').value = '';
+alert('Admin access granted successfully!');
+// --- ADD THIS LINE ---
+loadAdminList(); // Reload the admin list immediately
+// --- END OF ADDITION ---
+} catch (error) {
+console.error("Error granting admin access: ", error);
+alert('Error granting admin access: ' + error.message);
+}
 }
 // Load admin list
 async function loadAdminList() {
@@ -1774,8 +1797,8 @@ console.error("Error loading admin list: ", error);
 document.getElementById('adminList').innerHTML = '<p>Error loading admin list.</p>';
 }
 }
-// Revoke admin access
-// Revoke admin access - Updated to use modal
+
+// --- MODIFIED FUNCTION: Revoke admin access (uses modal now) ---
 async function revokeAdminAccess(adminId, email) {
     // Store the IDs for the actual revocation action
     pendingRevokeAdminId = adminId;
@@ -1790,378 +1813,324 @@ async function revokeAdminAccess(adminId, email) {
 
     // Show the confirmation modal
     document.getElementById('confirmRevokeModal').style.display = 'flex';
-
-    // Hide the admin access list container temporarily (optional, depending on desired UX)
-    // const adminList = document.getElementById('adminList');
-    // if (adminList) adminList.style.display = 'none';
 }
-// Performs the actual revocation after modal confirmation
-async function performRevokeAdmin() {
+// --- END MODIFIED FUNCTION ---
+
+// --- NEW FUNCTIONS: Handle the modal confirmation ---
+function performRevokeAdmin() {
     if (!pendingRevokeAdminId || !pendingRevokeAdminEmail) {
          console.error("Revoke operation lacks necessary data.");
          closeConfirmRevokeModal(); // Close modal anyway
          return; // Exit if data is missing
     }
 
-    try {
-        await db.collection("admins").doc(pendingRevokeAdminId).delete();
-        // Success feedback could go here if needed outside the list reload
-        // e.g., alert('Admin access revoked successfully!'); // This is still a browser alert, avoid if strictly in-browser is required
-        console.log('Admin access revoked successfully for:', pendingRevokeAdminEmail);
-
-        // Close the modal
-        closeConfirmRevokeModal();
-
-        // --- ADD THIS LINE ---
-        loadAdminList(); // Reload the admin list to reflect the change
-        // --- END OF ADDITION ---
-
-        // Clear pending IDs
-        pendingRevokeAdminId = null;
-        pendingRevokeAdminEmail = null;
-
-    } catch (error) {
-        console.error("Error revoking admin access: ", error);
-        // Display error message inside the modal
-        document.getElementById('revoke-confirm-error').textContent = 'Error revoking admin access: ' + error.message;
-    }
+    // Perform the revocation using stored IDs
+    db.collection("admins").doc(pendingRevokeAdminId).delete()
+        .then(() => {
+            console.log('Admin access revoked successfully for:', pendingRevokeAdminEmail);
+            // Close the modal
+            closeConfirmRevokeModal();
+            // Reload the admin list to reflect the change
+            loadAdminList();
+            // Clear pending IDs
+            pendingRevokeAdminId = null;
+            pendingRevokeAdminEmail = null;
+        })
+        .catch(error => {
+            console.error("Error revoking admin access: ", error);
+            // Display error message inside the modal
+            document.getElementById('revoke-confirm-error').textContent = 'Error revoking admin access: ' + error.message;
+        });
 }
-// Closes the confirmation modal
+
 function closeConfirmRevokeModal() {
     document.getElementById('confirmRevokeModal').style.display = 'none';
-    // Optionally, show the admin access list container again if it was hidden
-    // const adminList = document.getElementById('adminList');
-    // if (adminList) adminList.style.display = 'block'; // Adjust based on your layout needs
-
-     // Clear pending IDs when cancelled or closed
+    // Clear pending IDs when cancelled or closed
     pendingRevokeAdminId = null;
     pendingRevokeAdminEmail = null;
 }
+// --- END NEW FUNCTIONS ---
+
 // Load signup settings
 async function loadSignupSettings() {
-    try {
-        // Load ranks
-        const ranksSnapshot = await db.collection("ranks").orderBy("order").get();
-        const ranksList = document.getElementById('ranksList');
-        ranksList.innerHTML = '';
-
-        let rankItemsHTML = '';
-        ranksSnapshot.forEach((doc, index) => {
-            const rank = doc.data();
-            const isTop = index === 0;
-            const isBottom = index === ranksSnapshot.size - 1;
-
-            rankItemsHTML += `
-                <div class="setting-item">
-                    <span>${rank.name}</span>
-                    <div class="setting-actions">
-                        <button class="move-up-btn" ${isTop ? 'disabled' : ''} onclick="moveRankUp('${doc.id}', ${rank.order})" title="Move Up">
-                            <i class="fas fa-arrow-up"></i>
-                        </button>
-                        <button class="move-down-btn" ${isBottom ? 'disabled' : ''} onclick="moveRankDown('${doc.id}', ${rank.order})" title="Move Down">
-                            <i class="fas fa-arrow-down"></i>
-                        </button>
-                        <button class="delete-btn-setting" onclick="deleteRank('${doc.id}', '${rank.name}')">Delete</button>
-                    </div>
-                </div>
-            `;
-        });
-        ranksList.innerHTML = rankItemsHTML;
-
-        // Load courses
-        const coursesSnapshot = await db.collection("courses").orderBy("order").get();
-        const coursesList = document.getElementById('coursesList');
-        coursesList.innerHTML = '';
-
-        let courseItemsHTML = '';
-        coursesSnapshot.forEach((doc, index) => {
-            const course = doc.data();
-            const isTop = index === 0;
-            const isBottom = index === coursesSnapshot.size - 1;
-
-            courseItemsHTML += `
-                <div class="setting-item">
-                    <span>${course.name}</span>
-                    <div class="setting-actions">
-                        <button class="move-up-btn" ${isTop ? 'disabled' : ''} onclick="moveCourseUp('${doc.id}', ${course.order})" title="Move Up">
-                            <i class="fas fa-arrow-up"></i>
-                        </button>
-                        <button class="move-down-btn" ${isBottom ? 'disabled' : ''} onclick="moveCourseDown('${doc.id}', ${course.order})" title="Move Down">
-                            <i class="fas fa-arrow-down"></i>
-                        </button>
-                        <button class="delete-btn-setting" onclick="deleteCourse('${doc.id}', '${course.name}')">Delete</button>
-                    </div>
-                </div>
-            `;
-        });
-        coursesList.innerHTML = courseItemsHTML;
-    } catch (error) {
-        console.error("Error loading signup settings: ", error);
-    }
+try {
+// Load ranks
+const ranksSnapshot = await db.collection("ranks").orderBy("order").get();
+const ranksList = document.getElementById('ranksList');
+ranksList.innerHTML = '';
+let rankItemsHTML = '';
+ranksSnapshot.forEach((doc, index) => {
+const rank = doc.data();
+const isTop = index === 0;
+const isBottom = index === ranksSnapshot.size - 1;
+rankItemsHTML += `
+<div class="setting-item">
+<span>${rank.name}</span>
+<div class="setting-actions">
+<button class="move-up-btn" ${isTop ? 'disabled' : ''} onclick="moveRankUp('${doc.id}', ${rank.order})" title="Move Up">
+<i class="fas fa-arrow-up"></i>
+</button>
+<button class="move-down-btn" ${isBottom ? 'disabled' : ''} onclick="moveRankDown('${doc.id}', ${rank.order})" title="Move Down">
+<i class="fas fa-arrow-down"></i>
+</button>
+<button class="delete-btn-setting" onclick="deleteRank('${doc.id}', '${rank.name}')">Delete</button>
+</div>
+</div>
+`;
+});
+ranksList.innerHTML = rankItemsHTML;
+// Load courses
+const coursesSnapshot = await db.collection("courses").orderBy("order").get();
+const coursesList = document.getElementById('coursesList');
+coursesList.innerHTML = '';
+let courseItemsHTML = '';
+coursesSnapshot.forEach((doc, index) => {
+const course = doc.data();
+const isTop = index === 0;
+const isBottom = index === coursesSnapshot.size - 1;
+courseItemsHTML += `
+<div class="setting-item">
+<span>${course.name}</span>
+<div class="setting-actions">
+<button class="move-up-btn" ${isTop ? 'disabled' : ''} onclick="moveCourseUp('${doc.id}', ${course.order})" title="Move Up">
+<i class="fas fa-arrow-up"></i>
+</button>
+<button class="move-down-btn" ${isBottom ? 'disabled' : ''} onclick="moveCourseDown('${doc.id}', ${course.order})" title="Move Down">
+<i class="fas fa-arrow-down"></i>
+</button>
+<button class="delete-btn-setting" onclick="deleteCourse('${doc.id}', '${course.name}')">Delete</button>
+</div>
+</div>
+`;
+});
+coursesList.innerHTML = courseItemsHTML;
+} catch (error) {
+console.error("Error loading signup settings: ", error);
 }
-
+}
 // Move Rank Up
 async function moveRankUp(rankId, currentOrder) {
-    if (currentOrder <= 0) return; // Already at the top
-    const targetOrder = currentOrder - 1;
-
-    try {
-        // Find the rank that currently has the target order
-        const targetRankSnapshot = await db.collection("ranks")
-            .where("order", "==", targetOrder)
-            .limit(1)
-            .get();
-
-        if (targetRankSnapshot.empty) {
-            console.error("Target rank for swapping not found for order:", targetOrder);
-            return;
-        }
-
-        const targetRankDoc = targetRankSnapshot.docs[0];
-        const targetRankId = targetRankDoc.id;
-
-        // Perform batch write to swap orders atomically
-        const batch = db.batch();
-        batch.update(db.collection("ranks").doc(rankId), { order: targetOrder });
-        batch.update(db.collection("ranks").doc(targetRankId), { order: currentOrder });
-        await batch.commit();
-
-        console.log("Rank moved up successfully");
-        // Reload the settings list to reflect changes
-        loadSignupSettings();
-    } catch (error) {
-        console.error("Error moving rank up: ", error);
-        alert("Failed to move rank up: " + error.message);
-    }
+if (currentOrder <= 0) return; // Already at the top
+const targetOrder = currentOrder - 1;
+try {
+// Find the rank that currently has the target order
+const targetRankSnapshot = await db.collection("ranks")
+.where("order", "==", targetOrder)
+.limit(1)
+.get();
+if (targetRankSnapshot.empty) {
+console.error("Target rank for swapping not found for order:", targetOrder);
+return;
 }
-
+const targetRankDoc = targetRankSnapshot.docs[0];
+const targetRankId = targetRankDoc.id;
+// Perform batch write to swap orders atomically
+const batch = db.batch();
+batch.update(db.collection("ranks").doc(rankId), { order: targetOrder });
+batch.update(db.collection("ranks").doc(targetRankId), { order: currentOrder });
+await batch.commit();
+console.log("Rank moved up successfully");
+// Reload the settings list to reflect changes
+loadSignupSettings();
+} catch (error) {
+console.error("Error moving rank up: ", error);
+alert("Failed to move rank up: " + error.message);
+}
+}
 // Move Rank Down
 async function moveRankDown(rankId, currentOrder) {
-    // Need to find the highest order to know if this is the bottom
-    const allRanksSnapshot = await db.collection("ranks").orderBy("order").get();
-    const ranksArray = allRanksSnapshot.docs.map(d => d.data());
-    const maxOrder = Math.max(...ranksArray.map(r => r.order));
-
-    if (currentOrder >= maxOrder) return; // Already at the bottom
-    const targetOrder = currentOrder + 1;
-
-    try {
-        // Find the rank that currently has the target order
-        const targetRankSnapshot = await db.collection("ranks")
-            .where("order", "==", targetOrder)
-            .limit(1)
-            .get();
-
-        if (targetRankSnapshot.empty) {
-            console.error("Target rank for swapping not found for order:", targetOrder);
-            return;
-        }
-
-        const targetRankDoc = targetRankSnapshot.docs[0];
-        const targetRankId = targetRankDoc.id;
-
-        // Perform batch write to swap orders atomically
-        const batch = db.batch();
-        batch.update(db.collection("ranks").doc(rankId), { order: targetOrder });
-        batch.update(db.collection("ranks").doc(targetRankId), { order: currentOrder });
-        await batch.commit();
-
-        console.log("Rank moved down successfully");
-        // Reload the settings list to reflect changes
-        loadSignupSettings();
-    } catch (error) {
-        console.error("Error moving rank down: ", error);
-        alert("Failed to move rank down: " + error.message);
-    }
+// Need to find the highest order to know if this is the bottom
+const allRanksSnapshot = await db.collection("ranks").orderBy("order").get();
+const ranksArray = allRanksSnapshot.docs.map(d => d.data());
+const maxOrder = Math.max(...ranksArray.map(r => r.order));
+if (currentOrder >= maxOrder) return; // Already at the bottom
+const targetOrder = currentOrder + 1;
+try {
+// Find the rank that currently has the target order
+const targetRankSnapshot = await db.collection("ranks")
+.where("order", "==", targetOrder)
+.limit(1)
+.get();
+if (targetRankSnapshot.empty) {
+console.error("Target rank for swapping not found for order:", targetOrder);
+return;
 }
-
+const targetRankDoc = targetRankSnapshot.docs[0];
+const targetRankId = targetRankDoc.id;
+// Perform batch write to swap orders atomically
+const batch = db.batch();
+batch.update(db.collection("ranks").doc(rankId), { order: targetOrder });
+batch.update(db.collection("ranks").doc(targetRankId), { order: currentOrder });
+await batch.commit();
+console.log("Rank moved down successfully");
+// Reload the settings list to reflect changes
+loadSignupSettings();
+} catch (error) {
+console.error("Error moving rank down: ", error);
+alert("Failed to move rank down: " + error.message);
+}
+}
 // Move Course Up
 async function moveCourseUp(courseId, currentOrder) {
-    if (currentOrder <= 0) return; // Already at the top
-    const targetOrder = currentOrder - 1;
-
-    try {
-        // Find the course that currently has the target order
-        const targetCourseSnapshot = await db.collection("courses")
-            .where("order", "==", targetOrder)
-            .limit(1)
-            .get();
-
-        if (targetCourseSnapshot.empty) {
-            console.error("Target course for swapping not found for order:", targetOrder);
-            return;
-        }
-
-        const targetCourseDoc = targetCourseSnapshot.docs[0];
-        const targetCourseId = targetCourseDoc.id;
-
-        // Perform batch write to swap orders atomically
-        const batch = db.batch();
-        batch.update(db.collection("courses").doc(courseId), { order: targetOrder });
-        batch.update(db.collection("courses").doc(targetCourseId), { order: currentOrder });
-        await batch.commit();
-
-        console.log("Course moved up successfully");
-        // Reload the settings list to reflect changes
-        loadSignupSettings();
-    } catch (error) {
-        console.error("Error moving course up: ", error);
-        alert("Failed to move course up: " + error.message);
-    }
+if (currentOrder <= 0) return; // Already at the top
+const targetOrder = currentOrder - 1;
+try {
+// Find the course that currently has the target order
+const targetCourseSnapshot = await db.collection("courses")
+.where("order", "==", targetOrder)
+.limit(1)
+.get();
+if (targetCourseSnapshot.empty) {
+console.error("Target course for swapping not found for order:", targetOrder);
+return;
 }
-
+const targetCourseDoc = targetCourseSnapshot.docs[0];
+const targetCourseId = targetCourseDoc.id;
+// Perform batch write to swap orders atomically
+const batch = db.batch();
+batch.update(db.collection("courses").doc(courseId), { order: targetOrder });
+batch.update(db.collection("courses").doc(targetCourseId), { order: currentOrder });
+await batch.commit();
+console.log("Course moved up successfully");
+// Reload the settings list to reflect changes
+loadSignupSettings();
+} catch (error) {
+console.error("Error moving course up: ", error);
+alert("Failed to move course up: " + error.message);
+}
+}
 // Move Course Down
 async function moveCourseDown(courseId, currentOrder) {
-    // Need to find the highest order to know if this is the bottom
-    const allCoursesSnapshot = await db.collection("courses").orderBy("order").get();
-    const coursesArray = allCoursesSnapshot.docs.map(d => d.data());
-    const maxOrder = Math.max(...coursesArray.map(r => r.order));
-
-    if (currentOrder >= maxOrder) return; // Already at the bottom
-    const targetOrder = currentOrder + 1;
-
-    try {
-        // Find the course that currently has the target order
-        const targetCourseSnapshot = await db.collection("courses")
-            .where("order", "==", targetOrder)
-            .limit(1)
-            .get();
-
-        if (targetCourseSnapshot.empty) {
-            console.error("Target course for swapping not found for order:", targetOrder);
-            return;
-        }
-
-        const targetCourseDoc = targetCourseSnapshot.docs[0];
-        const targetCourseId = targetCourseDoc.id;
-
-        // Perform batch write to swap orders atomically
-        const batch = db.batch();
-        batch.update(db.collection("courses").doc(courseId), { order: targetOrder });
-        batch.update(db.collection("courses").doc(targetCourseId), { order: currentOrder });
-        await batch.commit();
-
-        console.log("Course moved down successfully");
-        // Reload the settings list to reflect changes
-        loadSignupSettings();
-    } catch (error) {
-        console.error("Error moving course down: ", error);
-        alert("Failed to move course down: " + error.message);
-    }
+// Need to find the highest order to know if this is the bottom
+const allCoursesSnapshot = await db.collection("courses").orderBy("order").get();
+const coursesArray = allCoursesSnapshot.docs.map(d => d.data());
+const maxOrder = Math.max(...coursesArray.map(r => r.order));
+if (currentOrder >= maxOrder) return; // Already at the bottom
+const targetOrder = currentOrder + 1;
+try {
+// Find the course that currently has the target order
+const targetCourseSnapshot = await db.collection("courses")
+.where("order", "==", targetOrder)
+.limit(1)
+.get();
+if (targetCourseSnapshot.empty) {
+console.error("Target course for swapping not found for order:", targetOrder);
+return;
+}
+const targetCourseDoc = targetCourseSnapshot.docs[0];
+const targetCourseId = targetCourseDoc.id;
+// Perform batch write to swap orders atomically
+const batch = db.batch();
+batch.update(db.collection("courses").doc(courseId), { order: targetOrder });
+batch.update(db.collection("courses").doc(targetCourseId), { order: currentOrder });
+await batch.commit();
+console.log("Course moved down successfully");
+// Reload the settings list to reflect changes
+loadSignupSettings();
+} catch (error) {
+console.error("Error moving course down: ", error);
+alert("Failed to move course down: " + error.message);
+}
 }
 // Move Skill Up - RELIES ON THE GLOBAL skillsData ARRAY
 async function moveSkillUp(skillId, currentOrder) {
-    // --- ADD CHECK FOR VALID ORDER VALUE ---
-    if (typeof currentOrder !== 'number' || isNaN(currentOrder)) {
-        console.error("Invalid order value received for moveSkillUp:", currentOrder);
-        alert("Cannot move skill: Invalid order data.");
-        return;
-    }
-    // --- END CHECK ---
-
-    // Find the index of the skill to move in the global skillsData array
-    const currentIndex = skillsData.findIndex(s => s.id === skillId);
-
-    // Check if it's already at the top (has the lowest order value among existing ones)
-    // Or if the skill is not found in the array
-    if (currentIndex <= 0) {
-        console.log("Skill is already at the top or not found, cannot move up.");
-        return; // Do nothing if it's the first item or not found
-    }
-
-    // Find the skill immediately preceding it in the sorted list (which has the target lower order)
-    const previousSkill = skillsData[currentIndex - 1];
-    if (!previousSkill) {
-        console.error("Previous skill not found in skillsData.");
-        return;
-    }
-    const targetSkillId = previousSkill.id;
-    // Use the previous skill's order, ensuring it's a number
-    const targetOrder = previousSkill.order !== undefined && previousSkill.order !== null ? previousSkill.order : currentOrder - 1;
-
-    try {
-        // Perform batch write to swap orders atomically
-        const batch = db.batch();
-        // Update the current skill to have the order of the previous one
-        batch.update(db.collection("skills").doc(skillId), { order: targetOrder });
-        // Update the previous skill to have the order of the current one
-        batch.update(db.collection("skills").doc(targetSkillId), { order: currentOrder });
-        await batch.commit();
-
-        console.log("Skill moved up successfully");
-
-        // The onSnapshot listener will automatically update skillsData and trigger loadSkillsList
-        // So reloading here might be redundant, but explicitly calling it ensures UI update
-        // Only reload if the current view is the skills section
-        if (document.getElementById('skills-section').style.display === 'block') {
-            loadSkillsList(); // Reload the admin panel list
-        }
-        // Potentially reload user interface list too if it's visible
-        if (document.getElementById('userInterface').style.display === 'block') {
-             loadSkillGrid(); // Reload the user interface grid
-        }
-
-    } catch (error) {
-        console.error("Error moving skill up: ", error);
-        alert("Failed to move skill up: " + error.message);
-    }
+// --- ADD CHECK FOR VALID ORDER VALUE ---
+if (typeof currentOrder !== 'number' || isNaN(currentOrder)) {
+console.error("Invalid order value received for moveSkillUp:", currentOrder);
+alert("Cannot move skill: Invalid order data.");
+return;
+}
+// --- END CHECK ---
+// Find the index of the skill to move in the global skillsData array
+const currentIndex = skillsData.findIndex(s => s.id === skillId);
+// Check if it's already at the top (has the lowest order value among existing ones)
+// Or if the skill is not found in the array
+if (currentIndex <= 0) {
+console.log("Skill is already at the top or not found, cannot move up.");
+return; // Do nothing if it's the first item or not found
+}
+// Find the skill immediately preceding it in the sorted list (which has the target lower order)
+const previousSkill = skillsData[currentIndex - 1];
+if (!previousSkill) {
+console.error("Previous skill not found in skillsData.");
+return;
+}
+const targetSkillId = previousSkill.id;
+// Use the previous skill's order, ensuring it's a number
+const targetOrder = previousSkill.order !== undefined && previousSkill.order !== null ? previousSkill.order : currentOrder - 1;
+try {
+// Perform batch write to swap orders atomically
+const batch = db.batch();
+// Update the current skill to have the order of the previous one
+batch.update(db.collection("skills").doc(skillId), { order: targetOrder });
+// Update the previous skill to have the order of the current one
+batch.update(db.collection("skills").doc(targetSkillId), { order: currentOrder });
+await batch.commit();
+console.log("Skill moved up successfully");
+// The onSnapshot listener will automatically update skillsData and trigger loadSkillsList
+// So reloading here might be redundant, but explicitly calling it ensures UI update
+// Only reload if the current view is the skills section
+if (document.getElementById('skills-section').style.display === 'block') {
+loadSkillsList(); // Reload the admin panel list
+}
+// Potentially reload user interface list too if it's visible
+if (document.getElementById('userInterface').style.display === 'block') {
+loadSkillGrid(); // Reload the user interface grid
+}
+} catch (error) {
+console.error("Error moving skill up: ", error);
+alert("Failed to move skill up: " + error.message);
+}
 }
 // Move Skill Down - RELIES ON THE GLOBAL skillsData ARRAY
 async function moveSkillDown(skillId, currentOrder) {
-    // --- ADD CHECK FOR VALID ORDER VALUE ---
-    if (typeof currentOrder !== 'number' || isNaN(currentOrder)) {
-        console.error("Invalid order value received for moveSkillDown:", currentOrder);
-        alert("Cannot move skill: Invalid order data.");
-        return;
-    }
-    // --- END CHECK ---
-
-    // Find the index of the skill to move in the global skillsData array
-    const currentIndex = skillsData.findIndex(s => s.id === skillId);
-
-    // Check if it's already at the bottom (has the highest order value among existing ones)
-    // Or if the skill is not found in the array
-    if (currentIndex === -1 || currentIndex >= skillsData.length - 1) {
-        console.log("Skill is already at the bottom or not found, cannot move down.");
-        return; // Do nothing if it's the last item or not found
-    }
-
-    // Find the skill immediately succeeding it in the sorted list (which has the target higher order)
-    const nextSkill = skillsData[currentIndex + 1];
-    if (!nextSkill) {
-        console.error("Next skill not found in skillsData.");
-        return;
-    }
-    const targetSkillId = nextSkill.id;
-    // Use the next skill's order, ensuring it's a number
-    const targetOrder = nextSkill.order !== undefined && nextSkill.order !== null ? nextSkill.order : currentOrder + 1;
-
-    try {
-        // Perform batch write to swap orders atomically
-        const batch = db.batch();
-        // Update the current skill to have the order of the next one
-        batch.update(db.collection("skills").doc(skillId), { order: targetOrder });
-        // Update the next skill to have the order of the current one
-        batch.update(db.collection("skills").doc(targetSkillId), { order: currentOrder });
-        await batch.commit();
-
-        console.log("Skill moved down successfully");
-
-        // The onSnapshot listener will automatically update skillsData and trigger loadSkillsList
-        // So reloading here might be redundant, but explicitly calling it ensures UI update
-        // Only reload if the current view is the skills section
-        if (document.getElementById('skills-section').style.display === 'block') {
-            loadSkillsList(); // Reload the admin panel list
-        }
-        // Potentially reload user interface list too if it's visible
-        if (document.getElementById('userInterface').style.display === 'block') {
-             loadSkillGrid(); // Reload the user interface grid
-        }
-
-    } catch (error) {
-        console.error("Error moving skill down: ", error);
-        alert("Failed to move skill down: " + error.message);
-    }
+// --- ADD CHECK FOR VALID ORDER VALUE ---
+if (typeof currentOrder !== 'number' || isNaN(currentOrder)) {
+console.error("Invalid order value received for moveSkillDown:", currentOrder);
+alert("Cannot move skill: Invalid order data.");
+return;
+}
+// --- END CHECK ---
+// Find the index of the skill to move in the global skillsData array
+const currentIndex = skillsData.findIndex(s => s.id === skillId);
+// Check if it's already at the bottom (has the highest order value among existing ones)
+// Or if the skill is not found in the array
+if (currentIndex === -1 || currentIndex >= skillsData.length - 1) {
+console.log("Skill is already at the bottom or not found, cannot move down.");
+return; // Do nothing if it's the last item or not found
+}
+// Find the skill immediately succeeding it in the sorted list (which has the target higher order)
+const nextSkill = skillsData[currentIndex + 1];
+if (!nextSkill) {
+console.error("Next skill not found in skillsData.");
+return;
+}
+const targetSkillId = nextSkill.id;
+// Use the next skill's order, ensuring it's a number
+const targetOrder = nextSkill.order !== undefined && nextSkill.order !== null ? nextSkill.order : currentOrder + 1;
+try {
+// Perform batch write to swap orders atomically
+const batch = db.batch();
+// Update the current skill to have the order of the next one
+batch.update(db.collection("skills").doc(skillId), { order: targetOrder });
+// Update the next skill to have the order of the current one
+batch.update(db.collection("skills").doc(targetSkillId), { order: currentOrder });
+await batch.commit();
+console.log("Skill moved down successfully");
+// The onSnapshot listener will automatically update skillsData and trigger loadSkillsList
+// So reloading here might be redundant, but explicitly calling it ensures UI update
+// Only reload if the current view is the skills section
+if (document.getElementById('skills-section').style.display === 'block') {
+loadSkillsList(); // Reload the admin panel list
+}
+// Potentially reload user interface list too if it's visible
+if (document.getElementById('userInterface').style.display === 'block') {
+loadSkillGrid(); // Reload the user interface grid
+}
+} catch (error) {
+console.error("Error moving skill down: ", error);
+alert("Failed to move skill down: " + error.message);
+}
 }
 // Add a new rank
 async function addRank() {
@@ -2310,105 +2279,93 @@ console.error("Error signing out: ", error);
 // Show different sections in admin panel
 // Show different sections in admin panel
 function showSection(section) {
-    // Hide all sections
-    document.querySelectorAll('.section').forEach(el => el.style.display = 'none');
-    document.getElementById('edit-skill-form').style.display = 'none';
-    // Remove active class from all nav items
-    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    // Show selected section and highlight nav item
-    document.getElementById(`${section}-section`).style.display = 'block';
-    document.querySelector(`.nav-item[onclick="showSection('${section}')"]`).classList.add('active');
-    if (section === 'dashboard') {
-        updateCounters();
-    }
-    // IMPORTANT: Always reload skills list when showing skills section
-    if (section === 'skills') {
-        loadSkillsList(); // Use the modified function
-    }
-    // Load users management when showing users section
-    if (section === 'users') {
-        loadUsersManagement();
-    }
-    // Load settings content when showing settings section
-    if (section === 'settings') {
-        // Load signup settings by default or the active tab
-        const activeTabButton = document.querySelector('.tab-button.active');
-        const activeTabId = activeTabButton ? activeTabButton.getAttribute('data-tab') : 'signupSettings';
-        if (activeTabId === 'signupSettings') {
-            loadSignupSettings();
-        } else if (activeTabId === 'adminAccess') {
-            loadAdminList(); // Call loadAdminList when Admin Access tab is active
-        }
-    }
+// Hide all sections
+document.querySelectorAll('.section').forEach(el => el.style.display = 'none');
+document.getElementById('edit-skill-form').style.display = 'none';
+// Remove active class from all nav items
+document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+// Show selected section and highlight nav item
+document.getElementById(`${section}-section`).style.display = 'block';
+document.querySelector(`.nav-item[onclick="showSection('${section}')"]`).classList.add('active');
+if (section === 'dashboard') {
+updateCounters();
+}
+// IMPORTANT: Always reload skills list when showing skills section
+if (section === 'skills') {
+loadSkillsList(); // Use the modified function
+}
+// Load users management when showing users section
+if (section === 'users') {
+loadUsersManagement();
+}
+// Load settings content when showing settings section
+if (section === 'settings') {
+// Load signup settings by default or the active tab
+const activeTabButton = document.querySelector('.tab-button.active');
+const activeTabId = activeTabButton ? activeTabButton.getAttribute('data-tab') : 'signupSettings';
+if (activeTabId === 'signupSettings') {
+loadSignupSettings();
+} else if (activeTabButton && activeTabId === 'adminAccess') { // Added check for activeTabButton
+loadAdminList(); // Call loadAdminList when Admin Access tab is active
+}
+}
 }
 // Load skills list in admin panel - MODIFIED TO USE GRID LAYOUT WITH EDIT/DELETE/REORDER BUTTONS
 // Load skills list in admin panel - MODIFIED TO USE GRID LAYOUT WITH EDIT/DELETE/REORDER BUTTONS
 // Uses the globally managed skillsData array, sorted by 'order'
 // Load skills list in admin panel - MODIFIED TO USE GRID LAYOUT WITH EDIT/DELETE/REORDER BUTTONS
 // Uses the globally managed skillsData array, sorted by 'order'
-// Load skills list in admin panel - MODIFIED TO USE GRID LAYOUT WITH EDIT/DELETE/REORDER BUTTONS
-// Uses the globally managed skillsData array, sorted by 'order'
 async function loadSkillsList() {
-    const skillsList = document.getElementById('skillsList');
-    skillsList.innerHTML = '';
-
-    // Sort the global skillsData array by 'order' field before displaying
-    // This redundant sorting is fine if skillsData is always kept sorted by the listener,
-    // but doing it here ensures correctness at the point of rendering.
-    const sortedSkillsArray = [...skillsData].sort((a, b) => {
-         const orderA = a.order !== undefined && a.order !== null ? a.order : Infinity;
-         const orderB = b.order !== undefined && b.order !== null ? b.order : Infinity;
-         return orderA - orderB;
-    });
-
-
-    if (sortedSkillsArray.length === 0) {
-        skillsList.innerHTML = '<p>No skills available.</p>';
-        return;
-    }
-
-    const skillGrid = document.createElement('div');
-    skillGrid.className = 'skill-grid';
-
-    sortedSkillsArray.forEach((skill, index) => {
-        const skillCard = document.createElement('div');
-        skillCard.className = 'skill-card-ui';
-        skillCard.setAttribute('data-skill-id', skill.id);
-
-        const isTop = index === 0;
-        const isBottom = index === sortedSkillsArray.length - 1;
-
-        // --- FIX: Provide fallback value (0) for skill.order if it's undefined/null ---
-        const orderValue = skill.order !== undefined && skill.order !== null ? skill.order : 0;
-        // --- END FIX ---
-
-        skillCard.innerHTML = `
-            <div class="skill-icon">
-                <i class="${skill.icon}"></i>
-            </div>
-            <div class="skill-content">
-                <h3 class="skill-name">${skill.name}</h3>
-                <p class="skill-desc">${skill.description.substring(0, 100)}...</p>
-                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                    <button class="skill-btn" style="background: var(--primary); flex: 1;" ${isTop ? 'disabled' : ''} onclick="moveSkillUp('${skill.id}', ${orderValue})" title="Move Up">
-                        <i class="fas fa-arrow-up"></i>
-                    </button>
-                    <button class="skill-btn" style="background: var(--primary); flex: 1;" ${isBottom ? 'disabled' : ''} onclick="moveSkillDown('${skill.id}', ${orderValue})" title="Move Down">
-                        <i class="fas fa-arrow-down"></i>
-                    </button>
-                </div>
-                <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
-                    <button class="skill-btn" style="background: var(--warning); flex: 1;" onclick="editSkill('${skill.id}')">Edit</button>
-                    <button class="skill-btn" style="background: var(--danger); flex: 1;" onclick="deleteSkill('${skill.id}')">Delete</button>
-                </div>
-            </div>
-        `;
-
-        skillGrid.appendChild(skillCard);
-    });
-
-    skillsList.appendChild(skillGrid);
-    // Note: Removed the try-catch block as it now relies on the pre-loaded skillsData array
+const skillsList = document.getElementById('skillsList');
+skillsList.innerHTML = '';
+// Sort the global skillsData array by 'order' field before displaying
+// This redundant sorting is fine if skillsData is always kept sorted by the listener,
+// but doing it here ensures correctness at the point of rendering.
+const sortedSkillsArray = [...skillsData].sort((a, b) => {
+const orderA = a.order !== undefined && a.order !== null ? a.order : Infinity;
+const orderB = b.order !== undefined && b.order !== null ? b.order : Infinity;
+return orderA - orderB;
+});
+if (sortedSkillsArray.length === 0) {
+skillsList.innerHTML = '<p>No skills available.</p>';
+return;
+}
+const skillGrid = document.createElement('div');
+skillGrid.className = 'skill-grid';
+sortedSkillsArray.forEach((skill, index) => {
+const skillCard = document.createElement('div');
+skillCard.className = 'skill-card-ui';
+skillCard.setAttribute('data-skill-id', skill.id);
+const isTop = index === 0;
+const isBottom = index === sortedSkillsArray.length - 1;
+// --- FIX: Provide fallback value (0) for skill.order if it's undefined/null ---
+const orderValue = skill.order !== undefined && skill.order !== null ? skill.order : 0;
+// --- END FIX ---
+skillCard.innerHTML = `
+<div class="skill-icon">
+<i class="${skill.icon}"></i>
+</div>
+<div class="skill-content">
+<h3 class="skill-name">${skill.name}</h3>
+<p class="skill-desc">${skill.description.substring(0, 100)}...</p>
+<div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+<button class="skill-btn" style="background: var(--primary); flex: 1;" ${isTop ? 'disabled' : ''} onclick="moveSkillUp('${skill.id}', ${orderValue})" title="Move Up">
+<i class="fas fa-arrow-up"></i>
+</button>
+<button class="skill-btn" style="background: var(--primary); flex: 1;" ${isBottom ? 'disabled' : ''} onclick="moveSkillDown('${skill.id}', ${orderValue})" title="Move Down">
+<i class="fas fa-arrow-down"></i>
+</button>
+</div>
+<div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+<button class="skill-btn" style="background: var(--warning); flex: 1;" onclick="editSkill('${skill.id}')">Edit</button>
+<button class="skill-btn" style="background: var(--danger); flex: 1;" onclick="deleteSkill('${skill.id}')">Delete</button>
+</div>
+</div>
+`;
+skillGrid.appendChild(skillCard);
+});
+skillsList.appendChild(skillGrid);
+// Note: Removed the try-catch block as it now relies on the pre-loaded skillsData array
 }
 // Load users management in admin panel
 function loadUsersManagement() {
@@ -2531,35 +2488,35 @@ document.getElementById('total-skills').textContent = skillsData.length;
 // Add new skill
 // Add new skill
 async function addNewSkill() {
-    try {
-        // Calculate the new order value based on the *maximum* existing order in the CURRENTLY KNOWN skillsData + 1
-        // Ensure skillsData is sorted first to get the latest max
-        // Use the same sorting logic as elsewhere to find the max order
-        const sortedSkillsForOrderCalc = [...skillsData].sort((a, b) => {
-             const orderA = a.order !== undefined && a.order !== null ? a.order : -1; // Use -1 or 0 if missing for calculation
-             const orderB = b.order !== undefined && b.order !== null ? b.order : -1;
-             return orderA - orderB;
-        });
-        const maxExistingOrder = sortedSkillsForOrderCalc.length > 0 ? (sortedSkillsForOrderCalc[sortedSkillsForOrderCalc.length - 1].order || 0) : -1;
-        const newOrder = maxExistingOrder + 1;
+try {
+// Calculate the new order value based on the *maximum* existing order in the CURRENTLY KNOWN skillsData + 1
+// Ensure skillsData is sorted first to get the latest max
+// Use the same sorting logic as elsewhere to find the max order
+const sortedSkillsForOrderCalc = [...skillsData].sort((a, b) => {
+const orderA = a.order !== undefined && a.order !== null ? a.order : -1; // Use -1 or 0 if missing for calculation
+const orderB = b.order !== undefined && b.order !== null ? b.order : -1;
+return orderA - orderB;
+});
 
-        currentEditingSkill = {
-            id: null, // Will be assigned by Firestore on add
-            name: '',
-            icon: '',
-            description: '',
-            tools: [],
-            steps: [],
-            theory: '',
-            quiz: [],
-            order: newOrder // Set the initial order based on max + 1
-        };
-        originalEditingSkill = JSON.parse(JSON.stringify(currentEditingSkill)); // Store original data
-        showEditForm();
-    } catch (error) {
-        console.error("Error calculating order for new skill: ", error);
-        alert("Error initializing new skill. Please try again.");
-    }
+const maxExistingOrder = sortedSkillsForOrderCalc.length > 0 ? (sortedSkillsForOrderCalc[sortedSkillsForOrderCalc.length - 1].order || 0) : -1;
+const newOrder = maxExistingOrder + 1;
+currentEditingSkill = {
+id: null, // Will be assigned by Firestore on add
+name: '',
+icon: '',
+description: '',
+tools: [],
+steps: [],
+theory: '',
+quiz: [],
+order: newOrder // Set the initial order based on max + 1
+};
+originalEditingSkill = JSON.parse(JSON.stringify(currentEditingSkill)); // Store original data
+showEditForm();
+} catch (error) {
+console.error("Error calculating order for new skill: ", error);
+alert("Error initializing new skill. Please try again.");
+}
 }
 // Edit existing skill
 function editSkill(skillId) {
@@ -2791,28 +2748,26 @@ console.error("Error removing skill with ID '" + skillId + "': ", error);
 // Load skills from Firebase (for user interface)
 // Load skills from Firebase (for user interface)
 async function loadSkillsFromFirebase() {
-    try {
-        // Use onSnapshot for real-time updates, similar to the listener above
-        // But for initial load, you might stick with get(), though onSnapshot is generally preferred
-        // Using get() here as per your original structure, but ensure consistency with the listener
-        const snapshot = await db.collection("skills").get(); // Get all skills first
-        let tempSkillsData = [];
-        snapshot.forEach(doc => {
-             tempSkillsData.push({ id: doc.id, ...doc.data() });
-        });
-
-         // Sort by 'order' field, handling potentially missing 'order' values gracefully
-         tempSkillsData.sort((a, b) => {
-            const orderA = a.order !== undefined && a.order !== null ? a.order : Infinity;
-            const orderB = b.order !== undefined && b.order !== null ? b.order : Infinity;
-            return orderA - orderB;
-        });
-
-        skillsData = tempSkillsData; // Update the global array
-        loadSkillGrid(); // Now load the grid with the sorted data
-    } catch (error) {
-        console.error("Error loading skills: ", error);
-    }
+try {
+// Use onSnapshot for real-time updates, similar to the listener above
+// But for initial load, you might stick with get(), though onSnapshot is generally preferred
+// Using get() here as per your original structure, but ensure consistency with the listener
+const snapshot = await db.collection("skills").get(); // Get all skills first
+let tempSkillsData = [];
+snapshot.forEach(doc => {
+tempSkillsData.push({ id: doc.id, ...doc.data() });
+});
+// Sort by 'order' field, handling potentially missing 'order' values gracefully
+tempSkillsData.sort((a, b) => {
+const orderA = a.order !== undefined && a.order !== null ? a.order : Infinity;
+const orderB = b.order !== undefined && b.order !== null ? b.order : Infinity;
+return orderA - orderB;
+});
+skillsData = tempSkillsData; // Update the global array
+loadSkillGrid(); // Now load the grid with the sorted data
+} catch (error) {
+console.error("Error loading skills: ", error);
+}
 }
 // Load skill grid for user interface
 function loadSkillGrid() {
@@ -3009,4 +2964,3 @@ loadAdminList(); // Load admin list specifically when the Admin Access tab is cl
 </script>
 </body>
 </html>
-
