@@ -1632,26 +1632,30 @@ alert('Error updating rank: ' + error.message);
 }
 // Setup Firestore listeners to sync data in real-time
 function setupFirestoreListeners() {
-// Listen for changes in skills collection
-db.collection("skills").onSnapshot((snapshot) => {
-skillsData = [];
-snapshot.forEach(doc => {
-skillsData.push({ id: doc.id, ...doc.data() });
-});
-updateCounters();
-// Update user interface if visible
-if (document.getElementById('userInterface').style.display === 'block') {
-loadSkillGrid();
-}
-// Update admin list if currently viewing the skills section
-if (document.getElementById('skills-section').style.display === 'block') {
-loadSkillsList();
-}
-// Update user preview if currently viewing
-if (document.getElementById('user-preview-section').style.display === 'block') {
-loadSkillGrid();
-}
-});
+    // Listen for changes in skills collection
+    db.collection("skills").onSnapshot((snapshot) => {
+        skillsData = [];
+        snapshot.forEach(doc => {
+            skillsData.push({ id: doc.id, ...doc.data() });
+        });
+        // --- ADD SORTING HERE ---
+        skillsData.sort((a, b) => (a.order || 0) - (b.order || 0));
+        // --- END OF ADDITION ---
+
+        updateCounters();
+        // Update user interface if visible
+        if (document.getElementById('userInterface').style.display === 'block') {
+            loadSkillGrid();
+        }
+        // Update admin list if currently viewing the skills section
+        if (document.getElementById('skills-section').style.display === 'block') {
+            loadSkillsList(); // This will now use the sorted skillsData
+        }
+        // Update user preview if currently viewing
+        if (document.getElementById('user-preview-section').style.display === 'block') {
+            loadSkillGrid();
+        }
+    });
 // Listen for changes in users collection
 db.collection("users").onSnapshot((snapshot) => {
 usersData = [];
@@ -2246,64 +2250,58 @@ function showSection(section) {
     }
 }
 // Load skills list in admin panel - MODIFIED TO USE GRID LAYOUT WITH EDIT/DELETE/REORDER BUTTONS
+// Load skills list in admin panel - MODIFIED TO USE GRID LAYOUT WITH EDIT/DELETE/REORDER BUTTONS
+// Uses the globally managed skillsData array, sorted by 'order'
 async function loadSkillsList() {
     const skillsList = document.getElementById('skillsList');
     skillsList.innerHTML = '';
 
-    try {
-        // Fetch skills ordered by the 'order' field
-        const skillsSnapshot = await db.collection("skills").orderBy("order").get();
-        const skillsArray = [];
-        skillsSnapshot.forEach(doc => {
-            skillsArray.push({ id: doc.id, ...doc.data() });
-        });
+    // Sort the global skillsData array by 'order' field before displaying
+    const sortedSkillsArray = [...skillsData].sort((a, b) => (a.order || 0) - (b.order || 0));
 
-        if (skillsArray.length === 0) {
-            skillsList.innerHTML = '<p>No skills available.</p>';
-            return;
-        }
-
-        const skillGrid = document.createElement('div');
-        skillGrid.className = 'skill-grid';
-
-        skillsArray.forEach((skill, index) => {
-            const skillCard = document.createElement('div');
-            skillCard.className = 'skill-card-ui';
-            skillCard.setAttribute('data-skill-id', skill.id);
-
-            const isTop = index === 0;
-            const isBottom = index === skillsArray.length - 1;
-
-            skillCard.innerHTML = `
-                <div class="skill-icon">
-                    <i class="${skill.icon}"></i>
-                </div>
-                <div class="skill-content">
-                    <h3 class="skill-name">${skill.name}</h3>
-                    <p class="skill-desc">${skill.description.substring(0, 100)}...</p>
-                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                        <button class="skill-btn" style="background: var(--primary); flex: 1;" ${isTop ? 'disabled' : ''} onclick="moveSkillUp('${skill.id}', ${skill.order})" title="Move Up">
-                            <i class="fas fa-arrow-up"></i>
-                        </button>
-                        <button class="skill-btn" style="background: var(--primary); flex: 1;" ${isBottom ? 'disabled' : ''} onclick="moveSkillDown('${skill.id}', ${skill.order})" title="Move Down">
-                            <i class="fas fa-arrow-down"></i>
-                        </button>
-                    </div>
-                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
-                        <button class="skill-btn" style="background: var(--warning); flex: 1;" onclick="editSkill('${skill.id}')">Edit</button>
-                        <button class="skill-btn" style="background: var(--danger); flex: 1;" onclick="deleteSkill('${skill.id}')">Delete</button>
-                    </div>
-                </div>
-            `;
-
-            skillGrid.appendChild(skillCard);
-        });
-
-        skillsList.appendChild(skillGrid);
-    } catch (error) {
-        console.error("Error loading skills list in admin panel: ", error);
-        skillsList.innerHTML = '<p>Error loading skills.</p>';
+    if (sortedSkillsArray.length === 0) {
+        skillsList.innerHTML = '<p>No skills available.</p>';
+        return;
     }
+
+    const skillGrid = document.createElement('div');
+    skillGrid.className = 'skill-grid';
+
+    sortedSkillsArray.forEach((skill, index) => {
+        const skillCard = document.createElement('div');
+        skillCard.className = 'skill-card-ui';
+        skillCard.setAttribute('data-skill-id', skill.id);
+
+        const isTop = index === 0;
+        const isBottom = index === sortedSkillsArray.length - 1;
+
+        skillCard.innerHTML = `
+            <div class="skill-icon">
+                <i class="${skill.icon}"></i>
+            </div>
+            <div class="skill-content">
+                <h3 class="skill-name">${skill.name}</h3>
+                <p class="skill-desc">${skill.description.substring(0, 100)}...</p>
+                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                    <button class="skill-btn" style="background: var(--primary); flex: 1;" ${isTop ? 'disabled' : ''} onclick="moveSkillUp('${skill.id}', ${skill.order || 0})" title="Move Up">
+                        <i class="fas fa-arrow-up"></i>
+                    </button>
+                    <button class="skill-btn" style="background: var(--primary); flex: 1;" ${isBottom ? 'disabled' : ''} onclick="moveSkillDown('${skill.id}', ${skill.order || 0})" title="Move Down">
+                        <i class="fas fa-arrow-down"></i>
+                    </button>
+                </div>
+                <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                    <button class="skill-btn" style="background: var(--warning); flex: 1;" onclick="editSkill('${skill.id}')">Edit</button>
+                    <button class="skill-btn" style="background: var(--danger); flex: 1;" onclick="deleteSkill('${skill.id}')">Delete</button>
+                </div>
+            </div>
+        `;
+
+        skillGrid.appendChild(skillCard);
+    });
+
+    skillsList.appendChild(skillGrid);
+    // Note: Removed the try-catch block as it now relies on the pre-loaded skillsData array
 }
 // Load users management in admin panel
 function loadUsersManagement() {
@@ -2423,11 +2421,14 @@ function updateCounters() {
 document.getElementById('total-skills').textContent = skillsData.length;
 }
 // Add new skill
+// Add new skill
 async function addNewSkill() {
     try {
-        // Calculate the new order value based on the current number of skills
-        const skillsSnapshot = await db.collection("skills").get();
-        const newOrder = skillsSnapshot.size; // Order starts from 0
+        // Calculate the new order value based on the *maximum* existing order in skillsData + 1
+        // Ensure skillsData is sorted first to get the latest max
+        const sortedSkillsForOrderCalc = [...skillsData].sort((a, b) => (a.order || 0) - (b.order || 0));
+        const maxExistingOrder = sortedSkillsForOrderCalc.length > 0 ? (sortedSkillsForOrderCalc[sortedSkillsForOrderCalc.length - 1].order || 0) : -1;
+        const newOrder = maxExistingOrder + 1;
 
         currentEditingSkill = {
             id: null,
@@ -2438,13 +2439,13 @@ async function addNewSkill() {
             steps: [],
             theory: '',
             quiz: [],
-            order: newOrder // Set the initial order
+            order: newOrder // Set the initial order based on max + 1
         };
         originalEditingSkill = JSON.parse(JSON.stringify(currentEditingSkill)); // Store original data
         showEditForm();
     } catch (error) {
-        console.error("Error getting skill count for ordering: ", error);
-        alert("Error initializing new skill order. Please try again.");
+        console.error("Error getting skill count/order for new skill: ", error);
+        alert("Error initializing new skill. Please try again.");
     }
 }
 // Edit existing skill
@@ -2883,6 +2884,7 @@ loadAdminList(); // Load admin list specifically when the Admin Access tab is cl
 </script>
 </body>
 </html>
+
 
 
 
