@@ -1079,7 +1079,21 @@ right: 10px;
         <div class="error-message" id="revoke-confirm-error"></div>
     </div>
 </div>
-
+<!-- Grant Admin Success Notification Modal -->
+<div class="login-popup" id="grantSuccessModal" style="display: none; z-index: 3002;"> <!-- Higher z-index than confirmRevokeModal -->
+  <div class="login-box">
+      <span class="close-btn" onclick="closeGrantSuccessModal()">&times;</span>
+      <h2><i class="fas fa-check-circle" style="color: var(--success);"></i> Success</h2>
+      <p id="grant-success-message">Admin access granted successfully!</p>
+      <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+          <!-- A simple OK button to close the modal -->
+          <button class="btn" style="background: var(--primary); flex: 1;" onclick="closeGrantSuccessModal()">OK</button>
+      </div>
+      <!-- Optional: Error display if needed later -->
+      <div class="error-message" id="grant-success-error"></div>
+  </div>
+</div>
+  <!-- End of Grant Admin Success Notification Modal -->
 <!-- Admin Dashboard -->
 <div class="admin-dashboard" id="adminDashboard">
 <div class="container">
@@ -1727,36 +1741,40 @@ loadSignupSettings();
 } // <-- This closing brace was missing!
 // Grant admin access to another user
 async function grantAdminAccess() {
-const email = document.getElementById('admin-email').value;
-if (!email) {
-alert('Please enter an email address');
-return;
-}
-try {
-// Find user by email
-const userQuery = await db.collection("users").where("email", "==", email).get();
-if (userQuery.empty) {
-alert('User not found');
-return;
-}
-const userDoc = userQuery.docs[0];
-const userId = userDoc.id;
-// Add user to admins collection
-await db.collection("admins").doc(userId).set({
-email: email,
-grantedBy: currentUser.email,
-date: new Date()
-});
-// Clear the input field
-document.getElementById('admin-email').value = '';
-alert('Admin access granted successfully!');
-// --- ADD THIS LINE ---
-loadAdminList(); // Reload the admin list immediately
-// --- END OF ADDITION ---
-} catch (error) {
-console.error("Error granting admin access: ", error);
-alert('Error granting admin access: ' + error.message);
-}
+    const email = document.getElementById('admin-email').value;
+    if (!email) {
+        alert('Please enter an email address'); // Could also use a modal for this error
+        return;
+    }
+    try {
+        // Find user by email
+        const userQuery = await db.collection("users").where("email", "==", email).get();
+        if (userQuery.empty) {
+            alert('User not found');
+            return;
+        }
+        const userDoc = userQuery.docs[0];
+        const userId = userDoc.id;
+        // Add user to admins collection
+        await db.collection("admins").doc(userId).set({
+            email: email,
+            grantedBy: currentUser.email,
+            date: new Date()
+        });
+        // Clear the input field
+        document.getElementById('admin-email').value = ''; // Keep this line
+
+        // CHANGED FROM ALERT TO MODAL
+        // alert('Admin access granted successfully!'); // Comment out or remove this line
+        showGrantSuccessModal('Admin access granted successfully for ' + email + '!'); // Call the new modal function
+
+        // --- ADD THIS LINE ---
+        loadAdminList(); // Reload the admin list immediately
+        // --- END OF ADDITION ---
+    } catch (error) {
+        console.error("Error granting admin access: ", error);
+        alert('Error granting admin access: ' + error.message); // You could also use a modal for errors
+    }
 }
 // Load admin list
 async function loadAdminList() {
@@ -1848,6 +1866,18 @@ function closeConfirmRevokeModal() {
     // Clear pending IDs when cancelled or closed
     pendingRevokeAdminId = null;
     pendingRevokeAdminEmail = null;
+}
+function showGrantSuccessModal(message = "Admin access granted successfully!") {
+    document.getElementById('grant-success-message').textContent = message;
+    document.getElementById('grantSuccessModal').style.display = 'flex';
+}
+
+function closeGrantSuccessModal() {
+    document.getElementById('grantSuccessModal').style.display = 'none';
+    // Optional: Clear the message when closed
+    document.getElementById('grant-success-message').textContent = "Admin access granted successfully!";
+    // Optional: Clear any potential error message
+    document.getElementById('grant-success-error').textContent = '';
 }
 // --- END NEW FUNCTIONS ---
 
@@ -2964,3 +2994,4 @@ loadAdminList(); // Load admin list specifically when the Admin Access tab is cl
 </script>
 </body>
 </html>
+
