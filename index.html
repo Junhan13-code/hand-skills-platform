@@ -616,30 +616,31 @@ cursor: pointer;
 .delete-btn-setting:hover {
 opacity: 0.9;
 }
+.add-item-input {
+display: flex;
+margin-top: 1rem;
+}
+/* Add this CSS inside your <style> tag */
+
 .move-up-btn, .move-down-btn {
-    background: var(--primary); /* Use your primary color */
+    background: var(--primary); /* Use primary color */
     color: white;
     border: none;
     padding: 0.25rem 0.5rem; /* Smaller padding */
     border-radius: 4px;
     cursor: pointer;
-    font-size: 0.9rem; /* Smaller font */
-    margin-left: 0.25rem; /* Small gap from the name/text */
-    margin-right: 0.25rem; /* Small gap from other buttons */
+    font-size: 0.8rem; /* Smaller font size */
+    margin-left: 0.25rem; /* Small gap between buttons/description */
 }
 
 .move-up-btn:hover, .move-down-btn:hover {
-    background: var(--secondary); /* Use your secondary color on hover */
+    opacity: 0.8; /* Slight hover effect */
 }
 
 .move-up-btn:disabled, .move-down-btn:disabled {
-    background: var(--gray); /* Grey out disabled buttons */
-    cursor: not-allowed; /* Show not-allowed cursor */
-    opacity: 0.6; /* Slightly reduce opacity */
-}
-.add-item-input {
-display: flex;
-margin-top: 1rem;
+    background: var(--gray); /* Greyed out when disabled */
+    cursor: not-allowed;
+    opacity: 0.5;
 }
 .add-item-input input {
 flex: 1;
@@ -1860,53 +1861,64 @@ alert('Error revoking admin access: ' + error.message);
 }
 
 // Load signup settings
-// --- REPLACE EXISTING loadSignupSettings FUNCTION (ADD THIS) ---
+// Update the loadSignupSettings function in your <script> tag
+
 // Load signup settings
 async function loadSignupSettings() {
     try {
         // Load ranks
-        const ranksSnapshot = await db.collection("ranks").orderBy("order").get();
+        const ranksSnapshot = await db.collection("ranks").orderBy("order").get(); // Order by 'order' field
         const ranksList = document.getElementById('ranksList');
-        ranksList.innerHTML = '';
-        ranksSnapshot.forEach((doc, index) => { // Use index to determine up/down possibility
-            const rank = doc.data();
-            const canMoveUp = index > 0;
-            const canMoveDown = index < ranksSnapshot.size - 1; // Use size for last item check
+        ranksList.innerHTML = ''; // Clear previous list
+        const rankDocs = ranksSnapshot.docs; // Get documents array
 
-            ranksList.innerHTML += `
-                <div class="setting-item">
+        rankDocs.forEach((doc, index) => { // Use index from ordered array
+            const rank = doc.data();
+            const isFirst = index === 0;
+            const isLast = index === rankDocs.length - 1;
+
+            // Create HTML element for the rank with move buttons
+            const rankItemHtml = `
+                <div class="setting-item" id="rank-item-${doc.id}"> <!-- Assign unique ID -->
                     <span>${rank.name}</span>
                     <div class="setting-actions">
-                        <button class="move-up-btn" ${canMoveUp ? '' : 'disabled'} onclick="moveRankUp('${doc.id}', ${rank.order})">↑</button>
-                        <button class="move-down-btn" ${canMoveDown ? '' : 'disabled'} onclick="moveRankDown('${doc.id}', ${rank.order})">↓</button>
+                        <button class="move-up-btn" ${isFirst ? 'disabled' : ''} onclick="moveRankUp('${doc.id}', ${index})">↑</button>
+                        <button class="move-down-btn" ${isLast ? 'disabled' : ''} onclick="moveRankDown('${doc.id}', ${index})">↓</button>
                         <button class="delete-btn-setting" onclick="deleteRank('${doc.id}', '${rank.name}')">Delete</button>
                     </div>
                 </div>
             `;
+            ranksList.innerHTML += rankItemHtml;
         });
 
         // Load courses
-        const coursesSnapshot = await db.collection("courses").orderBy("order").get();
+        const coursesSnapshot = await db.collection("courses").orderBy("order").get(); // Order by 'order' field
         const coursesList = document.getElementById('coursesList');
-        coursesList.innerHTML = '';
-        coursesSnapshot.forEach((doc, index) => { // Use index to determine up/down possibility
-            const course = doc.data();
-            const canMoveUp = index > 0;
-            const canMoveDown = index < coursesSnapshot.size - 1; // Use size for last item check
+        coursesList.innerHTML = ''; // Clear previous list
+        const courseDocs = coursesSnapshot.docs; // Get documents array
 
-            coursesList.innerHTML += `
-                <div class="setting-item">
+        courseDocs.forEach((doc, index) => { // Use index from ordered array
+            const course = doc.data();
+            const isFirst = index === 0;
+            const isLast = index === courseDocs.length - 1;
+
+            // Create HTML element for the course with move buttons
+            const courseItemHtml = `
+                <div class="setting-item" id="course-item-${doc.id}"> <!-- Assign unique ID -->
                     <span>${course.name}</span>
                     <div class="setting-actions">
-                        <button class="move-up-btn" ${canMoveUp ? '' : 'disabled'} onclick="moveCourseUp('${doc.id}', ${course.order})">↑</button>
-                        <button class="move-down-btn" ${canMoveDown ? '' : 'disabled'} onclick="moveCourseDown('${doc.id}', ${course.order})">↓</button>
+                        <button class="move-up-btn" ${isFirst ? 'disabled' : ''} onclick="moveCourseUp('${doc.id}', ${index})">↑</button>
+                        <button class="move-down-btn" ${isLast ? 'disabled' : ''} onclick="moveCourseDown('${doc.id}', ${index})">↓</button>
                         <button class="delete-btn-setting" onclick="deleteCourse('${doc.id}', '${course.name}')">Delete</button>
                     </div>
                 </div>
             `;
+            coursesList.innerHTML += courseItemHtml;
         });
+
     } catch (error) {
         console.error("Error loading signup settings: ", error);
+        // Consider adding an error message display in the UI
     }
 }
 
@@ -1931,49 +1943,48 @@ console.error("Error loading signup settings: ", error);
 }
 
 // Add a new rank
+// Update the addRank function in your <script> tag
 async function addRank() {
-const newRankInput = document.getElementById('newRankInput');
-const newRank = newRankInput.value.trim();
-if (!newRank) {
-document.getElementById('rankMessage').textContent = 'Please enter a rank name';
-setTimeout(() => {
-document.getElementById('rankMessage').textContent = '';
-}, 3000);
-return;
+    const newRankInput = document.getElementById('newRankInput');
+    const newRank = newRankInput.value.trim();
+    if (!newRank) {
+        document.getElementById('rankMessage').textContent = 'Please enter a rank name';
+        setTimeout(() => {
+            document.getElementById('rankMessage').textContent = '';
+        }, 3000);
+        return;
+    }
+    try {
+        // Check if rank already exists (using the global ranksData array which should be updated by listener)
+        const existingRank = ranksData.find(r => r.name === newRank);
+        if (existingRank) {
+            document.getElementById('rankMessage').textContent = 'This rank already exists';
+            setTimeout(() => {
+                document.getElementById('rankMessage').textContent = '';
+            }, 3000);
+            return;
+        }
+        // Add new rank to Firestore with order set to the current length of the list
+        // Since ranksData is kept in sync by the listener, its length represents the next index
+        await db.collection("ranks").add({
+            name: newRank,
+            order: ranksData.length // Use the current count as the new order
+        });
+        // Clear input
+        newRankInput.value = '';
+        document.getElementById('rankMessage').textContent = 'Rank added successfully!';
+        setTimeout(() => {
+            document.getElementById('rankMessage').textContent = '';
+        }, 3000);
+    } catch (error) {
+        console.error("Error adding rank: ", error);
+        document.getElementById('rankMessage').textContent = 'Error adding rank: ' + error.message;
+        setTimeout(() => {
+            document.getElementById('rankMessage').textContent = '';
+        }, 3000);
+    }
 }
-
-try {
-// Check if rank already exists
-const existingRank = ranksData.find(r => r.name === newRank);
-if (existingRank) {
-document.getElementById('rankMessage').textContent = 'This rank already exists';
-setTimeout(() => {
-document.getElementById('rankMessage').textContent = '';
-}, 3000);
-return;
-}
-
-// Add new rank to Firestore
-await db.collection("ranks").add({
-name: newRank,
-order: ranksData.length
-});
-
-// Clear input
-newRankInput.value = '';
-document.getElementById('rankMessage').textContent = 'Rank added successfully!';
-setTimeout(() => {
-document.getElementById('rankMessage').textContent = '';
-}, 3000);
-} catch (error) {
-console.error("Error adding rank: ", error);
-document.getElementById('rankMessage').textContent = 'Error adding rank: ' + error.message;
-setTimeout(() => {
-document.getElementById('rankMessage').textContent = '';
-}, 3000);
-}
-}
-
+    
 // Delete a rank
 async function deleteRank(rankId, rankName) {
 if (!confirm(`Are you sure you want to delete the rank "${rankName}"?`)) {
@@ -1997,27 +2008,205 @@ document.getElementById('rankMessage').textContent = '';
 
 // Add a new course
 async function addCourse() {
-const newCourseInput = document.getElementById('newCourseInput');
-const newCourse = newCourseInput.value.trim();
-if (!newCourse) {
-document.getElementById('courseMessage').textContent = 'Please enter a course name';
-setTimeout(() => {
-document.getElementById('courseMessage').textContent = '';
-}, 3000);
-return;
+    const newCourseInput = document.getElementById('newCourseInput');
+    const newCourse = newCourseInput.value.trim();
+    if (!newCourse) {
+        document.getElementById('courseMessage').textContent = 'Please enter a course name';
+        setTimeout(() => {
+            document.getElementById('courseMessage').textContent = '';
+        }, 3000);
+        return;
+    }
+    try {
+        // Check if course already exists (using the global coursesData array which should be updated by listener)
+        const existingCourse = coursesData.find(c => c.name === newCourse);
+        if (existingCourse) {
+            document.getElementById('courseMessage').textContent = 'This course already exists';
+            setTimeout(() => {
+                document.getElementById('courseMessage').textContent = '';
+            }, 3000);
+            return;
+        }
+        // Add new course to Firestore with order set to the current length of the list
+        // Since coursesData is kept in sync by the listener, its length represents the next index
+        await db.collection("courses").add({
+            name: newCourse,
+            order: coursesData.length // Use the current count as the new order
+        });
+        // Clear input
+        newCourseInput.value = '';
+        document.getElementById('courseMessage').textContent = 'Course added successfully!';
+        setTimeout(() => {
+            document.getElementById('courseMessage').textContent = '';
+        }, 3000);
+    } catch (error) {
+        console.error("Error adding course: ", error);
+        document.getElementById('courseMessage').textContent = 'Error adding course: ' + error.message;
+        setTimeout(() => {
+            document.getElementById('courseMessage').textContent = '';
+        }, 3000);
+    }
+}
+// Add these new functions to your <script> tag
+
+// Function to move a rank up (decrease its order number)
+async function moveRankUp(rankId, currentIndex) {
+    if (currentIndex <= 0) return; // Already first, can't move up
+
+    const targetIndex = currentIndex - 1;
+    try {
+        // Get the target rank's document ID (the one above the current rank)
+        const targetRankSnapshot = await db.collection("ranks")
+                                             .where("order", "==", targetIndex)
+                                             .limit(1)
+                                             .get();
+
+        if (targetRankSnapshot.empty) {
+            console.error("Target rank not found for order:", targetIndex);
+            return; // Shouldn't happen if list is properly ordered
+        }
+
+        const targetRankDoc = targetRankSnapshot.docs[0];
+        const targetRankId = targetRankDoc.id;
+
+        // Perform batch write to swap orders atomically
+        const batch = db.batch();
+
+        // Update current rank's order to the target index
+        batch.update(db.collection("ranks").doc(rankId), { order: targetIndex });
+        // Update target rank's order to the current rank's original index
+        batch.update(db.collection("ranks").doc(targetRankId), { order: currentIndex });
+
+        await batch.commit();
+        console.log("Rank moved up successfully");
+
+        // Reload the settings list to reflect changes
+        loadSignupSettings();
+
+    } catch (error) {
+        console.error("Error moving rank up: ", error);
+        alert("Failed to move rank up: " + error.message);
+    }
 }
 
-try {
-// Check if course already exists
-const existingCourse = coursesData.find(c => c.name === newCourse);
-if (existingCourse) {
-document.getElementById('courseMessage').textContent = 'This course already exists';
-setTimeout(() => {
-document.getElementById('courseMessage').textContent = '';
-}, 3000);
-return;
+// Function to move a rank down (increase its order number)
+async function moveRankDown(rankId, currentIndex) {
+    // Assuming ranksData is updated by the listener, we get the latest count implicitly from the snapshot
+    // Or you could fetch the count again if needed, but listener should update ranksData
+    // For now, rely on the index passed and fetching the next one
+    try {
+        // Get the rank below the current one
+        const targetRankSnapshot = await db.collection("ranks")
+                                             .where("order", "==", currentIndex + 1)
+                                             .limit(1)
+                                             .get();
+
+        if (targetRankSnapshot.empty) {
+             console.log("Reached end, cannot move rank down"); // Log if already last
+             return; // Already last, can't move down
+        }
+
+        const targetRankDoc = targetRankSnapshot.docs[0];
+        const targetRankId = targetRankDoc.id;
+        const targetIndex = currentIndex + 1;
+
+        // Perform batch write to swap orders atomically
+        const batch = db.batch();
+
+        // Update current rank's order to the target index
+        batch.update(db.collection("ranks").doc(rankId), { order: targetIndex });
+        // Update target rank's order to the current rank's original index
+        batch.update(db.collection("ranks").doc(targetRankId), { order: currentIndex });
+
+        await batch.commit();
+        console.log("Rank moved down successfully");
+
+        // Reload the settings list to reflect changes
+        loadSignupSettings();
+
+    } catch (error) {
+        console.error("Error moving rank down: ", error);
+        alert("Failed to move rank down: " + error.message);
+    }
 }
 
+// Function to move a course up (decrease its order number)
+async function moveCourseUp(courseId, currentIndex) {
+    if (currentIndex <= 0) return; // Already first, can't move up
+
+    const targetIndex = currentIndex - 1;
+    try {
+        // Get the target course's document ID (the one above the current course)
+        const targetCourseSnapshot = await db.collection("courses")
+                                              .where("order", "==", targetIndex)
+                                              .limit(1)
+                                              .get();
+
+        if (targetCourseSnapshot.empty) {
+            console.error("Target course not found for order:", targetIndex);
+            return; // Shouldn't happen if list is properly ordered
+        }
+
+        const targetCourseDoc = targetCourseSnapshot.docs[0];
+        const targetCourseId = targetCourseDoc.id;
+
+        // Perform batch write to swap orders atomically
+        const batch = db.batch();
+
+        // Update current course's order to the target index
+        batch.update(db.collection("courses").doc(courseId), { order: targetIndex });
+        // Update target course's order to the current course's original index
+        batch.update(db.collection("courses").doc(targetCourseId), { order: currentIndex });
+
+        await batch.commit();
+        console.log("Course moved up successfully");
+
+        // Reload the settings list to reflect changes
+        loadSignupSettings();
+
+    } catch (error) {
+        console.error("Error moving course up: ", error);
+        alert("Failed to move course up: " + error.message);
+    }
+}
+
+// Function to move a course down (increase its order number)
+async function moveCourseDown(courseId, currentIndex) {
+     try {
+        // Get the course below the current one
+        const targetCourseSnapshot = await db.collection("courses")
+                                              .where("order", "==", currentIndex + 1)
+                                              .limit(1)
+                                              .get();
+
+        if (targetCourseSnapshot.empty) {
+             console.log("Reached end, cannot move course down"); // Log if already last
+             return; // Already last, can't move down
+        }
+
+        const targetCourseDoc = targetCourseSnapshot.docs[0];
+        const targetCourseId = targetCourseDoc.id;
+        const targetIndex = currentIndex + 1;
+
+        // Perform batch write to swap orders atomically
+        const batch = db.batch();
+
+        // Update current course's order to the target index
+        batch.update(db.collection("courses").doc(courseId), { order: targetIndex });
+        // Update target course's order to the current course's original index
+        batch.update(db.collection("courses").doc(targetCourseId), { order: currentIndex });
+
+        await batch.commit();
+        console.log("Course moved down successfully");
+
+        // Reload the settings list to reflect changes
+        loadSignupSettings();
+
+    } catch (error) {
+        console.error("Error moving course down: ", error);
+        alert("Failed to move course down: " + error.message);
+    }
+}
 // Add new course to Firestore
 await db.collection("courses").add({
 name: newCourse,
@@ -2059,98 +2248,7 @@ document.getElementById('courseMessage').textContent = '';
 }, 3000);
 }
 }
-// --- ADD THESE FUNCTIONS (ADD THESE) ---
 
-// Move Rank Up
-async function moveRankUp(rankId, currentOrder) {
-    if (currentOrder <= 0) return; // Already at the top
-    const targetOrder = currentOrder - 1;
-    try {
-        const targetItemSnapshot = await db.collection("ranks").where("order", "==", targetOrder).limit(1).get();
-        if (!targetItemSnapshot.empty) {
-            const targetDoc = targetItemSnapshot.docs[0];
-            const targetDocId = targetDoc.id;
-            const batch = db.batch();
-            batch.update(db.collection("ranks").doc(rankId), { order: targetOrder });
-            batch.update(db.collection("ranks").doc(targetDocId), { order: currentOrder });
-            await batch.commit();
-            console.log("Rank moved up successfully.");
-            // No need to manually call loadSignupSettings, listener will trigger update
-        }
-    } catch (error) {
-        console.error("Error moving rank up: ", error);
-    }
-}
-
-// Move Rank Down
-async function moveRankDown(rankId, currentOrder) {
-    // Need to get max order dynamically
-    const snapshot = await db.collection("ranks").orderBy("order").get();
-    const maxOrder = snapshot.size - 1;
-    if (currentOrder >= maxOrder) return; // Already at the bottom
-    const targetOrder = currentOrder + 1;
-    try {
-        const targetItemSnapshot = await db.collection("ranks").where("order", "==", targetOrder).limit(1).get();
-        if (!targetItemSnapshot.empty) {
-            const targetDoc = targetItemSnapshot.docs[0];
-            const targetDocId = targetDoc.id;
-            const batch = db.batch();
-            batch.update(db.collection("ranks").doc(rankId), { order: targetOrder });
-            batch.update(db.collection("ranks").doc(targetDocId), { order: currentOrder });
-            await batch.commit();
-            console.log("Rank moved down successfully.");
-            // No need to manually call loadSignupSettings, listener will trigger update
-        }
-    } catch (error) {
-        console.error("Error moving rank down: ", error);
-    }
-}
-
-// Move Course Up
-async function moveCourseUp(courseId, currentOrder) {
-    if (currentOrder <= 0) return; // Already at the top
-    const targetOrder = currentOrder - 1;
-    try {
-        const targetItemSnapshot = await db.collection("courses").where("order", "==", targetOrder).limit(1).get();
-        if (!targetItemSnapshot.empty) {
-            const targetDoc = targetItemSnapshot.docs[0];
-            const targetDocId = targetDoc.id;
-            const batch = db.batch();
-            batch.update(db.collection("courses").doc(courseId), { order: targetOrder });
-            batch.update(db.collection("courses").doc(targetDocId), { order: currentOrder });
-            await batch.commit();
-            console.log("Course moved up successfully.");
-            // No need to manually call loadSignupSettings, listener will trigger update
-        }
-    } catch (error) {
-        console.error("Error moving course up: ", error);
-    }
-}
-
-// Move Course Down
-async function moveCourseDown(courseId, currentOrder) {
-    // Need to get max order dynamically
-    const snapshot = await db.collection("courses").orderBy("order").get();
-    const maxOrder = snapshot.size - 1;
-    if (currentOrder >= maxOrder) return; // Already at the bottom
-    const targetOrder = currentOrder + 1;
-    try {
-        const targetItemSnapshot = await db.collection("courses").where("order", "==", targetOrder).limit(1).get();
-        if (!targetItemSnapshot.empty) {
-            const targetDoc = targetItemSnapshot.docs[0];
-            const targetDocId = targetDoc.id;
-            const batch = db.batch();
-            batch.update(db.collection("courses").doc(courseId), { order: targetOrder });
-            batch.update(db.collection("courses").doc(targetDocId), { order: currentOrder });
-            await batch.commit();
-            console.log("Course moved down successfully.");
-            // No need to manually call loadSignupSettings, listener will trigger update
-        }
-    } catch (error) {
-        console.error("Error moving course down: ", error);
-    }
-}
-// --- END ADDITION OF FUNCTIONS ---
 // Logout function
 function logout() {
     auth.signOut().then(() => {
