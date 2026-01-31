@@ -2005,6 +2005,14 @@ async function moveCourseDown(courseId, currentOrder) {
 }
 // Move Skill Up - RELIES ON THE GLOBAL skillsData ARRAY
 async function moveSkillUp(skillId, currentOrder) {
+    // --- ADD CHECK FOR VALID ORDER VALUE ---
+    if (typeof currentOrder !== 'number' || isNaN(currentOrder)) {
+        console.error("Invalid order value received for moveSkillUp:", currentOrder);
+        alert("Cannot move skill: Invalid order data.");
+        return;
+    }
+    // --- END CHECK ---
+
     // Find the index of the skill to move in the global skillsData array
     const currentIndex = skillsData.findIndex(s => s.id === skillId);
 
@@ -2022,7 +2030,8 @@ async function moveSkillUp(skillId, currentOrder) {
         return;
     }
     const targetSkillId = previousSkill.id;
-    const targetOrder = previousSkill.order; // This will become the new order for the moved skill
+    // Use the previous skill's order, ensuring it's a number
+    const targetOrder = previousSkill.order !== undefined && previousSkill.order !== null ? previousSkill.order : currentOrder - 1;
 
     try {
         // Perform batch write to swap orders atomically
@@ -2051,9 +2060,16 @@ async function moveSkillUp(skillId, currentOrder) {
         alert("Failed to move skill up: " + error.message);
     }
 }
-
 // Move Skill Down - RELIES ON THE GLOBAL skillsData ARRAY
 async function moveSkillDown(skillId, currentOrder) {
+    // --- ADD CHECK FOR VALID ORDER VALUE ---
+    if (typeof currentOrder !== 'number' || isNaN(currentOrder)) {
+        console.error("Invalid order value received for moveSkillDown:", currentOrder);
+        alert("Cannot move skill: Invalid order data.");
+        return;
+    }
+    // --- END CHECK ---
+
     // Find the index of the skill to move in the global skillsData array
     const currentIndex = skillsData.findIndex(s => s.id === skillId);
 
@@ -2071,7 +2087,8 @@ async function moveSkillDown(skillId, currentOrder) {
         return;
     }
     const targetSkillId = nextSkill.id;
-    const targetOrder = nextSkill.order; // This will become the new order for the moved skill
+    // Use the next skill's order, ensuring it's a number
+    const targetOrder = nextSkill.order !== undefined && nextSkill.order !== null ? nextSkill.order : currentOrder + 1;
 
     try {
         // Perform batch write to swap orders atomically
@@ -2283,6 +2300,8 @@ function showSection(section) {
 // Uses the globally managed skillsData array, sorted by 'order'
 // Load skills list in admin panel - MODIFIED TO USE GRID LAYOUT WITH EDIT/DELETE/REORDER BUTTONS
 // Uses the globally managed skillsData array, sorted by 'order'
+// Load skills list in admin panel - MODIFIED TO USE GRID LAYOUT WITH EDIT/DELETE/REORDER BUTTONS
+// Uses the globally managed skillsData array, sorted by 'order'
 async function loadSkillsList() {
     const skillsList = document.getElementById('skillsList');
     skillsList.innerHTML = '';
@@ -2313,6 +2332,10 @@ async function loadSkillsList() {
         const isTop = index === 0;
         const isBottom = index === sortedSkillsArray.length - 1;
 
+        // --- FIX: Provide fallback value (0) for skill.order if it's undefined/null ---
+        const orderValue = skill.order !== undefined && skill.order !== null ? skill.order : 0;
+        // --- END FIX ---
+
         skillCard.innerHTML = `
             <div class="skill-icon">
                 <i class="${skill.icon}"></i>
@@ -2321,10 +2344,10 @@ async function loadSkillsList() {
                 <h3 class="skill-name">${skill.name}</h3>
                 <p class="skill-desc">${skill.description.substring(0, 100)}...</p>
                 <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                    <button class="skill-btn" style="background: var(--primary); flex: 1;" ${isTop ? 'disabled' : ''} onclick="moveSkillUp('${skill.id}', ${skill.order || 0})" title="Move Up">
+                    <button class="skill-btn" style="background: var(--primary); flex: 1;" ${isTop ? 'disabled' : ''} onclick="moveSkillUp('${skill.id}', ${orderValue})" title="Move Up">
                         <i class="fas fa-arrow-up"></i>
                     </button>
-                    <button class="skill-btn" style="background: var(--primary); flex: 1;" ${isBottom ? 'disabled' : ''} onclick="moveSkillDown('${skill.id}', ${skill.order || 0})" title="Move Down">
+                    <button class="skill-btn" style="background: var(--primary); flex: 1;" ${isBottom ? 'disabled' : ''} onclick="moveSkillDown('${skill.id}', ${orderValue})" title="Move Down">
                         <i class="fas fa-arrow-down"></i>
                     </button>
                 </div>
