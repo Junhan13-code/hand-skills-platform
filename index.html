@@ -1975,7 +1975,7 @@ async function loadAdminList() {
         document.getElementById('adminList').innerHTML = '<p>Error loading admin list.</p>';
     }
 }
-// Revoke admin access - MODIFIED TO USE CONFIRMATION MODAL
+// Revoke admin access - MODIFIED TO USE CONFIRMATION MODAL AND NOTIFICATIONS
 async function revokeAdminAccess(adminId, email) {
     // Prepare the confirmation message
     const confirmationMessage = `Are you sure you want to revoke admin access for ${email}?`;
@@ -3173,6 +3173,7 @@ loadAdminList(); // Load admin list specifically when the Admin Access tab is cl
 </script>
 </body>
 </html>
+
 
 
 
