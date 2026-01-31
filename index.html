@@ -926,6 +926,9 @@ right: 10px;
 <button class="admin-switch-btn" id="adminBackBtn" onclick="switchToAdminInterface()" style="display: none;">
 <i class="fas fa-lock"></i> Admin View
 </button>
+<button class="profile-btn" id="loginBtn" onclick="openLoginPopup()" style="display: none;">
+    <i class="fas fa-sign-in-alt"></i> Login
+</button>
 </header>
 
 <!-- Profile Popup -->
@@ -1281,22 +1284,30 @@ let coursesData = []; // Store courses from Firestore
 let wasInAdminView = false; // Track if we were in admin view before switching
 
 // Initialize the app
+// Initialize the app
 window.onload = function() {
-// Check if user is already logged in
-auth.onAuthStateChanged(user => {
-if (user) {
-loadUserData(user.uid);
-} else {
-// Show user interface by default
-document.getElementById('userInterface').style.display = 'block';
-loadSkillsFromFirebase();
-// Show login popup
-document.getElementById('loginPopup').style.display = 'flex';
-}
-});
-
-// Load ranks and courses from Firestore
-loadRanksAndCourses();
+    // Check if user is already logged in
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            // User is logged in
+            loadUserData(user.uid);
+            // Hide the login button if user is logged in
+            document.getElementById('loginBtn').style.display = 'none'; 
+        } else {
+            // User is not logged in
+            // Show user interface by default
+            document.getElementById('userInterface').style.display = 'block';
+            loadSkillsFromFirebase();
+            
+            // Hide the login popup initially
+            document.getElementById('loginPopup').style.display = 'none'; 
+            // Show the login button in the header
+            document.getElementById('loginBtn').style.display = 'block'; 
+        }
+    });
+    
+    // Load ranks and courses from Firestore
+    loadRanksAndCourses();
 };
 
 // Load ranks and courses from Firestore
@@ -1594,13 +1605,19 @@ document.getElementById('auth-error').textContent = error.message;
 }
 
 // Close login popup
+// Close login popup
 function closeLoginPopup() {
-document.getElementById('loginPopup').style.display = 'none';
+    document.getElementById('loginPopup').style.display = 'none';
+    // Show the login button in the header when popup is closed while logged out
+    document.getElementById('loginBtn').style.display = 'block'; 
 }
 
 // Open login popup
+// Open login popup
 function openLoginPopup() {
-document.getElementById('loginPopup').style.display = 'flex';
+    document.getElementById('loginPopup').style.display = 'flex';
+    // Hide the login button when the popup opens
+    document.getElementById('loginBtn').style.display = 'none'; 
 }
 
 // Toggle profile popup
@@ -1978,20 +1995,30 @@ document.getElementById('courseMessage').textContent = '';
 
 // Logout function
 function logout() {
-auth.signOut().then(() => {
-currentUser = null;
-isAdmin = false;
-document.getElementById('adminDashboard').style.display = 'none';
-document.getElementById('userInterface').style.display = 'block';
-document.getElementById('profilePopup').style.display = 'none';
-document.getElementById('profileBtn').style.display = 'none';
-document.getElementById('adminSwitchBtn').style.display = 'none';
-document.getElementById('adminBackBtn').style.display = 'none';
-document.getElementById('loginPopup').style.display = 'flex';
-loadSkillsFromFirebase();
-}).catch(error => {
-console.error("Error signing out: ", error);
-});
+    auth.signOut().then(() => {
+        currentUser = null;
+        isAdmin = false;
+        
+        // Hide interfaces
+        document.getElementById('adminDashboard').style.display = 'none';
+        document.getElementById('userInterface').style.display = 'block';
+        document.getElementById('profilePopup').style.display = 'none';
+        
+        // Hide profile/admin buttons
+        document.getElementById('profileBtn').style.display = 'none';
+        document.getElementById('adminSwitchBtn').style.display = 'none';
+        document.getElementById('adminBackBtn').style.display = 'none';
+        
+        // Hide the login popup if it happens to be open
+        document.getElementById('loginPopup').style.display = 'none'; 
+        
+         // Show the login button again after logging out
+        document.getElementById('loginBtn').style.display = 'block'; 
+        
+        loadSkillsFromFirebase();
+    }).catch(error => {
+        console.error("Error signing out: ", error);
+    });
 }
 
 // Show different sections in admin panel
@@ -2621,3 +2648,4 @@ document.getElementById(`${tabName}Tab`).classList.add('active');
 </script>
 </body>
 </html>
+
