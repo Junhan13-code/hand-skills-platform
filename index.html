@@ -204,20 +204,61 @@ margin-top: 1rem;
 display: flex;
 gap: 0.5rem;
 }
-.action-btn {
+/* CORRECTED SELECTORS: Use more specific classes or IDs for the action buttons */
+.skill-card .skill-actions .action-btn,
+#edit-skill-form .action-btn,
+#edit-skill-form .btn.add-step-btn,
+#edit-skill-form .btn.add-quiz-btn,
+#edit-skill-form .btn.update-rank-btn,
+#edit-skill-form .btn.logout-btn-popup,
+#edit-skill-form .btn.close-profile-btn,
+#edit-skill-form .btn.delete-btn-setting,
+#edit-skill-form .btn.move-up-btn,
+#edit-skill-form .btn.move-down-btn,
+#edit-skill-form .btn.btn-secondary,
+#edit-skill-form .btn.btn-primary {
 padding: 0.4rem 0.8rem;
 border-radius: 4px;
 border: none;
 cursor: pointer;
 font-size: 0.9rem;
+margin-left: 0.25rem; /* Add small gap between buttons if needed */
+margin-right: 0.25rem;
 }
-.edit-btn {
+/* Specific styles for action buttons inside skill cards */
+.skill-card .skill-actions .edit-btn {
 background: var(--warning);
 color: white;
 }
-.delete-btn {
+.skill-card .skill-actions .delete-btn {
 background: var(--danger);
 color: white;
+}
+/* Specific styles for action buttons inside edit form */
+#edit-skill-form .btn.add-step-btn,
+#edit-skill-form .btn.add-quiz-btn {
+margin-top: 1rem;
+background: var(--success);
+color: white;
+}
+#edit-skill-form .btn.btn-secondary {
+background: var(--gray);
+color: white;
+}
+#edit-skill-form .btn.btn-primary {
+background: var(--primary);
+color: white;
+}
+/* Specific styles for setting item actions */
+.setting-actions .delete-btn-setting {
+background: var(--danger);
+color: white;
+padding: 0.25rem 0.5rem;
+}
+.setting-actions .move-up-btn, .setting-actions .move-down-btn {
+background: var(--primary);
+color: white;
+padding: 0.25rem 0.5rem;
 }
 /* Edit Form */
 .edit-form {
@@ -267,11 +308,6 @@ display: grid;
 grid-template-columns: 1fr 1fr;
 gap: 1rem;
 }
-.add-step-btn {
-margin-top: 1rem;
-background: var(--success);
-color: white;
-}
 /* Quiz Editor */
 .quiz-editor {
 margin-top: 1.5rem;
@@ -298,11 +334,6 @@ gap: 1rem;
 display: grid;
 grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 gap: 1rem;
-}
-.add-quiz-btn {
-margin-top: 1rem;
-background: var(--success);
-color: white;
 }
 /* Settings Tabs */
 .settings-tabs {
@@ -569,26 +600,16 @@ display: flex;
 gap: 0.5rem;
 }
 .delete-btn-setting {
-background: var(--danger);
-color: white;
 border: none;
 padding: 0.25rem 0.5rem;
 border-radius: 4px;
 cursor: pointer;
-}
-.delete-btn-setting:hover {
-opacity: 0.9;
 }
 .move-up-btn, .move-down-btn {
-background: var(--primary);
-color: white;
 border: none;
 padding: 0.25rem 0.5rem;
 border-radius: 4px;
 cursor: pointer;
-}
-.move-up-btn:hover, .move-down-btn:hover {
-opacity: 0.9;
 }
 .add-item-input {
 display: flex;
@@ -1441,7 +1462,7 @@ loadSkillsFromFirebase();
 showProfileCompletion();
 }
 } catch (error) {
-console.error("Error loading user data: ", error);
+console.error("Error loading user  ", error);
 }
 }
 // Show profile completion form
@@ -2439,7 +2460,7 @@ skillCard.setAttribute('data-skill-id', skill.id);
 const isTop = index === 0;
 const isBottom = index === sortedSkillsArray.length - 1;
 // --- FIX: Provide fallback value (0) for skill.order if it's undefined/null ---
-const orderValue = skill.order !== undefined && skill.order !== null ? a.order : 0;
+const orderValue = skill.order !== undefined && skill.order !== null ? skill.order : 0; // Use skill.order, not a.order
 // --- END FIX ---
 skillCard.innerHTML = `
 <div class="skill-icon">
