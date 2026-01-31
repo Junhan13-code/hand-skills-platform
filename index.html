@@ -1476,6 +1476,7 @@ function showConfirmationModal(message, actionCallback) {
     pendingRevokeAction = actionCallback; // Store the action to call if confirmed
 
     overlay.style.display = 'flex'; // Show the modal
+    console.log("Show confirmation modal called"); // Debug log
 }
 
 // Function to hide the confirmation modal
@@ -1483,13 +1484,17 @@ function closeConfirmationModal() {
     const overlay = document.getElementById('confirmationOverlay');
     overlay.style.display = 'none'; // Hide the modal
     pendingRevokeAction = null; // Clear the pending action
+    console.log("Close confirmation modal called"); // Debug log
 }
 
 // Function to handle the confirmed action (e.g., revoking admin access)
 function executePendingAction() {
+    console.log("Execute pending action called, pending action exists:", !!pendingRevokeAction); // Debug log
     if (pendingRevokeAction && typeof pendingRevokeAction === 'function') {
         pendingRevokeAction(); // Execute the stored action
         closeConfirmationModal(); // Close the modal after execution
+    } else {
+        console.warn("No pending action to execute or it's not a function.");
     }
 }
 // Load ranks and courses from Firestore
@@ -3173,6 +3178,7 @@ loadAdminList(); // Load admin list specifically when the Admin Access tab is cl
 </script>
 </body>
 </html>
+
 
 
 
