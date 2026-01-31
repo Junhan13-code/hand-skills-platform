@@ -973,6 +973,69 @@ right: 10px;
     font-weight: bold;
     font-size: 1.2em;
 }
+/* Confirmation Modal Overlay */
+.confirmation-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3002; /* Ensure it's above notifications and other modals */
+    display: none; /* Hidden by default */
+}
+
+/* Confirmation Modal Box */
+.confirmation-modal {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    width: 100%;
+    max-width: 450px;
+    text-align: center;
+    position: relative;
+}
+
+.confirmation-modal h3 {
+    margin-bottom: 1.5rem;
+    color: var(--danger); /* Use danger color for warnings */
+}
+
+.confirmation-modal p {
+    margin-bottom: 1.5rem;
+    color: var(--dark);
+}
+
+.confirmation-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.confirmation-actions .btn {
+    flex: 1;
+    max-width: 150px; /* Limit button width */
+}
+
+.confirmation-actions .btn-confirm {
+    background: var(--danger); /* Use danger color for confirm */
+}
+
+.confirmation-actions .btn-confirm:hover {
+    background: #e53e3e; /* Darker danger on hover */
+}
+
+.confirmation-actions .btn-cancel {
+    background: var(--gray); /* Use gray for cancel */
+}
+
+.confirmation-actions .btn-cancel:hover {
+    background: #5a6268; /* Darker gray on hover */
+}
 </style>
 </head>
 <body>
@@ -1299,6 +1362,16 @@ right: 10px;
 </footer>
 <!-- Notification Container -->
 <div class="notification-container" id="notificationContainer"></div>
+<div class="confirmation-overlay" id="confirmationOverlay">
+    <div class="confirmation-modal">
+        <h3>Confirm Action</h3>
+        <p id="confirmationMessage">Are you sure you want to perform this action?</p>
+        <div class="confirmation-actions">
+            <button class="btn btn-confirm" id="confirmActionBtn" onclick="executePendingAction()">Confirm</button> <!-- Added onclick handler -->
+            <button class="btn btn-cancel" onclick="closeConfirmationModal()">Cancel</button>
+        </div>
+    </div>
+</div>
 </div>
 <script>
 // Initialize Firebase
@@ -1327,7 +1400,7 @@ let isAdmin = false; // Track if current user is admin
 let ranksData = []; // Store ranks from Firestore
 let coursesData = []; // Store courses from Firestore
 let wasInAdminView = false; // Track if we were in admin view before switching
-// Initialize the app
+let pendingRevokeAction = null; // Variable to hold the action to perform after confirmation
 // Initialize the app
 window.onload = function() {
 // Check if user is already logged in
@@ -1352,6 +1425,7 @@ document.getElementById('loginBtn').style.display = 'block';
 loadRanksAndCourses();
 };
 
+// Function to show a notification popup
 // Function to show a notification popup
 function showNotification(message, type = 'info') { // Default type is 'info', can be 'success', 'error', 'warning'
     const container = document.getElementById('notificationContainer');
@@ -1390,6 +1464,33 @@ function removeNotification(notificationElement) {
             notificationElement.parentNode.removeChild(notificationElement);
         }
     }, 300); // Match the transition duration for smooth removal
+}
+
+// Function to show the confirmation modal
+function showConfirmationModal(message, actionCallback) {
+    const overlay = document.getElementById('confirmationOverlay');
+    const messageElement = document.getElementById('confirmationMessage');
+    const confirmBtn = document.getElementById('confirmActionBtn');
+
+    messageElement.textContent = message;
+    pendingRevokeAction = actionCallback; // Store the action to call if confirmed
+
+    overlay.style.display = 'flex'; // Show the modal
+}
+
+// Function to hide the confirmation modal
+function closeConfirmationModal() {
+    const overlay = document.getElementById('confirmationOverlay');
+    overlay.style.display = 'none'; // Hide the modal
+    pendingRevokeAction = null; // Clear the pending action
+}
+
+// Function to handle the confirmed action (e.g., revoking admin access)
+function executePendingAction() {
+    if (pendingRevokeAction && typeof pendingRevokeAction === 'function') {
+        pendingRevokeAction(); // Execute the stored action
+        closeConfirmationModal(); // Close the modal after execution
+    }
 }
 // Load ranks and courses from Firestore
 async function loadRanksAndCourses() {
@@ -1870,25 +1971,32 @@ console.error("Error loading admin list: ", error);
 document.getElementById('adminList').innerHTML = '<p>Error loading admin list.</p>';
 }
 }
-// Revoke admin access
+// Revoke admin access - MODIFIED TO USE CONFIRMATION MODAL
 async function revokeAdminAccess(adminId, email) {
-    if (!confirm(`Are you sure you want to revoke admin access for ${email}?`)) {
-        return;
-    }
-    try {
-        await db.collection("admins").doc(adminId).delete();
-        // Use the new notification system
-        showNotification('Admin access revoked successfully!', 'success');
+    // Prepare the confirmation message
+    const confirmationMessage = `Are you sure you want to revoke admin access for ${email}?`;
 
-        // Reload the admin list immediately
-        loadAdminList();
+    // Prepare the action to perform if confirmed
+    const revokeAction = async () => {
+        try {
+            await db.collection("admins").doc(adminId).delete();
+            // Use the new notification system
+            showNotification('Admin access revoked successfully!', 'success');
 
-    } catch (error) {
-        console.error("Error revoking admin access: ", error);
-        // Use the new notification system for errors
-        showNotification('Error revoking admin access: ' + error.message, 'error');
-    }
+            // Reload the admin list immediately
+            loadAdminList();
+
+        } catch (error) {
+            console.error("Error revoking admin access: ", error);
+            // Use the new notification system for errors
+            showNotification('Error revoking admin access: ' + error.message, 'error');
+        }
+    };
+
+    // Show the confirmation modal with the message and action
+    showConfirmationModal(confirmationMessage, revokeAction);
 }
+
 // Load signup settings
 async function loadSignupSettings() {
     try {
@@ -3061,6 +3169,7 @@ loadAdminList(); // Load admin list specifically when the Admin Access tab is cl
 </script>
 </body>
 </html>
+
 
 
 
