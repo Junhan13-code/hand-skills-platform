@@ -1272,7 +1272,8 @@ let isAdmin = false; // Track if current user is admin
 let ranksData = []; // Store ranks from Firestore
 let coursesData = []; // Store courses from Firestore
 let wasInAdminView = false; // Track if we were in admin view before switching
-// Initialize the app
+let pendingRevokeAdminId = null; // To store the ID of the admin to potentially revoke
+let pendingRevokeAdminEmail = null; // To store the email of the admin to potentially revoke
 // Initialize the app
 window.onload = function() {
 // Check if user is already logged in
@@ -1774,22 +1775,67 @@ document.getElementById('adminList').innerHTML = '<p>Error loading admin list.</
 }
 }
 // Revoke admin access
+// Revoke admin access - Updated to use modal
 async function revokeAdminAccess(adminId, email) {
-    if (!confirm(`Are you sure you want to revoke admin access for ${email}?`)) {
-        return;
+    // Store the IDs for the actual revocation action
+    pendingRevokeAdminId = adminId;
+    pendingRevokeAdminEmail = email;
+
+    // Set the message in the modal
+    document.getElementById('confirm-revoke-message').textContent =
+        `Are you sure you want to revoke admin access for ${email}? This action cannot be undone.`;
+
+    // Clear any previous errors
+    document.getElementById('revoke-confirm-error').textContent = '';
+
+    // Show the confirmation modal
+    document.getElementById('confirmRevokeModal').style.display = 'flex';
+
+    // Hide the admin access list container temporarily (optional, depending on desired UX)
+    // const adminList = document.getElementById('adminList');
+    // if (adminList) adminList.style.display = 'none';
+}
+// Performs the actual revocation after modal confirmation
+async function performRevokeAdmin() {
+    if (!pendingRevokeAdminId || !pendingRevokeAdminEmail) {
+         console.error("Revoke operation lacks necessary data.");
+         closeConfirmRevokeModal(); // Close modal anyway
+         return; // Exit if data is missing
     }
+
     try {
-        await db.collection("admins").doc(adminId).delete();
-        alert('Admin access revoked successfully!');
+        await db.collection("admins").doc(pendingRevokeAdminId).delete();
+        // Success feedback could go here if needed outside the list reload
+        // e.g., alert('Admin access revoked successfully!'); // This is still a browser alert, avoid if strictly in-browser is required
+        console.log('Admin access revoked successfully for:', pendingRevokeAdminEmail);
+
+        // Close the modal
+        closeConfirmRevokeModal();
 
         // --- ADD THIS LINE ---
-        loadAdminList(); // Reload the admin list immediately
+        loadAdminList(); // Reload the admin list to reflect the change
         // --- END OF ADDITION ---
+
+        // Clear pending IDs
+        pendingRevokeAdminId = null;
+        pendingRevokeAdminEmail = null;
 
     } catch (error) {
         console.error("Error revoking admin access: ", error);
-        alert('Error revoking admin access: ' + error.message);
+        // Display error message inside the modal
+        document.getElementById('revoke-confirm-error').textContent = 'Error revoking admin access: ' + error.message;
     }
+}
+// Closes the confirmation modal
+function closeConfirmRevokeModal() {
+    document.getElementById('confirmRevokeModal').style.display = 'none';
+    // Optionally, show the admin access list container again if it was hidden
+    // const adminList = document.getElementById('adminList');
+    // if (adminList) adminList.style.display = 'block'; // Adjust based on your layout needs
+
+     // Clear pending IDs when cancelled or closed
+    pendingRevokeAdminId = null;
+    pendingRevokeAdminEmail = null;
 }
 // Load signup settings
 async function loadSignupSettings() {
@@ -2963,3 +3009,4 @@ loadAdminList(); // Load admin list specifically when the Admin Access tab is cl
 </script>
 </body>
 </html>
+
