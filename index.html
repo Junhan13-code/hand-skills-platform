@@ -1993,7 +1993,80 @@ async function moveCourseDown(courseId, currentOrder) {
         alert("Failed to move course down: " + error.message);
     }
 }
+// Move Skill Up
+async function moveSkillUp(skillId, currentOrder) {
+    if (currentOrder <= 0) return; // Already at the top
+    const targetOrder = currentOrder - 1;
 
+    try {
+        // Find the skill that currently has the target order
+        const targetSkillSnapshot = await db.collection("skills")
+            .where("order", "==", targetOrder)
+            .limit(1)
+            .get();
+
+        if (targetSkillSnapshot.empty) {
+            console.error("Target skill for swapping not found for order:", targetOrder);
+            return;
+        }
+
+        const targetSkillDoc = targetSkillSnapshot.docs[0];
+        const targetSkillId = targetSkillDoc.id;
+
+        // Perform batch write to swap orders atomically
+        const batch = db.batch();
+        batch.update(db.collection("skills").doc(skillId), { order: targetOrder });
+        batch.update(db.collection("skills").doc(targetSkillId), { order: currentOrder });
+        await batch.commit();
+
+        console.log("Skill moved up successfully");
+        // Reload the skills list to reflect changes
+        loadSkillsList();
+    } catch (error) {
+        console.error("Error moving skill up: ", error);
+        alert("Failed to move skill up: " + error.message);
+    }
+}
+// Move Skill Down
+async function moveSkillDown(skillId, currentOrder) {
+    // Need to find the highest order to know if this is the bottom
+    const allSkillsSnapshot = await db.collection("skills").orderBy("order").get();
+    const skillsArray = allSkillsSnapshot.docs.map(d => d.data());
+    const maxOrder = Math.max(...skillsArray.map(s => s.order || 0)); // Handle potential missing order field gracefully
+
+    if (currentOrder >= maxOrder) return; // Already at the bottom
+    const targetOrder = currentOrder + 1;
+
+    try {
+        // Find the skill that currently has the target order
+        const targetSkillSnapshot = await db.collection("skills")
+            .where("order", "==", targetOrder)
+            .limit(1)
+            .get();
+
+        if (targetSkillSnapshot.empty) {
+            console.error("Target skill for swapping not found for order:", targetOrder);
+            return;
+        }
+
+        const targetSkillDoc = targetSkillSnapshot.docs[0];
+        const targetSkillId = targetSkillDoc.id;
+
+        // Perform batch write to swap orders atomically
+        const batch = db.batch();
+        batch.update(db.collection("skills").doc(skillId), { order: targetOrder });
+        batch.update(db.collection("skills").doc(targetSkillId), { order: currentOrder });
+        await batch.commit();
+
+        console.log("Skill moved down successfully");
+        // Reload the skills list to reflect changes
+        loadSkillsList();
+    } catch (error) {
+        console.error("Error moving skill down: ", error);
+        alert("Failed to move skill down: " + error.message);
+    }
+}
+    
 // Add a new rank
 async function addRank() {
 const newRankInput = document.getElementById('newRankInput');
@@ -2172,48 +2245,65 @@ function showSection(section) {
         }
     }
 }
-// Load skills list in admin panel - MODIFIED TO USE GRID LAYOUT WITH EDIT/DELETE BUTTONS
-function loadSkillsList() {
-    const skillsList = document.getElementById('skillsList'); // Assuming the container ID remains 'skillsList'
-    skillsList.innerHTML = ''; // Clear previous content
+// Load skills list in admin panel - MODIFIED TO USE GRID LAYOUT WITH EDIT/DELETE/REORDER BUTTONS
+async function loadSkillsList() {
+    const skillsList = document.getElementById('skillsList');
+    skillsList.innerHTML = '';
 
-    if (skillsData.length === 0) {
-        skillsList.innerHTML = '<p>No skills available.</p>';
-        return;
-    }
+    try {
+        // Fetch skills ordered by the 'order' field
+        const skillsSnapshot = await db.collection("skills").orderBy("order").get();
+        const skillsArray = [];
+        skillsSnapshot.forEach(doc => {
+            skillsArray.push({ id: doc.id, ...doc.data() });
+        });
 
-    // Create a container element styled like the user skill grid
-    const skillGrid = document.createElement('div');
-    skillGrid.className = 'skill-grid'; // Reuse the user interface grid class
+        if (skillsArray.length === 0) {
+            skillsList.innerHTML = '<p>No skills available.</p>';
+            return;
+        }
 
-    skillsData.forEach(skill => {
-        // Create a skill card element similar to the user interface
-        const skillCard = document.createElement('div');
-        skillCard.className = 'skill-card-ui'; // Reuse the user interface card class
-        // Add a unique identifier if needed for targeting later
-        skillCard.setAttribute('data-skill-id', skill.id);
+        const skillGrid = document.createElement('div');
+        skillGrid.className = 'skill-grid';
 
-        // Construct the inner HTML for the card, including the admin buttons
-        skillCard.innerHTML = `
-            <div class="skill-icon">
-                <i class="${skill.icon}"></i>
-            </div>
-            <div class="skill-content">
-                <h3 class="skill-name">${skill.name}</h3>
-                <p class="skill-desc">${skill.description.substring(0, 100)}...</p>
-                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;"> <!-- Flex container for buttons -->
-                    <button class="skill-btn" style="background: var(--warning); flex: 1;" onclick="editSkill('${skill.id}')">Edit</button>
-                    <button class="skill-btn" style="background: var(--danger); flex: 1;" onclick="deleteSkill('${skill.id}')">Delete</button>
+        skillsArray.forEach((skill, index) => {
+            const skillCard = document.createElement('div');
+            skillCard.className = 'skill-card-ui';
+            skillCard.setAttribute('data-skill-id', skill.id);
+
+            const isTop = index === 0;
+            const isBottom = index === skillsArray.length - 1;
+
+            skillCard.innerHTML = `
+                <div class="skill-icon">
+                    <i class="${skill.icon}"></i>
                 </div>
-            </div>
-        `;
+                <div class="skill-content">
+                    <h3 class="skill-name">${skill.name}</h3>
+                    <p class="skill-desc">${skill.description.substring(0, 100)}...</p>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                        <button class="skill-btn" style="background: var(--primary); flex: 1;" ${isTop ? 'disabled' : ''} onclick="moveSkillUp('${skill.id}', ${skill.order})" title="Move Up">
+                            <i class="fas fa-arrow-up"></i>
+                        </button>
+                        <button class="skill-btn" style="background: var(--primary); flex: 1;" ${isBottom ? 'disabled' : ''} onclick="moveSkillDown('${skill.id}', ${skill.order})" title="Move Down">
+                            <i class="fas fa-arrow-down"></i>
+                        </button>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                        <button class="skill-btn" style="background: var(--warning); flex: 1;" onclick="editSkill('${skill.id}')">Edit</button>
+                        <button class="skill-btn" style="background: var(--danger); flex: 1;" onclick="deleteSkill('${skill.id}')">Delete</button>
+                    </div>
+                </div>
+            `;
 
-        // Append the constructed card to the grid container
-        skillGrid.appendChild(skillCard);
-    });
+            skillGrid.appendChild(skillCard);
+        });
 
-    // Append the grid container to the main skills list area
-    skillsList.appendChild(skillGrid);
+        skillsList.appendChild(skillGrid);
+    } catch (error) {
+        console.error("Error loading skills list in admin panel: ", error);
+        skillsList.innerHTML = '<p>Error loading skills.</p>';
+    }
 }
 // Load users management in admin panel
 function loadUsersManagement() {
@@ -2333,19 +2423,29 @@ function updateCounters() {
 document.getElementById('total-skills').textContent = skillsData.length;
 }
 // Add new skill
-function addNewSkill() {
-currentEditingSkill = {
-id: null,
-name: '',
-icon: '',
-description: '',
-tools: [],
-steps: [],
-theory: '',
-quiz: []
-};
-originalEditingSkill = JSON.parse(JSON.stringify(currentEditingSkill)); // Store original data
-showEditForm();
+async function addNewSkill() {
+    try {
+        // Calculate the new order value based on the current number of skills
+        const skillsSnapshot = await db.collection("skills").get();
+        const newOrder = skillsSnapshot.size; // Order starts from 0
+
+        currentEditingSkill = {
+            id: null,
+            name: '',
+            icon: '',
+            description: '',
+            tools: [],
+            steps: [],
+            theory: '',
+            quiz: [],
+            order: newOrder // Set the initial order
+        };
+        originalEditingSkill = JSON.parse(JSON.stringify(currentEditingSkill)); // Store original data
+        showEditForm();
+    } catch (error) {
+        console.error("Error getting skill count for ordering: ", error);
+        alert("Error initializing new skill order. Please try again.");
+    }
 }
 // Edit existing skill
 function editSkill(skillId) {
@@ -2574,17 +2674,19 @@ console.error("Error removing skill with ID '" + skillId + "': ", error);
 }
 }
 // Load skills from Firebase
+// Load skills from Firebase (for user interface)
 async function loadSkillsFromFirebase() {
-try {
-const snapshot = await db.collection("skills").get();
-skillsData = [];
-snapshot.forEach(doc => {
-skillsData.push({ id: doc.id, ...doc.data() });
-});
-loadSkillGrid();
-} catch (error) {
-console.error("Error loading skills: ", error);
-}
+    try {
+        // Fetch skills ordered by the 'order' field
+        const snapshot = await db.collection("skills").orderBy("order").get();
+        skillsData = [];
+        snapshot.forEach(doc => {
+            skillsData.push({ id: doc.id, ...doc.data() });
+        });
+        loadSkillGrid();
+    } catch (error) {
+        console.error("Error loading skills: ", error);
+    }
 }
 // Load skill grid for user interface
 function loadSkillGrid() {
@@ -2781,5 +2883,6 @@ loadAdminList(); // Load admin list specifically when the Admin Access tab is cl
 </script>
 </body>
 </html>
+
 
 
