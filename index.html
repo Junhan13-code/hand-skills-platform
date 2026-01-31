@@ -1689,35 +1689,41 @@ loadSignupSettings();
 }
 // Grant admin access to another user
 async function grantAdminAccess() {
-const email = document.getElementById('admin-email').value;
-if (!email) {
-alert('Please enter an email address');
-return;
+    const email = document.getElementById('admin-email').value;
+    if (!email) {
+        alert('Please enter an email address');
+        return;
+    }
+    try {
+        // Find user by email
+        const userQuery = await db.collection("users").where("email", "==", email).get();
+        if (userQuery.empty) {
+            alert('User not found');
+            return;
+        }
+        const userDoc = userQuery.docs[0];
+        const userId = userDoc.id;
+
+        // Add user to admins collection
+        await db.collection("admins").doc(userId).set({
+            email: email,
+            grantedBy: currentUser.email,
+            date: new Date()
+        });
+
+        // Clear the input field
+        document.getElementById('admin-email').value = '';
+        alert('Admin access granted successfully!');
+
+        // --- ADD THIS LINE ---
+        loadAdminList(); // Reload the admin list immediately
+        // --- END OF ADDITION ---
+
+    } catch (error) {
+        console.error("Error granting admin access: ", error);
+        alert('Error granting admin access: ' + error.message);
+    }
 }
-try {
-// Find user by email
-const userQuery = await db.collection("users").where("email", "==", email).get();
-if (userQuery.empty) {
-alert('User not found');
-return;
-}
-const userDoc = userQuery.docs[0];
-const userId = userDoc.id;
-// Add user to admins collection
-await db.collection("admins").doc(userId).set({
-email: email,
-grantedBy: currentUser.email,
-date: new Date()
-});
-// Clear the input field
-document.getElementById('admin-email').value = '';
-alert('Admin access granted successfully!');
-} catch (error) {
-console.error("Error granting admin access: ", error);
-alert('Error granting admin access: ' + error.message);
-}
-}
-// Load admin list
 // Load admin list
 async function loadAdminList() {
 try {
@@ -1759,16 +1765,21 @@ document.getElementById('adminList').innerHTML = '<p>Error loading admin list.</
 }
 // Revoke admin access
 async function revokeAdminAccess(adminId, email) {
-if (!confirm(`Are you sure you want to revoke admin access for ${email}?`)) {
-return;
-}
-try {
-await db.collection("admins").doc(adminId).delete();
-alert('Admin access revoked successfully!');
-} catch (error) {
-console.error("Error revoking admin access: ", error);
-alert('Error revoking admin access: ' + error.message);
-}
+    if (!confirm(`Are you sure you want to revoke admin access for ${email}?`)) {
+        return;
+    }
+    try {
+        await db.collection("admins").doc(adminId).delete();
+        alert('Admin access revoked successfully!');
+
+        // --- ADD THIS LINE ---
+        loadAdminList(); // Reload the admin list immediately
+        // --- END OF ADDITION ---
+
+    } catch (error) {
+        console.error("Error revoking admin access: ", error);
+        alert('Error revoking admin access: ' + error.message);
+    }
 }
 // Load signup settings
 async function loadSignupSettings() {
@@ -2749,3 +2760,4 @@ loadAdminList(); // Load admin list specifically when the Admin Access tab is cl
 </script>
 </body>
 </html>
+
