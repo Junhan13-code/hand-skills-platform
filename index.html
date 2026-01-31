@@ -9,6 +9,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script> <!-- Add Storage SDK -->
 <style>
 * {
 margin: 0;
@@ -88,66 +89,28 @@ display: block;
 margin-bottom: 0.5rem;
 font-weight: 500;
 }
-.form-group input, .form-group select {
+.form-group input, .form-group select, .form-group textarea {
 width: 100%;
 padding: 0.8rem;
 border: 1px solid #ddd;
 border-radius: 5px;
 font-size: 1rem;
 }
-.btn {
-display: block;
+/* New styles for image upload previews */
+.image-upload-preview {
+width: 100px; /* Adjust size as needed */
+height: 100px;
+border: 1px dashed #ccc;
+display: flex;
+align-items: center;
+justify-content: center;
+margin-top: 0.5rem;
+overflow: hidden;
+}
+.image-upload-preview img {
 width: 100%;
-padding: 0.8rem;
-background: var(--primary);
-color: white;
-border: none;
-border-radius: 5px;
-font-size: 1rem;
-font-weight: 600;
-cursor: pointer;
-transition: var(--transition);
-margin-bottom: 0.5rem;
-}
-.btn:hover {
-background: var(--secondary);
-}
-.btn-secondary {
-background: var(--gray);
-}
-.btn-secondary:hover {
-background: #5a6268;
-}
-.btn-success {
-background: var(--success);
-}
-.btn-success:hover {
-background: #22c55e;
-}
-.google-btn {
-background: #DB4437;
-}
-.google-btn:hover {
-background: #c23325;
-}
-.auth-toggle {
-margin-top: 1rem;
-color: var(--gray);
-}
-.auth-toggle a {
-color: var(--primary);
-text-decoration: none;
-font-weight: 600;
-}
-.error-message {
-color: var(--danger);
-margin-top: 0.5rem;
-font-size: 0.9rem;
-}
-.operation-message {
-color: var(--success);
-margin-top: 0.5rem;
-font-size: 0.9rem;
+height: 100%;
+object-fit: cover;
 }
 /* Admin Dashboard */
 .admin-dashboard {
@@ -666,13 +629,18 @@ transform: translateY(-5px);
 box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 }
 .skill-icon {
-background: linear-gradient(135deg, var(--primary), var(--accent));
-color: white;
+/* background: linear-gradient(135deg, var(--primary), var(--accent)); */
+/* color: white; */
 font-size: 3rem;
 height: 150px;
 display: flex;
 align-items: center;
 justify-content: center;
+}
+.skill-icon img {
+width: 100%;
+height: 100%;
+object-fit: cover;
 }
 .skill-content {
 padding: 1.5rem;
@@ -719,10 +687,11 @@ margin-bottom: 2rem;
 padding-bottom: 1rem;
 border-bottom: 2px solid var(--light);
 }
-.skill-header i {
-font-size: 2.5rem;
+.skill-header img { /* Changed selector for skill detail header */
+width: 50px; /* Adjust size as needed */
+height: 50px;
 margin-right: 1rem;
-color: var(--primary);
+object-fit: cover;
 }
 .skill-header h2 {
 font-size: 2rem;
@@ -755,13 +724,17 @@ transition: var(--transition);
 background: var(--primary);
 color: white;
 }
-.tool-item i {
-font-size: 1.8rem;
+.tool-item img { /* New selector for tool image in detail view */
+width: 50px; /* Adjust size as needed */
+height: 50px;
+object-fit: cover;
 margin-bottom: 0.5rem;
-color: var(--primary);
 }
-.tool-item:hover i {
-color: white;
+.tool-item:hover img { /* Adjust hover color if needed */
+opacity: 0.8; /* Example hover effect */
+}
+.tool-item span {
+display: block;
 }
 /* Steps Section */
 .steps-container {
@@ -898,7 +871,7 @@ height: 200px;
 flex-direction: column;
 text-align: center;
 }
-.skill-header i {
+.skill-header img { /* Adjust selector for mobile */
 margin-right: 0;
 margin-bottom: 1rem;
 }
@@ -920,14 +893,12 @@ top: 50px;
 right: 10px;
 }
 }
-
 /* Confirmation Modal */
 .login-popup.confirmation-modal {
-    /* Inherits basic styles from .login-popup */
-    z-index: 3001; /* Ensure it's above other modals */
+/* Inherits basic styles from .login-popup */
+z-index: 3001; /* Ensure it's above other modals */
 }
 /* No specific additional styling needed unless customization is desired */
-
 </style>
 </head>
 <body>
@@ -1065,35 +1036,34 @@ right: 10px;
 <div class="error-message" id="auth-error"></div>
 </div>
 </div>
-
 <!-- Confirmation Modal for Revoking Admin Access -->
 <div class="login-popup confirmation-modal" id="confirmRevokeModal" style="display: none;">
-    <div class="login-box">
-        <span class="close-btn" onclick="closeConfirmRevokeModal()">&times;</span>
-        <h2><i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i> Confirm Revoke</h2>
-        <p id="confirm-revoke-message">Are you sure you want to revoke admin access?</p>
-        <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
-            <button class="btn btn-secondary" onclick="closeConfirmRevokeModal()" style="flex: 1;">Cancel</button>
-            <button class="btn" style="background: var(--danger); flex: 1;" onclick="performRevokeAdmin()">Revoke</button>
-        </div>
-        <div class="error-message" id="revoke-confirm-error"></div>
-    </div>
+<div class="login-box">
+<span class="close-btn" onclick="closeConfirmRevokeModal()">&times;</span>
+<h2><i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i> Confirm Revoke</h2>
+<p id="confirm-revoke-message">Are you sure you want to revoke admin access?</p>
+<div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+<button class="btn btn-secondary" onclick="closeConfirmRevokeModal()" style="flex: 1;">Cancel</button>
+<button class="btn" style="background: var(--danger); flex: 1;" onclick="performRevokeAdmin()">Revoke</button>
+</div>
+<div class="error-message" id="revoke-confirm-error"></div>
+</div>
 </div>
 <!-- Grant Admin Success Notification Modal -->
 <div class="login-popup" id="grantSuccessModal" style="display: none; z-index: 3002;"> <!-- Higher z-index than confirmRevokeModal -->
-  <div class="login-box">
-      <span class="close-btn" onclick="closeGrantSuccessModal()">&times;</span>
-      <h2><i class="fas fa-check-circle" style="color: var(--success);"></i> Success</h2>
-      <p id="grant-success-message">Admin access granted successfully!</p>
-      <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
-          <!-- A simple OK button to close the modal -->
-          <button class="btn" style="background: var(--primary); flex: 1;" onclick="closeGrantSuccessModal()">OK</button>
-      </div>
-      <!-- Optional: Error display if needed later -->
-      <div class="error-message" id="grant-success-error"></div>
-  </div>
+<div class="login-box">
+<span class="close-btn" onclick="closeGrantSuccessModal()">&times;</span>
+<h2><i class="fas fa-check-circle" style="color: var(--success);"></i> Success</h2>
+<p id="grant-success-message">Admin access granted successfully!</p>
+<div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+<!-- A simple OK button to close the modal -->
+<button class="btn" style="background: var(--primary); flex: 1;" onclick="closeGrantSuccessModal()">OK</button>
 </div>
-  <!-- End of Grant Admin Success Notification Modal -->
+<!-- Optional: Error display if needed later -->
+<div class="error-message" id="grant-success-error"></div>
+</div>
+</div>
+<!-- End of Grant Admin Success Notification Modal -->
 <!-- Admin Dashboard -->
 <div class="admin-dashboard" id="adminDashboard">
 <div class="container">
@@ -1196,8 +1166,13 @@ right: 10px;
 <input type="text" id="edit-skill-name" placeholder="Enter skill name">
 </div>
 <div class="form-col">
-<label for="edit-skill-icon">Icon Class</label>
-<input type="text" id="edit-skill-icon" placeholder="e.g., fas fa-hammer">
+<label for="edit-skill-image">Skill Image</label>
+<input type="file" id="edit-skill-image" accept="image/*">
+<div class="image-upload-preview" id="skill-image-preview">
+<!-- Preview will be shown here -->
+</div>
+<!-- Hidden input to store the image URL -->
+<input type="hidden" id="edit-skill-image-url">
 </div>
 </div>
 <div class="form-row">
@@ -1208,8 +1183,11 @@ right: 10px;
 </div>
 <div class="form-row">
 <div class="form-col">
-<label for="edit-tools">Tools Required (comma separated)</label>
-<textarea id="edit-tools" placeholder="Enter required tools"></textarea>
+<label for="edit-tools">Tools Required</label>
+<div id="tools-container">
+<!-- Tool inputs will be added here -->
+</div>
+<button class="btn add-step-btn" type="button" onclick="addTool()">Add Tool</button>
 </div>
 </div>
 <div class="form-row">
@@ -1297,6 +1275,7 @@ measurementId: "G-R2J40EVW18"
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
+const storage = firebase.storage(); // Initialize Storage
 // Global variables
 let skillsData = [];
 let usersData = [];
@@ -1309,12 +1288,10 @@ let isAdmin = false; // Track if current user is admin
 let ranksData = []; // Store ranks from Firestore
 let coursesData = []; // Store courses from Firestore
 let wasInAdminView = false; // Track if we were in admin view before switching
-
 // --- NEW VARIABLES FOR REVOKE CONFIRMATION ---
 let pendingRevokeAdminId = null;
 let pendingRevokeAdminEmail = null;
 // --- END NEW VARIABLES ---
-
 // Initialize the app
 // Initialize the app
 window.onload = function() {
@@ -1464,7 +1441,7 @@ loadSkillsFromFirebase();
 showProfileCompletion();
 }
 } catch (error) {
-console.error("Error loading user  ", error);
+console.error("Error loading user data: ", error);
 }
 }
 // Show profile completion form
@@ -1741,40 +1718,38 @@ loadSignupSettings();
 } // <-- This closing brace was missing!
 // Grant admin access to another user
 async function grantAdminAccess() {
-    const email = document.getElementById('admin-email').value;
-    if (!email) {
-        alert('Please enter an email address'); // Could also use a modal for this error
-        return;
-    }
-    try {
-        // Find user by email
-        const userQuery = await db.collection("users").where("email", "==", email).get();
-        if (userQuery.empty) {
-            alert('User not found');
-            return;
-        }
-        const userDoc = userQuery.docs[0];
-        const userId = userDoc.id;
-        // Add user to admins collection
-        await db.collection("admins").doc(userId).set({
-            email: email,
-            grantedBy: currentUser.email,
-            date: new Date()
-        });
-        // Clear the input field
-        document.getElementById('admin-email').value = ''; // Keep this line
-
-        // CHANGED FROM ALERT TO MODAL
-        // alert('Admin access granted successfully!'); // Comment out or remove this line
-        showGrantSuccessModal('Admin access granted successfully for ' + email + '!'); // Call the new modal function
-
-        // --- ADD THIS LINE ---
-        loadAdminList(); // Reload the admin list immediately
-        // --- END OF ADDITION ---
-    } catch (error) {
-        console.error("Error granting admin access: ", error);
-        alert('Error granting admin access: ' + error.message); // You could also use a modal for errors
-    }
+const email = document.getElementById('admin-email').value;
+if (!email) {
+alert('Please enter an email address'); // Could also use a modal for this error
+return;
+}
+try {
+// Find user by email
+const userQuery = await db.collection("users").where("email", "==", email).get();
+if (userQuery.empty) {
+alert('User not found');
+return;
+}
+const userDoc = userQuery.docs[0];
+const userId = userDoc.id;
+// Add user to admins collection
+await db.collection("admins").doc(userId).set({
+email: email,
+grantedBy: currentUser.email,
+date: new Date()
+});
+// Clear the input field
+document.getElementById('admin-email').value = ''; // Keep this line
+// CHANGED FROM ALERT TO MODAL
+// alert('Admin access granted successfully!'); // Comment out or remove this line
+showGrantSuccessModal('Admin access granted successfully for ' + email + '!'); // Call the new modal function
+// --- ADD THIS LINE ---
+loadAdminList(); // Reload the admin list immediately
+// --- END OF ADDITION ---
+} catch (error) {
+console.error("Error granting admin access: ", error);
+alert('Error granting admin access: ' + error.message); // You could also use a modal for errors
+}
 }
 // Load admin list
 async function loadAdminList() {
@@ -1815,72 +1790,63 @@ console.error("Error loading admin list: ", error);
 document.getElementById('adminList').innerHTML = '<p>Error loading admin list.</p>';
 }
 }
-
 // --- MODIFIED FUNCTION: Revoke admin access (uses modal now) ---
 async function revokeAdminAccess(adminId, email) {
-    // Store the IDs for the actual revocation action
-    pendingRevokeAdminId = adminId;
-    pendingRevokeAdminEmail = email;
-
-    // Set the message in the modal
-    document.getElementById('confirm-revoke-message').textContent =
-        `Are you sure you want to revoke admin access for ${email}? This action cannot be undone.`;
-
-    // Clear any previous errors
-    document.getElementById('revoke-confirm-error').textContent = '';
-
-    // Show the confirmation modal
-    document.getElementById('confirmRevokeModal').style.display = 'flex';
+// Store the IDs for the actual revocation action
+pendingRevokeAdminId = adminId;
+pendingRevokeAdminEmail = email;
+// Set the message in the modal
+document.getElementById('confirm-revoke-message').textContent =
+`Are you sure you want to revoke admin access for ${email}? This action cannot be undone.`;
+// Clear any previous errors
+document.getElementById('revoke-confirm-error').textContent = '';
+// Show the confirmation modal
+document.getElementById('confirmRevokeModal').style.display = 'flex';
 }
 // --- END MODIFIED FUNCTION ---
-
 // --- NEW FUNCTIONS: Handle the modal confirmation ---
 function performRevokeAdmin() {
-    if (!pendingRevokeAdminId || !pendingRevokeAdminEmail) {
-         console.error("Revoke operation lacks necessary data.");
-         closeConfirmRevokeModal(); // Close modal anyway
-         return; // Exit if data is missing
-    }
-
-    // Perform the revocation using stored IDs
-    db.collection("admins").doc(pendingRevokeAdminId).delete()
-        .then(() => {
-            console.log('Admin access revoked successfully for:', pendingRevokeAdminEmail);
-            // Close the modal
-            closeConfirmRevokeModal();
-            // Reload the admin list to reflect the change
-            loadAdminList();
-            // Clear pending IDs
-            pendingRevokeAdminId = null;
-            pendingRevokeAdminEmail = null;
-        })
-        .catch(error => {
-            console.error("Error revoking admin access: ", error);
-            // Display error message inside the modal
-            document.getElementById('revoke-confirm-error').textContent = 'Error revoking admin access: ' + error.message;
-        });
+if (!pendingRevokeAdminId || !pendingRevokeAdminEmail) {
+console.error("Revoke operation lacks necessary data.");
+closeConfirmRevokeModal(); // Close modal anyway
+return; // Exit if data is missing
 }
-
+// Perform the revocation using stored IDs
+db.collection("admins").doc(pendingRevokeAdminId).delete()
+.then(() => {
+console.log('Admin access revoked successfully for:', pendingRevokeAdminEmail);
+// Close the modal
+closeConfirmRevokeModal();
+// Reload the admin list to reflect the change
+loadAdminList();
+// Clear pending IDs
+pendingRevokeAdminId = null;
+pendingRevokeAdminEmail = null;
+})
+.catch(error => {
+console.error("Error revoking admin access: ", error);
+// Display error message inside the modal
+document.getElementById('revoke-confirm-error').textContent = 'Error revoking admin access: ' + error.message;
+});
+}
 function closeConfirmRevokeModal() {
-    document.getElementById('confirmRevokeModal').style.display = 'none';
-    // Clear pending IDs when cancelled or closed
-    pendingRevokeAdminId = null;
-    pendingRevokeAdminEmail = null;
+document.getElementById('confirmRevokeModal').style.display = 'none';
+// Clear pending IDs when cancelled or closed
+pendingRevokeAdminId = null;
+pendingRevokeAdminEmail = null;
 }
 function showGrantSuccessModal(message = "Admin access granted successfully!") {
-    document.getElementById('grant-success-message').textContent = message;
-    document.getElementById('grantSuccessModal').style.display = 'flex';
+document.getElementById('grant-success-message').textContent = message;
+document.getElementById('grantSuccessModal').style.display = 'flex';
 }
-
 function closeGrantSuccessModal() {
-    document.getElementById('grantSuccessModal').style.display = 'none';
-    // Optional: Clear the message when closed
-    document.getElementById('grant-success-message').textContent = "Admin access granted successfully!";
-    // Optional: Clear any potential error message
-    document.getElementById('grant-success-error').textContent = '';
+document.getElementById('grantSuccessModal').style.display = 'none';
+// Optional: Clear the message when closed
+document.getElementById('grant-success-message').textContent = "Admin access granted successfully!";
+// Optional: Clear any potential error message
+document.getElementById('grant-success-error').textContent = '';
 }
 // --- END NEW FUNCTIONS ---
-
 // Load signup settings
 async function loadSignupSettings() {
 try {
@@ -2284,6 +2250,111 @@ document.getElementById('courseMessage').textContent = '';
 }, 3000);
 }
 }
+
+// --- NEW FUNCTIONS FOR IMAGE UPLOAD AND TOOL MANAGEMENT ---
+
+// Function to handle skill image upload
+async function uploadSkillImage(file) {
+if (!file) return null;
+const storageRef = storage.ref();
+const fileRef = storageRef.child(`skill_images/${Date.now()}_${file.name}`);
+try {
+await fileRef.put(file);
+const downloadURL = await fileRef.getDownloadURL();
+return downloadURL;
+} catch (error) {
+console.error("Error uploading skill image: ", error);
+return null;
+}
+}
+
+// Function to handle tool image upload
+async function uploadToolImage(file) {
+if (!file) return null;
+const storageRef = storage.ref();
+const fileRef = storageRef.child(`tool_images/${Date.now()}_${file.name}`);
+try {
+await fileRef.put(file);
+const downloadURL = await fileRef.getDownloadURL();
+return downloadURL;
+} catch (error) {
+console.error("Error uploading tool image: ", error);
+return null;
+}
+}
+
+// Function to preview skill image
+function previewSkillImage(input) {
+const preview = document.getElementById('skill-image-preview');
+if (input.files && input.files[0]) {
+const reader = new FileReader();
+reader.onload = function(e) {
+preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+};
+reader.readAsDataURL(input.files[0]);
+} else {
+preview.innerHTML = '';
+}
+}
+
+// Function to preview tool image
+function previewToolImage(input, index) {
+const previewId = `tool-image-preview-${index}`;
+const preview = document.getElementById(previewId);
+if (input.files && input.files[0]) {
+const reader = new FileReader();
+reader.onload = function(e) {
+preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+};
+reader.readAsDataURL(input.files[0]);
+} else {
+preview.innerHTML = '';
+}
+}
+
+// Function to add a new tool input field
+function addTool(index = null) {
+const container = document.getElementById('tools-container');
+const toolIndex = index !== null ? index : container.children.length; // Use provided index or next available
+
+const toolDiv = document.createElement('div');
+toolDiv.className = 'form-group';
+toolDiv.id = `tool-item-${toolIndex}`;
+
+toolDiv.innerHTML = `
+<label>Tool ${toolIndex + 1}</label>
+<input type="text" id="tool-name-${toolIndex}" placeholder="Tool name">
+<input type="file" id="tool-image-${toolIndex}" accept="image/*" onchange="previewToolImage(this, ${toolIndex})">
+<div class="image-upload-preview" id="tool-image-preview-${toolIndex}">
+<!-- Preview will be shown here -->
+</div>
+<input type="hidden" id="tool-image-url-${toolIndex}"> <!-- Hidden input for URL -->
+<button type="button" class="btn btn-secondary" onclick="removeTool(${toolIndex})">Remove Tool</button>
+`;
+
+container.appendChild(toolDiv);
+
+// Pre-populate fields if editing existing tool data
+if (currentEditingSkill && Array.isArray(currentEditingSkill.tools) && currentEditingSkill.tools[toolIndex]) {
+const existingTool = currentEditingSkill.tools[toolIndex];
+document.getElementById(`tool-name-${toolIndex}`).value = existingTool.name || '';
+document.getElementById(`tool-image-url-${toolIndex}`).value = existingTool.imageUrl || '';
+if (existingTool.imageUrl) {
+document.getElementById(`tool-image-preview-${toolIndex}`).innerHTML = `<img src="${existingTool.imageUrl}" alt="Preview">`;
+}
+}
+}
+
+// Function to remove a tool input field
+function removeTool(index) {
+const toolElement = document.getElementById(`tool-item-${index}`);
+if (toolElement) {
+toolElement.remove();
+}
+}
+
+// --- END NEW FUNCTIONS ---
+
 // Logout function
 function logout() {
 auth.signOut().then(() => {
@@ -2341,7 +2412,6 @@ loadAdminList(); // Call loadAdminList when Admin Access tab is active
 }
 }
 // Load skills list in admin panel - MODIFIED TO USE GRID LAYOUT WITH EDIT/DELETE/REORDER BUTTONS
-// Load skills list in admin panel - MODIFIED TO USE GRID LAYOUT WITH EDIT/DELETE/REORDER BUTTONS
 // Uses the globally managed skillsData array, sorted by 'order'
 // Load skills list in admin panel - MODIFIED TO USE GRID LAYOUT WITH EDIT/DELETE/REORDER BUTTONS
 // Uses the globally managed skillsData array, sorted by 'order'
@@ -2369,11 +2439,11 @@ skillCard.setAttribute('data-skill-id', skill.id);
 const isTop = index === 0;
 const isBottom = index === sortedSkillsArray.length - 1;
 // --- FIX: Provide fallback value (0) for skill.order if it's undefined/null ---
-const orderValue = skill.order !== undefined && skill.order !== null ? skill.order : 0;
+const orderValue = skill.order !== undefined && skill.order !== null ? a.order : 0;
 // --- END FIX ---
 skillCard.innerHTML = `
 <div class="skill-icon">
-<i class="${skill.icon}"></i>
+<img src="${skill.imageUrl || 'path/to/default/image.png'}" alt="${skill.name}">
 </div>
 <div class="skill-content">
 <h3 class="skill-name">${skill.name}</h3>
@@ -2527,16 +2597,14 @@ const orderA = a.order !== undefined && a.order !== null ? a.order : -1; // Use 
 const orderB = b.order !== undefined && b.order !== null ? b.order : -1;
 return orderA - orderB;
 });
-
 const maxExistingOrder = sortedSkillsForOrderCalc.length > 0 ? (sortedSkillsForOrderCalc[sortedSkillsForOrderCalc.length - 1].order || 0) : -1;
 const newOrder = maxExistingOrder + 1;
 currentEditingSkill = {
 id: null, // Will be assigned by Firestore on add
 name: '',
-icon: '',
+imageUrl: '', // Changed from 'icon'
 description: '',
-tools: [],
-steps: [],
+tools: [], // Structure changed to hold objects with name and imageUrl
 theory: '',
 quiz: [],
 order: newOrder // Set the initial order based on max + 1
@@ -2559,10 +2627,25 @@ showEditForm();
 // Show edit form
 function showEditForm() {
 document.getElementById('edit-skill-name').value = currentEditingSkill.name || '';
-document.getElementById('edit-skill-icon').value = currentEditingSkill.icon || '';
+// Set the skill image URL in the hidden input and preview it
+document.getElementById('edit-skill-image-url').value = currentEditingSkill.imageUrl || '';
+if (currentEditingSkill.imageUrl) {
+document.getElementById('skill-image-preview').innerHTML = `<img src="${currentEditingSkill.imageUrl}" alt="Preview">`;
+} else {
+document.getElementById('skill-image-preview').innerHTML = '';
+}
 document.getElementById('edit-skill-description').value = currentEditingSkill.description || '';
-document.getElementById('edit-tools').value = Array.isArray(currentEditingSkill.tools) ? currentEditingSkill.tools.join(', ') : '';
-document.getElementById('edit-theory').value = currentEditingSkill.theory || '';
+// Populate tools section
+const toolsContainer = document.getElementById('tools-container');
+toolsContainer.innerHTML = ''; // Clear existing
+if (Array.isArray(currentEditingSkill.tools)) {
+currentEditingSkill.tools.forEach((tool, index) => {
+addTool(index); // Pass index to addTool to reuse IDs
+});
+} else {
+// If tools is not an array or doesn't exist, start with one empty field
+addTool();
+}
 // Clear and populate steps
 const stepsContainer = document.getElementById('steps-container');
 stepsContainer.innerHTML = '';
@@ -2722,13 +2805,56 @@ addQuizQuestionToForm(idx, question);
 }
 }
 // Save skill
-function saveSkill() {
+async function saveSkill() {
 // Update current skill with form values
 currentEditingSkill.name = document.getElementById('edit-skill-name').value;
-currentEditingSkill.icon = document.getElementById('edit-skill-icon').value;
+
+// --- HANDLE SKILL IMAGE UPLOAD ---
+const skillImageFile = document.getElementById('edit-skill-image').files[0];
+let skillImageUrl = document.getElementById('edit-skill-image-url').value; // Get existing URL
+if (skillImageFile) {
+skillImageUrl = await uploadSkillImage(skillImageFile); // Upload new file if selected
+if (!skillImageUrl) {
+alert("Error uploading skill image. Skill not saved.");
+return; // Stop saving if upload fails
+}
+}
+currentEditingSkill.imageUrl = skillImageUrl; // Store the final URL
+
+// --- HANDLE TOOLS UPLOAD ---
+const toolsContainer = document.getElementById('tools-container');
+currentEditingSkill.tools = []; // Reset tools array
+let toolIndex = 0;
+while (true) { // Loop through potential tool inputs until one doesn't exist
+const toolNameInput = document.getElementById(`tool-name-${toolIndex}`);
+const toolImageFileInput = document.getElementById(`tool-image-${toolIndex}`);
+const toolImageUrlHidden = document.getElementById(`tool-image-url-${toolIndex}`);
+
+if (!toolNameInput) break; // No more tool inputs found
+
+let toolImageUrl = toolImageUrlHidden ? toolImageUrlHidden.value : ''; // Get existing URL
+if (toolImageFileInput && toolImageFileInput.files[0]) {
+toolImageUrl = await uploadToolImage(toolImageFileInput.files[0]); // Upload new file if selected
+if (!toolImageUrl) {
+alert(`Error uploading image for tool ${toolIndex + 1}. Skill not saved.`);
+return; // Stop saving if upload fails
+}
+}
+
+currentEditingSkill.tools.push({
+name: toolNameInput.value,
+imageUrl: toolImageUrl
+});
+
+toolIndex++;
+}
+
+// --- END HANDLE TOOLS UPLOAD ---
+
 currentEditingSkill.description = document.getElementById('edit-skill-description').value;
-currentEditingSkill.tools = document.getElementById('edit-tools').value.split(',').map(t => t.trim()).filter(t => t);
+// currentEditingSkill.tools handled above
 currentEditingSkill.theory = document.getElementById('edit-theory').value;
+
 // If it's a new skill, add to Firestore
 if (!currentEditingSkill.id) {
 db.collection("skills").add(currentEditingSkill)
@@ -2757,6 +2883,7 @@ alert('Error saving skill');
 });
 }
 }
+
 // Delete skill
 function deleteSkill(skillId) {
 if (!skillId) {
@@ -2809,7 +2936,7 @@ const isCompleted = currentUser && currentUser.completedSkills && currentUser.co
 html += `
 <div class="skill-card-ui" onclick="loadSkillDetail('${skill.id}')">
 <div class="skill-icon">
-<i class="${skill.icon}"></i>
+<img src="${skill.imageUrl || 'path/to/default/image.png'}" alt="${skill.name}">
 </div>
 <div class="skill-content">
 <h3 class="skill-name">${skill.name}</h3>
@@ -2831,7 +2958,7 @@ const skill = skillsData.find(s => s.id === skillId);
 if (!skill) return;
 let html = `
 <div class="skill-header">
-<i class="${skill.icon}"></i>
+<img src="${skill.imageUrl || 'path/to/default/image.png'}" alt="${skill.name}">
 <h2>${skill.name}</h2>
 </div>
 <div class="skill-section">
@@ -2841,8 +2968,8 @@ let html = `
 skill.tools.forEach(tool => {
 html += `
 <div class="tool-item">
-<i class="fas fa-toolbox"></i>
-<div>${tool}</div>
+<img src="${tool.imageUrl || 'path/to/default/tool/image.png'}" alt="${tool.name}">
+<span>${tool.name}</span>
 </div>
 `;
 });
@@ -2966,7 +3093,8 @@ Congratulations! You've completed this skill.`);
 });
 } else {
 alert(`Quiz completed!
-Score: ${score}/${totalQuestions} (${percentage}%)`);
+Score: ${score}/${totalQuestions} (${percentage}%)
+You need at least 70% to pass. Try again!`);
 }
 } else {
 alert(`Quiz completed!
