@@ -1631,6 +1631,7 @@ alert('Error updating rank: ' + error.message);
 }
 }
 // Setup Firestore listeners to sync data in real-time
+// Setup Firestore listeners to sync data in real-time
 function setupFirestoreListeners() {
     // Listen for changes in skills collection
     db.collection("skills").onSnapshot((snapshot) => {
@@ -1638,24 +1639,32 @@ function setupFirestoreListeners() {
         snapshot.forEach(doc => {
             skillsData.push({ id: doc.id, ...doc.data() });
         });
-        // --- ADD SORTING HERE ---
-        skillsData.sort((a, b) => (a.order || 0) - (b.order || 0));
-        // --- END OF ADDITION ---
+        // --- CORRECTED SORTING LOGIC ---
+        // Sort by 'order' field, handling potentially missing 'order' values gracefully
+        // Assign a high default value (like the current length) if 'order' is missing or null/undefined
+        skillsData.sort((a, b) => {
+            const orderA = a.order !== undefined && a.order !== null ? a.order : Infinity; // Or use a large number
+            const orderB = b.order !== undefined && b.order !== null ? b.order : Infinity;
+            return orderA - orderB;
+        });
+        // --- END OF CORRECTION ---
 
         updateCounters();
         // Update user interface if visible
         if (document.getElementById('userInterface').style.display === 'block') {
-            loadSkillGrid();
+            loadSkillGrid(); // This will now use the sorted skillsData
         }
         // Update admin list if currently viewing the skills section
         if (document.getElementById('skills-section').style.display === 'block') {
-            loadSkillsList(); // This will now use the sorted skillsData
+            loadSkillsList(); // This will also use the sorted skillsData
         }
-        // Update user preview if currently viewing
-        if (document.getElementById('user-preview-section').style.display === 'block') {
-            loadSkillGrid();
-        }
+        // Update user preview if currently viewing (if applicable)
+        // if (document.getElementById('user-preview-section').style.display === 'block') {
+        //     loadSkillGrid(); // This might also use sorted skillsData
+        // }
     });
+    // ... rest of the listeners remain the same ...
+}
 // Listen for changes in users collection
 db.collection("users").onSnapshot((snapshot) => {
 usersData = [];
@@ -1997,74 +2006,98 @@ async function moveCourseDown(courseId, currentOrder) {
         alert("Failed to move course down: " + error.message);
     }
 }
-// Move Skill Up
+// Move Skill Up - RELIES ON THE GLOBAL skillsData ARRAY
 async function moveSkillUp(skillId, currentOrder) {
-    if (currentOrder <= 0) return; // Already at the top
-    const targetOrder = currentOrder - 1;
+    // Find the index of the skill to move in the global skillsData array
+    const currentIndex = skillsData.findIndex(s => s.id === skillId);
+
+    // Check if it's already at the top (has the lowest order value among existing ones)
+    // Or if the skill is not found in the array
+    if (currentIndex <= 0) {
+        console.log("Skill is already at the top or not found, cannot move up.");
+        return; // Do nothing if it's the first item or not found
+    }
+
+    // Find the skill immediately preceding it in the sorted list (which has the target lower order)
+    const previousSkill = skillsData[currentIndex - 1];
+    if (!previousSkill) {
+        console.error("Previous skill not found in skillsData.");
+        return;
+    }
+    const targetSkillId = previousSkill.id;
+    const targetOrder = previousSkill.order; // This will become the new order for the moved skill
 
     try {
-        // Find the skill that currently has the target order
-        const targetSkillSnapshot = await db.collection("skills")
-            .where("order", "==", targetOrder)
-            .limit(1)
-            .get();
-
-        if (targetSkillSnapshot.empty) {
-            console.error("Target skill for swapping not found for order:", targetOrder);
-            return;
-        }
-
-        const targetSkillDoc = targetSkillSnapshot.docs[0];
-        const targetSkillId = targetSkillDoc.id;
-
         // Perform batch write to swap orders atomically
         const batch = db.batch();
+        // Update the current skill to have the order of the previous one
         batch.update(db.collection("skills").doc(skillId), { order: targetOrder });
+        // Update the previous skill to have the order of the current one
         batch.update(db.collection("skills").doc(targetSkillId), { order: currentOrder });
         await batch.commit();
 
         console.log("Skill moved up successfully");
-        // Reload the skills list to reflect changes
-        loadSkillsList();
+
+        // The onSnapshot listener will automatically update skillsData and trigger loadSkillsList
+        // So reloading here might be redundant, but explicitly calling it ensures UI update
+        // Only reload if the current view is the skills section
+        if (document.getElementById('skills-section').style.display === 'block') {
+            loadSkillsList(); // Reload the admin panel list
+        }
+        // Potentially reload user interface list too if it's visible
+        if (document.getElementById('userInterface').style.display === 'block') {
+             loadSkillGrid(); // Reload the user interface grid
+        }
+
     } catch (error) {
         console.error("Error moving skill up: ", error);
         alert("Failed to move skill up: " + error.message);
     }
 }
-// Move Skill Down
-async function moveSkillDown(skillId, currentOrder) {
-    // Need to find the highest order to know if this is the bottom
-    const allSkillsSnapshot = await db.collection("skills").orderBy("order").get();
-    const skillsArray = allSkillsSnapshot.docs.map(d => d.data());
-    const maxOrder = Math.max(...skillsArray.map(s => s.order || 0)); // Handle potential missing order field gracefully
 
-    if (currentOrder >= maxOrder) return; // Already at the bottom
-    const targetOrder = currentOrder + 1;
+// Move Skill Down - RELIES ON THE GLOBAL skillsData ARRAY
+async function moveSkillDown(skillId, currentOrder) {
+    // Find the index of the skill to move in the global skillsData array
+    const currentIndex = skillsData.findIndex(s => s.id === skillId);
+
+    // Check if it's already at the bottom (has the highest order value among existing ones)
+    // Or if the skill is not found in the array
+    if (currentIndex === -1 || currentIndex >= skillsData.length - 1) {
+        console.log("Skill is already at the bottom or not found, cannot move down.");
+        return; // Do nothing if it's the last item or not found
+    }
+
+    // Find the skill immediately succeeding it in the sorted list (which has the target higher order)
+    const nextSkill = skillsData[currentIndex + 1];
+    if (!nextSkill) {
+        console.error("Next skill not found in skillsData.");
+        return;
+    }
+    const targetSkillId = nextSkill.id;
+    const targetOrder = nextSkill.order; // This will become the new order for the moved skill
 
     try {
-        // Find the skill that currently has the target order
-        const targetSkillSnapshot = await db.collection("skills")
-            .where("order", "==", targetOrder)
-            .limit(1)
-            .get();
-
-        if (targetSkillSnapshot.empty) {
-            console.error("Target skill for swapping not found for order:", targetOrder);
-            return;
-        }
-
-        const targetSkillDoc = targetSkillSnapshot.docs[0];
-        const targetSkillId = targetSkillDoc.id;
-
         // Perform batch write to swap orders atomically
         const batch = db.batch();
+        // Update the current skill to have the order of the next one
         batch.update(db.collection("skills").doc(skillId), { order: targetOrder });
+        // Update the next skill to have the order of the current one
         batch.update(db.collection("skills").doc(targetSkillId), { order: currentOrder });
         await batch.commit();
 
         console.log("Skill moved down successfully");
-        // Reload the skills list to reflect changes
-        loadSkillsList();
+
+        // The onSnapshot listener will automatically update skillsData and trigger loadSkillsList
+        // So reloading here might be redundant, but explicitly calling it ensures UI update
+        // Only reload if the current view is the skills section
+        if (document.getElementById('skills-section').style.display === 'block') {
+            loadSkillsList(); // Reload the admin panel list
+        }
+        // Potentially reload user interface list too if it's visible
+        if (document.getElementById('userInterface').style.display === 'block') {
+             loadSkillGrid(); // Reload the user interface grid
+        }
+
     } catch (error) {
         console.error("Error moving skill down: ", error);
         alert("Failed to move skill down: " + error.message);
@@ -2252,12 +2285,21 @@ function showSection(section) {
 // Load skills list in admin panel - MODIFIED TO USE GRID LAYOUT WITH EDIT/DELETE/REORDER BUTTONS
 // Load skills list in admin panel - MODIFIED TO USE GRID LAYOUT WITH EDIT/DELETE/REORDER BUTTONS
 // Uses the globally managed skillsData array, sorted by 'order'
+// Load skills list in admin panel - MODIFIED TO USE GRID LAYOUT WITH EDIT/DELETE/REORDER BUTTONS
+// Uses the globally managed skillsData array, sorted by 'order'
 async function loadSkillsList() {
     const skillsList = document.getElementById('skillsList');
     skillsList.innerHTML = '';
 
     // Sort the global skillsData array by 'order' field before displaying
-    const sortedSkillsArray = [...skillsData].sort((a, b) => (a.order || 0) - (b.order || 0));
+    // This redundant sorting is fine if skillsData is always kept sorted by the listener,
+    // but doing it here ensures correctness at the point of rendering.
+    const sortedSkillsArray = [...skillsData].sort((a, b) => {
+         const orderA = a.order !== undefined && a.order !== null ? a.order : Infinity;
+         const orderB = b.order !== undefined && b.order !== null ? b.order : Infinity;
+         return orderA - orderB;
+    });
+
 
     if (sortedSkillsArray.length === 0) {
         skillsList.innerHTML = '<p>No skills available.</p>';
@@ -2422,16 +2464,22 @@ document.getElementById('total-skills').textContent = skillsData.length;
 }
 // Add new skill
 // Add new skill
+// Add new skill
 async function addNewSkill() {
     try {
-        // Calculate the new order value based on the *maximum* existing order in skillsData + 1
+        // Calculate the new order value based on the *maximum* existing order in the CURRENTLY KNOWN skillsData + 1
         // Ensure skillsData is sorted first to get the latest max
-        const sortedSkillsForOrderCalc = [...skillsData].sort((a, b) => (a.order || 0) - (b.order || 0));
+        // Use the same sorting logic as elsewhere to find the max order
+        const sortedSkillsForOrderCalc = [...skillsData].sort((a, b) => {
+             const orderA = a.order !== undefined && a.order !== null ? a.order : -1; // Use -1 or 0 if missing for calculation
+             const orderB = b.order !== undefined && b.order !== null ? b.order : -1;
+             return orderA - orderB;
+        });
         const maxExistingOrder = sortedSkillsForOrderCalc.length > 0 ? (sortedSkillsForOrderCalc[sortedSkillsForOrderCalc.length - 1].order || 0) : -1;
         const newOrder = maxExistingOrder + 1;
 
         currentEditingSkill = {
-            id: null,
+            id: null, // Will be assigned by Firestore on add
             name: '',
             icon: '',
             description: '',
@@ -2444,7 +2492,7 @@ async function addNewSkill() {
         originalEditingSkill = JSON.parse(JSON.stringify(currentEditingSkill)); // Store original data
         showEditForm();
     } catch (error) {
-        console.error("Error getting skill count/order for new skill: ", error);
+        console.error("Error calculating order for new skill: ", error);
         alert("Error initializing new skill. Please try again.");
     }
 }
@@ -2676,15 +2724,27 @@ console.error("Error removing skill with ID '" + skillId + "': ", error);
 }
 // Load skills from Firebase
 // Load skills from Firebase (for user interface)
+// Load skills from Firebase (for user interface)
 async function loadSkillsFromFirebase() {
     try {
-        // Fetch skills ordered by the 'order' field
-        const snapshot = await db.collection("skills").orderBy("order").get();
-        skillsData = [];
+        // Use onSnapshot for real-time updates, similar to the listener above
+        // But for initial load, you might stick with get(), though onSnapshot is generally preferred
+        // Using get() here as per your original structure, but ensure consistency with the listener
+        const snapshot = await db.collection("skills").get(); // Get all skills first
+        let tempSkillsData = [];
         snapshot.forEach(doc => {
-            skillsData.push({ id: doc.id, ...doc.data() });
+             tempSkillsData.push({ id: doc.id, ...doc.data() });
         });
-        loadSkillGrid();
+
+         // Sort by 'order' field, handling potentially missing 'order' values gracefully
+         tempSkillsData.sort((a, b) => {
+            const orderA = a.order !== undefined && a.order !== null ? a.order : Infinity;
+            const orderB = b.order !== undefined && b.order !== null ? b.order : Infinity;
+            return orderA - orderB;
+        });
+
+        skillsData = tempSkillsData; // Update the global array
+        loadSkillGrid(); // Now load the grid with the sorted data
     } catch (error) {
         console.error("Error loading skills: ", error);
     }
@@ -2884,6 +2944,7 @@ loadAdminList(); // Load admin list specifically when the Admin Access tab is cl
 </script>
 </body>
 </html>
+
 
 
 
