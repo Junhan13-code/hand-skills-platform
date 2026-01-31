@@ -920,6 +920,59 @@ top: 50px;
 right: 10px;
 }
 }
+/* Notification Container */
+.notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 3001; /* Ensure it's above other elements like modals */
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Space between notifications if multiple appear */
+}
+
+/* Individual Notification Style */
+.notification {
+    padding: 15px 20px;
+    border-radius: 5px;
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    transform: translateX(100%);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    max-width: 300px; /* Limit width */
+    word-wrap: break-word;
+}
+
+/* Fade-in and slide-in animation */
+.notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Success Notification Color */
+.notification.success {
+    background-color: var(--success); /* Use your defined success color */
+}
+
+/* Error/Info Notification Color */
+.notification.error {
+    background-color: var(--danger); /* Use your defined danger color */
+}
+
+/* Warning Notification Color (optional) */
+.notification.warning {
+    background-color: var(--warning); /* Use your defined warning color */
+}
+
+/* Close button for notifications (optional) */
+.notification .close-btn {
+    float: right;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.2em;
+}
 </style>
 </head>
 <body>
@@ -1244,6 +1297,8 @@ right: 10px;
 <p>&copy; 2026 Hand Skills Learning Platform | Master Essential Hands-On Skills</p>
 </div>
 </footer>
+<!-- Notification Container -->
+<div class="notification-container" id="notificationContainer"></div>
 </div>
 <script>
 // Initialize Firebase
@@ -1296,6 +1351,46 @@ document.getElementById('loginBtn').style.display = 'block';
 // Load ranks and courses from Firestore
 loadRanksAndCourses();
 };
+
+// Function to show a notification popup
+function showNotification(message, type = 'info') { // Default type is 'info', can be 'success', 'error', 'warning'
+    const container = document.getElementById('notificationContainer');
+
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+
+    // Optional close button
+    const closeButton = document.createElement('span');
+    closeButton.className = 'close-btn';
+    closeButton.innerHTML = '&times;';
+    closeButton.onclick = () => removeNotification(notification);
+    notification.appendChild(closeButton);
+
+    const textNode = document.createTextNode(' ' + message); // Add space after close button
+    notification.appendChild(textNode);
+
+    container.appendChild(notification);
+
+    // Trigger the show animation after a brief delay to allow the element to be added to the DOM
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 10);
+
+    // Auto-remove the notification after a delay (e.g., 5 seconds)
+    setTimeout(() => {
+        removeNotification(notification);
+    }, 5000); // 5000 milliseconds = 5 seconds
+}
+
+// Function to remove a notification with fade-out animation
+function removeNotification(notificationElement) {
+    notificationElement.classList.remove('show');
+    setTimeout(() => {
+        if (notificationElement.parentNode) {
+            notificationElement.parentNode.removeChild(notificationElement);
+        }
+    }, 300); // Match the transition duration for smooth removal
+}
 // Load ranks and courses from Firestore
 async function loadRanksAndCourses() {
 try {
@@ -1701,14 +1796,15 @@ function setupFirestoreListeners() {
 async function grantAdminAccess() {
     const email = document.getElementById('admin-email').value;
     if (!email) {
-        alert('Please enter an email address');
+        // Use the new notification system for errors too
+        showNotification('Please enter an email address', 'error');
         return;
     }
     try {
         // Find user by email
         const userQuery = await db.collection("users").where("email", "==", email).get();
         if (userQuery.empty) {
-            alert('User not found');
+            showNotification('User not found', 'error');
             return;
         }
         const userDoc = userQuery.docs[0];
@@ -1723,15 +1819,16 @@ async function grantAdminAccess() {
 
         // Clear the input field
         document.getElementById('admin-email').value = '';
-        alert('Admin access granted successfully!');
+        // Use the new notification system
+        showNotification('Admin access granted successfully!', 'success');
 
-        // --- ADD THIS LINE ---
-        loadAdminList(); // Reload the admin list immediately
-        // --- END OF ADDITION ---
+        // Reload the admin list immediately
+        loadAdminList();
 
     } catch (error) {
         console.error("Error granting admin access: ", error);
-        alert('Error granting admin access: ' + error.message);
+        // Use the new notification system for errors
+        showNotification('Error granting admin access: ' + error.message, 'error');
     }
 }
 // Load admin list
@@ -1780,15 +1877,16 @@ async function revokeAdminAccess(adminId, email) {
     }
     try {
         await db.collection("admins").doc(adminId).delete();
-        alert('Admin access revoked successfully!');
+        // Use the new notification system
+        showNotification('Admin access revoked successfully!', 'success');
 
-        // --- ADD THIS LINE ---
-        loadAdminList(); // Reload the admin list immediately
-        // --- END OF ADDITION ---
+        // Reload the admin list immediately
+        loadAdminList();
 
     } catch (error) {
         console.error("Error revoking admin access: ", error);
-        alert('Error revoking admin access: ' + error.message);
+        // Use the new notification system for errors
+        showNotification('Error revoking admin access: ' + error.message, 'error');
     }
 }
 // Load signup settings
