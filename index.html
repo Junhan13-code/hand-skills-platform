@@ -616,6 +616,27 @@ cursor: pointer;
 .delete-btn-setting:hover {
 opacity: 0.9;
 }
+/* Add these styles */
+.move-up-btn, .move-down-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 0.25rem; /* Add some space */
+    font-size: 0.8rem; /* Make icon smaller */
+}
+
+.move-up-btn:hover, .move-down-btn:hover {
+    opacity: 0.9;
+}
+
+.move-up-btn:disabled, .move-down-btn:disabled {
+    background: var(--gray);
+    cursor: not-allowed;
+    opacity: 0.5;
+}
 .add-item-input {
 display: flex;
 margin-top: 1rem;
@@ -1840,22 +1861,46 @@ alert('Error revoking admin access: ' + error.message);
 
 // Load signup settings
 async function loadSignupSettings() {
-try {
-// Load ranks
-const ranksSnapshot = await db.collection("ranks").orderBy("order").get();
-const ranksList = document.getElementById('ranksList');
-ranksList.innerHTML = '';
-ranksSnapshot.forEach(doc => {
-const rank = doc.data();
-ranksList.innerHTML += `
-<div class="setting-item">
-<span>${rank.name}</span>
-<div class="setting-actions">
-<button class="delete-btn-setting" onclick="deleteRank('${doc.id}', '${rank.name}')">Delete</button>
-</div>
-</div>
-`;
-});
+    try {
+        // Load ranks
+        const ranksSnapshot = await db.collection("ranks").orderBy("order").get();
+        const ranksList = document.getElementById('ranksList');
+        ranksList.innerHTML = '';
+        ranksSnapshot.forEach((doc, index) => { // Use index for display
+            const rank = doc.data();
+            ranksList.innerHTML += `
+                <div class="setting-item">
+                    <span>(${rank.order}) ${rank.name}</span> <!-- Show order number -->
+                    <div class="setting-actions">
+                        <button class="delete-btn-setting" onclick="deleteRank('${doc.id}', '${rank.name}')">Delete</button>
+                        <button class="move-up-btn" onclick="moveRankOrder('${doc.id}', ${rank.order}, 'up')" ${rank.order === 0 ? 'disabled' : ''}>↑</button>
+                        <button class="move-down-btn" onclick="moveRankOrder('${doc.id}', ${rank.order}, 'down')" ${index === ranksSnapshot.size - 1 ? 'disabled' : ''}>↓</button>
+                    </div>
+                </div>
+            `;
+        });
+
+        // Load courses
+        const coursesSnapshot = await db.collection("courses").orderBy("order").get();
+        const coursesList = document.getElementById('coursesList');
+        coursesList.innerHTML = '';
+        coursesSnapshot.forEach((doc, index) => { // Use index for display
+            const course = doc.data();
+            coursesList.innerHTML += `
+                <div class="setting-item">
+                    <span>(${course.order}) ${course.name}</span> <!-- Show order number -->
+                    <div class="setting-actions">
+                        <button class="delete-btn-setting" onclick="deleteCourse('${doc.id}', '${course.name}')">Delete</button>
+                        <button class="move-up-btn" onclick="moveCourseOrder('${doc.id}', ${course.order}, 'up')" ${course.order === 0 ? 'disabled' : ''}>↑</button>
+                        <button class="move-down-btn" onclick="moveCourseOrder('${doc.id}', ${course.order}, 'down')" ${index === coursesSnapshot.size - 1 ? 'disabled' : ''}>↓</button>
+                    </div>
+                </div>
+            `;
+        });
+    } catch (error) {
+        console.error("Error loading signup settings: ", error);
+    }
+}
 
 // Load courses
 const coursesSnapshot = await db.collection("courses").orderBy("order").get();
@@ -2196,7 +2241,6 @@ function closeEditUserModal() {
     document.getElementById('editUserModal').style.display = 'none';
 }
 
-// --- ADD THIS NEW FUNCTION ---
 // Delete a user
 async function deleteUser(userId, userName) {
     if (!confirm(`Are you sure you want to delete the user "${userName}"? This action cannot be undone.`)) {
@@ -2204,6 +2248,9 @@ async function deleteUser(userId, userName) {
     }
 
     try {
+        // Check if the user being deleted is the current user
+        const isCurrentUser = currentUser && currentUser.id === userId;
+
         // Delete user document from 'users' collection
         await db.collection("users").doc(userId).delete();
 
@@ -2216,16 +2263,40 @@ async function deleteUser(userId, userName) {
         });
 
         alert(`User "${userName}" has been deleted successfully.`);
-        // Optionally, refresh the user list to reflect the deletion
-        if (document.getElementById('users-section').style.display === 'block') {
-             loadUsersManagement(); // Reload the user list if currently viewing
+
+        // If the current user was deleted, sign them out
+        if (isCurrentUser) {
+            // Manually clear local user state first to prevent UI flicker
+            currentUser = null;
+            isAdmin = false;
+
+            // Hide relevant UI elements
+            document.getElementById('adminDashboard').style.display = 'none';
+            document.getElementById('userInterface').style.display = 'none';
+            document.getElementById('profilePopup').style.display = 'none';
+            document.getElementById('profileBtn').style.display = 'none';
+            document.getElementById('adminSwitchBtn').style.display = 'none';
+            document.getElementById('adminBackBtn').style.display = 'none';
+
+            // Attempt to sign out via Firebase Auth
+            await auth.signOut();
+
+            // Show login popup
+            document.getElementById('loginPopup').style.display = 'flex';
+        } else {
+             // If not the current user, just reload the user list
+             if (document.getElementById('users-section').style.display === 'block') {
+                 loadUsersManagement(); // Reload the user list if currently viewing
+             }
         }
     } catch (error) {
-        console.error("Error deleting user: ", error);
+        console.error("Error deleting user or signing out: ", error);
         alert('Error deleting user: ' + error.message);
+        // Potentially sign out anyway if auth state is corrupted?
+        // Only do this if you're sure it's safe in your context
+        // auth.signOut();
     }
 }
-// --- END OF NEW FUNCTION ---
 // Update dashboard counters
 function updateCounters() {
 document.getElementById('total-skills').textContent = skillsData.length;
@@ -2707,8 +2778,89 @@ document.querySelectorAll('.tab-button').forEach(button => {
         // --- END OF ADDITION ---
     });
 });
+
+// Move rank order up or down
+async function moveRankOrder(rankId, currentOrder, direction) {
+    const targetOrder = direction === 'up' ? currentOrder - 1 : currentOrder + 1;
+
+    if (targetOrder < 0) {
+        console.error("Cannot move rank up, already at the top.");
+        return; // Prevent moving below 0
+    }
+
+    try {
+        // Find the rank that currently holds the target order
+        const targetRankSnapshot = await db.collection("ranks")
+            .where("order", "==", targetOrder)
+            .limit(1)
+            .get();
+
+        if (targetRankSnapshot.empty) {
+             console.error("Target rank for swap not found for order:", targetOrder);
+             return; // Shouldn't happen if logic is correct
+        }
+
+        const targetRankDoc = targetRankSnapshot.docs[0];
+        const targetRankId = targetRankDoc.id;
+
+        // Perform batch write to swap orders atomically
+        const batch = db.batch();
+
+        batch.update(db.collection("ranks").doc(rankId), { order: targetOrder });
+        batch.update(db.collection("ranks").doc(targetRankId), { order: currentOrder });
+
+        await batch.commit();
+
+        console.log("Rank order updated successfully.");
+
+    } catch (error) {
+        console.error("Error moving rank order: ", error);
+        alert('Error moving rank: ' + error.message);
+    }
+}
+
+// Move course order up or down
+async function moveCourseOrder(courseId, currentOrder, direction) {
+    const targetOrder = direction === 'up' ? currentOrder - 1 : currentOrder + 1;
+
+     if (targetOrder < 0) {
+        console.error("Cannot move course up, already at the top.");
+        return; // Prevent moving below 0
+    }
+
+    try {
+        // Find the course that currently holds the target order
+        const targetCourseSnapshot = await db.collection("courses")
+            .where("order", "==", targetOrder)
+            .limit(1)
+            .get();
+
+        if (targetCourseSnapshot.empty) {
+             console.error("Target course for swap not found for order:", targetOrder);
+             return; // Shouldn't happen if logic is correct
+        }
+
+        const targetCourseDoc = targetCourseSnapshot.docs[0];
+        const targetCourseId = targetCourseDoc.id;
+
+        // Perform batch write to swap orders atomically
+        const batch = db.batch();
+
+        batch.update(db.collection("courses").doc(courseId), { order: targetOrder });
+        batch.update(db.collection("courses").doc(targetCourseId), { order: currentOrder });
+
+        await batch.commit();
+
+        console.log("Course order updated successfully.");
+
+    } catch (error) {
+        console.error("Error moving course order: ", error);
+        alert('Error moving course: ' + error.message);
+    }
+}
 </script>
 </body>
 </html>
+
 
 
