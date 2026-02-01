@@ -60,7 +60,6 @@ Forgot Password?
 <label for="signupPassword">Password:</label>
 <input type="password" id="signupPassword" placeholder="Create a password">
 </div>
-<!-- Removed confirm password field as per JS logic -->
 <div class="form-group">
 <label for="rankSelect">Rank:</label>
 <select id="rankSelect">
@@ -94,10 +93,10 @@ Already have an account? Login
 </div>
 </div>
 
-<!-- Profile Completion Form (Added) -->
+<!-- Profile Completion Form (ADDED BACK) -->
 <div class="login-popup" id="profileForm" style="display: none;">
 <div class="login-box">
-<span class="close-btn" onclick="closeProfileForm()">&times;</span>
+<span class="close-btn" onclick="closeSignupForm()">&times;</span> <!-- Assuming closeSignupForm works for this too -->
 <h2>Complete Your Profile</h2>
 <div class="form-group">
     <label for="profileName">Full Name:</label>
@@ -105,11 +104,23 @@ Already have an account? Login
 </div>
 <div class="form-group">
     <label for="profileRank">Rank:</label>
-    <select id="profileRank"></select>
+    <select id="profileRank">
+        <option value="">Select Rank</option>
+        <option value="ME1T">ME1T</option>
+        <option value="ME2">ME2</option>
+        <option value="ME3">ME3</option>
+        <option value="ME4">ME4</option>
+        <option value="ME5">ME5</option>
+        <option value="ME6">ME6</option>
+    </select>
 </div>
 <div class="form-group">
     <label for="profileCourse">Course Group:</label>
-    <select id="profileCourse"></select>
+    <select id="profileCourse">
+        <option value="">Select Course</option>
+        <option value="56th Mech">56th Mech</option>
+        <option value="56th Avionics">56th Avionics</option>
+    </select>
 </div>
 <button class="btn primary-btn" onclick="completeProfile()">Save Profile</button>
 <div id="auth-error" class="error-message" style="display: none;"></div>
@@ -219,7 +230,7 @@ Already have an account? Login
 </div>
 <div class="form-group">
 <label for="skillImage">Upload Image:</label>
-<input type="file" id="skillImage" accept="image/*" onchange="previewSkillImage(this)">
+<input type="file" id="skillImage" accept="image/*">
 <div class="image-upload-preview" id="imagePreview">
 <img id="previewImg" src="" alt="Preview" style="display: none;">
 <span id="previewText">No image selected</span>
@@ -293,7 +304,7 @@ Already have an account? Login
 <div class="settings-tabs">
 <button class="tab-button active" data-tab="general">General</button>
 <button class="tab-button" data-tab="signup">Signup Settings</button>
-<button class="tab-button" data-tab="adminAccess">Admin Access</button> <!-- Fixed data-tab -->
+<button class="tab-button" data-tab="admin">Admin Access</button>
 </div>
 <div class="tab-content active" id="general-tab-settings">
 <div class="settings-controls">
@@ -327,7 +338,6 @@ Already have an account? Login
 <input type="text" id="newRankInput" placeholder="Add new rank">
 <button class="btn success-btn" onclick="addRank()">Add</button>
 </div>
-<div id="rankMessage" class="operation-message" style="display: none;"></div> <!-- Added message div -->
 </div>
 <div class="settings-column">
 <h4 class="setting-title"><i class="fas fa-users"></i> Course Groups</h4>
@@ -338,11 +348,10 @@ Already have an account? Login
 <input type="text" id="newCourseInput" placeholder="Add new course">
 <button class="btn success-btn" onclick="addCourse()">Add</button>
 </div>
-<div id="courseMessage" class="operation-message" style="display: none;"></div> <!-- Added message div -->
 </div>
 </div>
 </div>
-<div class="tab-content" id="adminAccessTab"> <!-- Renamed ID -->
+<div class="tab-content" id="admin-tab-settings">
 <div class="admin-access-form">
 <h4 class="setting-title"><i class="fas fa-user-shield"></i> Grant Admin Access</h4>
 <div class="form-group">
@@ -358,6 +367,7 @@ Already have an account? Login
 </div>
 </div>
 </div>
+</div>
 </main>
 </div>
 </div>
@@ -370,7 +380,7 @@ Already have an account? Login
 <button class="profile-btn" onclick="toggleProfilePopup()">
 <i class="fas fa-user"></i> Profile
 </button>
-<button class="admin-switch-btn" onclick="switchToAdmin()">
+<button class="admin-switch-btn" id="admin-switch-btn" onclick="switchToAdminInterface()"> <!-- Added ID -->
 <i class="fas fa-cogs"></i> Admin Panel
 </button>
 </div>
@@ -386,19 +396,19 @@ Already have an account? Login
 <div class="profile-info">
 <div class="info-item">
 <span class="info-label">Name:</span>
-<span class="info-value" id="profileNameDisplay">Loading...</span> <!-- Renamed ID -->
+<span class="info-value" id="profileName">Loading...</span>
 </div>
 <div class="info-item">
 <span class="info-label">Email:</span>
-<span class="info-value" id="profileEmailDisplay">Loading...</span> <!-- Renamed ID -->
+<span class="info-value" id="profileEmail">Loading...</span>
 </div>
 <div class="info-item">
 <span class="info-label">Rank:</span>
-<span class="info-value" id="profileRankDisplay">Loading...</span> <!-- Renamed ID -->
+<span class="info-value" id="profileRank">Loading...</span>
 </div>
 <div class="info-item">
 <span class="info-label">Course:</span>
-<span class="info-value" id="profileCourseDisplay">Loading...</span> <!-- Renamed ID -->
+<span class="info-value" id="profileCourse">Loading...</span>
 </div>
 </div>
 <select class="change-rank-select" id="changeRankSelect">
@@ -409,8 +419,8 @@ Already have an account? Login
 <option value="ME5">ME5</option>
 <option value="ME6">ME6</option>
 </select>
-<button class="update-rank-btn" onclick="updateUserRank()"> <!-- Renamed function call -->
-<i class="fas fa-sync-alt"></i> Update Rank
+<button class="update-rank-btn" onclick="updateUserRank()">
+Update Rank
 </button>
 <button class="logout-btn-popup" onclick="logout()">
 <i class="fas fa-sign-out-alt"></i> Logout
@@ -483,7 +493,6 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 const storage = firebase.storage();
-
 // Global Variables
 let currentUser = null;
 let skillsData = []; // Centralized skills data array
@@ -497,1563 +506,1495 @@ let firestoreListenersSetup = false; // Guard to prevent duplicate listeners
 // Define a global variable to hold users data fetched in loadUsersManagement
 let usersData = [];
 
-// Function to update dashboard counters
-function updateCounters() {
-    // Total Skills is updated via the skills listener
-    document.getElementById('totalSkills').textContent = skillsData.length; // Fixed ID
-    // Fetch other counts separately
-    db.collection("users").get().then(snapshot => {
-        document.getElementById('totalUsers').textContent = snapshot.size; // Fixed ID
-    }).catch(console.error);
-
-    // Calculate completed skills count (example logic)
-    let completedCount = 0;
-    if (currentUser && currentUser.completedSkills) {
-        completedCount = currentUser.completedSkills.length;
-    }
-    // Assuming there's a counter for completed skills on dashboard - if not, ignore or create
-    // document.getElementById('completed-skills').textContent = completedCount;
-
-    // Fetch admin count
-    db.collection("admins").get().then(snapshot => {
-        document.getElementById('totalAdmins').textContent = snapshot.size; // Fixed ID
-    }).catch(console.error);
-}
-
-// --- FIRESTORE LISTENERS ---
-function startSkillsListener() {
-    db.collection("skills").onSnapshot((snapshot) => {
-        skillsData = [];
-        snapshot.forEach(doc => {
-            skillsData.push({ id: doc.id, ...doc.data() });
-        });
-        // Sort by order
-        skillsData.sort((a, b) => {
-            const orderA = a.order !== undefined && a.order !== null ? a.order : Infinity;
-            const orderB = b.order !== undefined && b.order !== null ? b.order : Infinity;
-            return orderA - orderB;
-        });
-
-        // Update UIs if visible
-        if (document.getElementById('skills-section').style.display === 'block') {
-            loadSkillsList(); // Update admin skills list
-        }
-        if (document.getElementById('userInterface').style.display === 'block' &&
-            document.getElementById('adminDashboard').style.display === 'none') { // Only update user view if not in admin
-            loadSkillGrid(); // Update user skills grid
-        }
-        updateCounters(); // Update dashboard counter
-    }, (error) => {
-        console.error("Error in skills listener: ", error);
-    });
-}
-
-function setupFirestoreListeners() {
-    if (firestoreListenersSetup) return; // Prevent duplicate setup
-
-    // Start the skills listener (handles both admin and user)
-    startSkillsListener();
-
-    // Listen for changes in ranks and courses collections
-    db.collection("ranks").orderBy("order").onSnapshot((snapshot) => {
-        ranksData = [];
-        snapshot.forEach(doc => {
-            ranksData.push({ id: doc.id, ...doc.data() });
-        });
-        // Reload dropdowns and settings if needed
-        updateDropdowns();
-        if (document.getElementById('settings-section').style.display === 'block') {
-            loadSignupSettings();
-        }
-    }, (error) => {
-        console.error("Error in ranks listener: ", error);
-    });
-
-    db.collection("courses").orderBy("order").onSnapshot((snapshot) => {
-        coursesData = [];
-        snapshot.forEach(doc => {
-            coursesData.push({ id: doc.id, ...doc.data() });
-        });
-        // Reload dropdowns and settings if needed
-        updateDropdowns();
-        if (document.getElementById('settings-section').style.display === 'block') {
-            loadSignupSettings();
-        }
-    }, (error) => {
-        console.error("Error in courses listener: ", error);
-    });
-
-    firestoreListenersSetup = true;
-}
-
 // --- AUTHENTICATION ---
 window.onload = function() {
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            loadUserData(user.uid);
-        } else {
-            showLoginPopup();
-            // Still start the skills listener for public view
-            startSkillsListener();
-        }
-    });
+auth.onAuthStateChanged(user => {
+if (user) {
+loadUserData(user.uid);
+} else {
+showLoginPopup();
+// Still start the skills listener for public view
+startSkillsListener();
+}
+});
 };
 
 function showLoginPopup() {
-    document.getElementById('loginPopup').style.display = 'flex';
-    document.getElementById('loginForm').style.display = 'block';
-    document.getElementById('signupForm').style.display = 'none';
-    document.getElementById('forgotPasswordForm').style.display = 'none';
-    document.getElementById('profileForm').style.display = 'none';
+document.getElementById('loginPopup').style.display = 'flex';
+document.getElementById('loginForm').style.display = 'block'; // Assuming loginForm is a typo for loginPopup, but it's an ID
+document.getElementById('signupForm').style.display = 'none';
+document.getElementById('forgotPasswordForm').style.display = 'none'; // Assuming this ID exists
+document.getElementById('profileForm').style.display = 'none'; // FIX: Check if exists before accessing
+const profileForm = document.getElementById('profileForm');
+if(profileForm) profileForm.style.display = 'none';
 }
 
 function closeLoginPopup() {
-    document.getElementById('loginPopup').style.display = 'none';
+document.getElementById('loginPopup').style.display = 'none';
 }
 
 function showSignupForm() {
-    document.getElementById('loginForm').style.display = 'none';
-    document.getElementById('signupForm').style.display = 'block';
-    document.getElementById('forgotPasswordForm').style.display = 'none';
-    document.getElementById('profileForm').style.display = 'none';
-    document.getElementById('signupError').textContent = ''; // Fixed ID
+document.getElementById('loginPopup').style.display = 'none'; // Hide main login popup
+document.getElementById('signupForm').style.display = 'block';
+document.getElementById('forgotPasswordForm').style.display = 'none';
+document.getElementById('profileForm').style.display = 'none';
+document.getElementById('auth-error').textContent = ''; // Assuming this is for signup error
 }
 
 function showLoginForm() {
-    document.getElementById('loginForm').style.display = 'block';
-    document.getElementById('signupForm').style.display = 'none';
-    document.getElementById('forgotPasswordForm').style.display = 'none';
-    document.getElementById('profileForm').style.display = 'none';
-    document.getElementById('loginError').textContent = ''; // Fixed ID
+document.getElementById('loginPopup').style.display = 'flex'; // Show main login popup
+document.getElementById('signupForm').style.display = 'none';
+document.getElementById('forgotPasswordForm').style.display = 'none';
+document.getElementById('profileForm').style.display = 'none';
+document.getElementById('auth-error').textContent = ''; // Assuming this is for login error
 }
 
 function showForgotPassword() {
-    // Assuming you have a forgot password form div somewhere
-    document.getElementById('loginForm').style.display = 'none';
-    document.getElementById('signupForm').style.display = 'none';
-    document.getElementById('forgotPasswordForm').style.display = 'none'; // Ensure this div exists
-    document.getElementById('profileForm').style.display = 'none';
-    document.getElementById('auth-error').textContent = '';
+// Assuming you have a forgot password form div somewhere
+document.getElementById('loginPopup').style.display = 'none'; // Hide main login popup
+document.getElementById('signupForm').style.display = 'none';
+document.getElementById('forgotPasswordForm').style.display = 'block'; // Assuming this ID exists
+document.getElementById('profileForm').style.display = 'none';
+document.getElementById('auth-error').textContent = '';
 }
 
 function sendPasswordReset() {
-    const email = document.getElementById('forgot-email').value; // Assuming this ID exists in a forgot password form
-    if (!email) {
-        document.getElementById('auth-error').textContent = 'Please enter your email address';
-        return;
-    }
-    auth.sendPasswordResetEmail(email)
-        .then(() => {
-            alert('Password reset email sent!');
-            showLoginForm();
-        })
-        .catch(error => {
-            document.getElementById('auth-error').textContent = error.message;
-        });
+const email = document.getElementById('forgot-email').value; // Assuming this ID exists in a forgot password form
+if (!email) {
+document.getElementById('auth-error').textContent = 'Please enter your email address';
+return;
+}
+auth.sendPasswordResetEmail(email)
+.then(() => {
+alert('Password reset email sent!');
+showLoginForm();
+})
+.catch(error => {
+document.getElementById('auth-error').textContent = error.message;
+});
 }
 
 function login() {
-    const email = document.getElementById('loginEmail').value; // Fixed ID
-    const password = document.getElementById('loginPassword').value; // Fixed ID
-    if (!email || !password) {
-        document.getElementById('loginError').textContent = 'Please enter both email and password'; // Fixed ID
-        return;
-    }
-    auth.signInWithEmailAndPassword(email, password)
-        .then(userCredential => {
-            loadUserData(userCredential.user.uid);
-        })
-        .catch(error => {
-            document.getElementById('loginError').textContent = error.message; // Fixed ID
-        });
+const email = document.getElementById('loginEmail').value; // Fixed ID
+const password = document.getElementById('loginPassword').value; // Fixed ID
+if (!email || !password) {
+document.getElementById('loginError').textContent = 'Please enter both email and password'; // Fixed ID
+return;
+}
+auth.signInWithEmailAndPassword(email, password)
+.then(userCredential => {
+loadUserData(userCredential.user.uid);
+})
+.catch(error => {
+document.getElementById('loginError').textContent = error.message; // Fixed ID
+});
 }
 
 function signup() {
-    const name = document.getElementById('signupName').value; // Added name capture
-    const email = document.getElementById('signupEmail').value; // Fixed ID
-    const password = document.getElementById('signupPassword').value; // Fixed ID
-    // Removed confirm password check as field is removed
-
-    if (password.length < 6) {
-        document.getElementById('signupError').textContent = 'Password must be at least 6 characters'; // Fixed ID
-        return;
-    }
-
-    auth.createUserWithEmailAndPassword(email, password)
-        .then(userCredential => {
-            // Add user to Firestore with provided data
-            db.collection("users").doc(userCredential.user.uid).set({
-                email: email,
-                name: name.toUpperCase(), // Auto-convert to uppercase
-                rank: "", // Will be filled later or during Google signup
-                course: "", // Will be filled later or during Google signup
-                completedSkills: [],
-                lastLogin: new Date()
-            }).then(() => {
-                loadUserData(userCredential.user.uid);
-            }).catch(error => {
-                document.getElementById('signupError').textContent = error.message; // Fixed ID
-            });
-        })
-        .catch(error => {
-            document.getElementById('signupError').textContent = error.message; // Fixed ID
-        });
+const name = document.getElementById('signupName').value; // Added name capture
+const email = document.getElementById('signupEmail').value; // Fixed ID
+const password = document.getElementById('signupPassword').value; // Fixed ID
+const confirmPassword = document.getElementById('signupConfirmPassword').value; // Fixed ID
+if (password !== confirmPassword) {
+document.getElementById('signupError').textContent = 'Passwords do not match'; // Fixed ID
+return;
+}
+if (password.length < 6) {
+document.getElementById('signupError').textContent = 'Password must be at least 6 characters'; // Fixed ID
+return;
+}
+auth.createUserWithEmailAndPassword(email, password)
+.then(userCredential => {
+// Add user to Firestore with provided data
+db.collection("users").doc(userCredential.user.uid).set({
+email: email,
+name: name.toUpperCase(), // Auto-convert to uppercase
+rank: "", // Will be filled later or during Google signup
+course: "", // Will be filled later or during Google signup
+completedSkills: [],
+lastLogin: new Date()
+}).then(() => {
+loadUserData(userCredential.user.uid);
+}).catch(error => {
+document.getElementById('signupError').textContent = error.message; // Fixed ID
+});
+})
+.catch(error => {
+document.getElementById('signupError').textContent = error.message; // Fixed ID
+});
 }
 
 function googleLogin() {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider)
-        .then(result => {
-            const user = result.user;
-            // Check if user exists in Firestore
-            db.collection("users").doc(user.uid).get().then(doc => {
-                if (doc.exists) {
-                    // User already exists, load data
-                    loadUserData(user.uid);
-                } else {
-                    // New user via Google, prompt for profile completion
-                    showProfileCompletion();
-                }
-            }).catch(error => {
-                console.error("Error fetching user data: ", error);
-                document.getElementById('loginError').textContent = 'Error logging in.'; // Fixed ID
-            });
-        })
-        .catch(error => {
-            console.error("Google login error: ", error);
-            document.getElementById('loginError').textContent = error.message; // Fixed ID
-        });
+const provider = new firebase.auth.GoogleAuthProvider();
+auth.signInWithPopup(provider)
+.then(result => {
+const user = result.user;
+// Check if user exists in Firestore
+db.collection("users").doc(user.uid).get().then(doc => {
+if (doc.exists) {
+// User already exists, load data
+loadUserData(user.uid);
+} else {
+// New user via Google, prompt for profile completion
+showProfileCompletion();
+}
+}).catch(error => {
+console.error("Error fetching user  ", error);
+document.getElementById('loginError').textContent = 'Error logging in.'; // Fixed ID
+});
+})
+.catch(error => {
+console.error("Google login error: ", error);
+document.getElementById('loginError').textContent = error.message; // Fixed ID
+});
 }
 
 function logout() {
-    auth.signOut().then(() => {
-        currentUser = null;
-        document.getElementById('adminDashboard').style.display = 'none';
-        document.getElementById('userInterface').style.display = 'block';
-        document.getElementById('adminSwitchBtn').style.display = 'none'; // Assuming this ID exists on header buttons
-        document.getElementById('adminBackBtn').style.display = 'none'; // Assuming this ID exists on header buttons
-        closeProfilePopup(); // Close profile popup on logout
-        showLoginPopup();
+auth.signOut().then(() => {
+currentUser = null;
+document.getElementById('adminDashboard').style.display = 'none';
+document.getElementById('userInterface').style.display = 'block';
+document.getElementById('admin-switch-btn').style.display = 'none'; // Fixed ID
+// document.getElementById('adminBackBtn').style.display = 'none'; // Assuming this ID doesn't exist in header, removed
+closeProfilePopup(); // Close profile popup on logout
+showLoginPopup();
 
-        // Reset UI states
-        document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
-        document.getElementById('dashboard-section').style.display = 'block';
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        document.getElementById('dashboardNav').classList.add('active');
+// Reset UI states
+document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none'); // Fixed selector
+document.getElementById('dashboard-section').style.display = 'block';
+document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+document.getElementById('dashboardNav').classList.add('active');
 
-    }).catch(error => {
-        console.error("Logout error: ", error);
-    });
+// Stop listeners if needed (optional, depends on desired behavior)
+// firestoreListenersSetup = false; // This might require more complex cleanup
+}).catch(error => {
+console.error("Logout error: ", error);
+});
 }
 
 // --- USER DATA AND PROFILE ---
 async function loadUserData(userId) {
-    try {
-        const userDoc = await db.collection("users").doc(userId).get();
-        if (userDoc.exists) {
-            currentUser = { id: userDoc.id, ...userDoc.data() };
-            // Assuming userDisplayName is used somewhere, otherwise remove
-            // document.getElementById('userDisplayName').textContent = currentUser.name || currentUser.email.split('@')[0];
-            document.getElementById('loginPopup').style.display = 'none';
-            document.getElementById('profileForm').style.display = 'none'; // Hide profile form if shown
+try {
+const userDoc = await db.collection("users").doc(userId).get();
+if (userDoc.exists) {
+currentUser = { id: userDoc.id, ...userDoc.data() };
+// document.getElementById('userDisplayName').textContent = ...; // REMOVED LINE
+document.getElementById('loginPopup').style.display = 'none';
+document.getElementById('profileForm').style.display = 'none'; // Hide profile form if shown
 
-            // Check if user is admin
-            const adminDoc = await db.collection("admins").doc(userId).get();
-            if (adminDoc.exists) {
-                document.getElementById('adminDashboard').style.display = 'block';
-                document.getElementById('userInterface').style.display = 'none';
-                document.getElementById('adminSwitchBtn').style.display = 'none'; // Hide switch btn in admin view initially
-                document.getElementById('adminBackBtn').style.display = 'inline-block'; // Show back btn
-                setupFirestoreListeners(); // Set up listeners for admin
-                switchTab('dashboard'); // Default admin view - using switchTab for consistency
-            } else {
-                document.getElementById('adminDashboard').style.display = 'none';
-                document.getElementById('userInterface').style.display = 'block';
-                document.getElementById('adminSwitchBtn').style.display = 'inline-block'; // Show switch btn in user view
-                document.getElementById('adminBackBtn').style.display = 'none'; // Hide back btn
-                // Skills listener already started in window.onload or login flow
-                loadSkillGrid(); // Explicitly load user skills grid after user data is loaded
-            }
-        } else {
-            // This shouldn't happen if user exists in Auth, but handle it
-            console.error("User document does not exist in Firestore!");
-            alert("User data error. Please contact support.");
-        }
-    } catch (error) {
-        console.error("Error loading user data: ", error);
-    }
+// Check if user is admin
+const adminDoc = await db.collection("admins").doc(userId).get();
+if (adminDoc.exists) {
+document.getElementById('adminDashboard').style.display = 'block';
+document.getElementById('userInterface').style.display = 'none';
+document.getElementById('admin-switch-btn').style.display = 'none'; // Hide switch btn in admin view initially
+// document.getElementById('adminBackBtn').style.display = 'inline-block'; // Assuming this ID doesn't exist in header, removed
+setupFirestoreListeners(); // Set up listeners for admin
+switchTab('dashboard'); // Default admin view - using switchTab for consistency
+} else {
+document.getElementById('adminDashboard').style.display = 'none';
+document.getElementById('userInterface').style.display = 'block';
+document.getElementById('admin-switch-btn').style.display = 'inline-block'; // Show switch btn in user view
+// document.getElementById('adminBackBtn').style.display = 'none'; // Assuming this ID doesn't exist in header, removed
+// Skills listener already started in window.onload or login flow
+loadSkillGrid(); // Explicitly load user skills grid after user data is loaded
+}
+} else {
+// This shouldn't happen if user exists in Auth, but handle it
+console.error("User document does not exist in Firestore!");
+alert("User data error. Please contact support.");
+}
+} catch (error) {
+console.error("Error loading user data: ", error); // Improved error message
+}
 }
 
 function showProfileCompletion() {
-    document.getElementById('loginForm').style.display = 'none';
-    document.getElementById('signupForm').style.display = 'none';
-    document.getElementById('forgotPasswordForm').style.display = 'none'; // Assuming this exists
-    document.getElementById('profileForm').style.display = 'block';
-    document.getElementById('auth-error').textContent = '';
-    updateDropdowns(); // Populate rank/course dropdowns for completion
+document.getElementById('loginPopup').style.display = 'none'; // Hide main login popup
+document.getElementById('signupForm').style.display = 'none';
+document.getElementById('forgotPasswordForm').style.display = 'none'; // Assuming this exists
+document.getElementById('profileForm').style.display = 'block';
+document.getElementById('auth-error').textContent = '';
+updateDropdowns(); // Populate rank/course dropdowns for completion
 }
 
 async function completeProfile() {
-    const rank = document.getElementById('profileRank').value; // Fixed ID
-    const course = document.getElementById('profileCourse').value; // Fixed ID
-    const name = document.getElementById('profileName').value.toUpperCase(); // Fixed ID, Auto-convert to uppercase
+const rank = document.getElementById('profileRank').value; // Fixed ID
+const course = document.getElementById('profileCourse').value; // Fixed ID
+const name = document.getElementById('profileName').value.toUpperCase(); // Fixed ID, Auto-convert to uppercase
 
-    if (!rank || !course || !name) {
-        document.getElementById('auth-error').textContent = 'Please fill in all fields';
-        return;
-    }
-
-    try {
-        // Get current user UID
-        const user = auth.currentUser;
-        if (!user) throw new Error("No authenticated user found");
-
-        // Update user document in Firestore
-        await db.collection("users").doc(user.uid).update({
-            name: name,
-            rank: rank,
-            course: course
-        });
-
-        // Reload user data to reflect changes
-        loadUserData(user.uid);
-    } catch (error) {
-        console.error("Error completing profile: ", error);
-        document.getElementById('auth-error').textContent = error.message;
-    }
+if (!rank || !course || !name) {
+document.getElementById('auth-error').textContent = 'Please fill in all fields';
+return;
 }
 
-function closeProfileForm() {
-  document.getElementById('profileForm').style.display = 'none';
+try {
+// Get current user UID
+const user = auth.currentUser;
+if (!user) throw new Error("No authenticated user found");
+
+// Update user document in Firestore
+await db.collection("users").doc(user.uid).update({
+name: name,
+rank: rank,
+course: course
+});
+
+// Reload user data to reflect changes
+loadUserData(user.uid);
+} catch (error) {
+console.error("Error completing profile: ", error);
+document.getElementById('auth-error').textContent = error.message;
+}
 }
 
 // --- UI MANAGEMENT ---
 function switchTab(tabName) {
-    // Hide all tab contents
-    document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
-    // Remove active class from all nav items and tab buttons
-    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+// Hide all tab contents
+document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+// Remove active class from all nav items and tab buttons
+document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
 
-    // Show the requested section and highlight its nav item and tab button
-    const sectionElement = document.getElementById(tabName + '-section');
-    if (sectionElement) {
-        sectionElement.style.display = 'block';
-        const navItem = document.querySelector(`.nav-item[onclick="switchTab('${tabName}')"]`);
-        if (navItem) navItem.classList.add('active');
-    }
+// Show the requested section and highlight its nav item and tab button
+const sectionElement = document.getElementById(tabName + '-section');
+if (sectionElement) {
+sectionElement.style.display = 'block';
+const navItem = document.querySelector(`.nav-item[onclick="switchTab('${tabName}')"]`);
+if (navItem) navItem.classList.add('active');
+}
 
-    // Handle specific tab content activation (for settings tabs)
-    const tabButton = document.querySelector(`.tab-button[data-tab="${tabName}"]`);
-    if (tabButton) {
-        tabButton.classList.add('active');
-        const tabContent = document.getElementById(tabName + 'Tab');
-        if (tabContent) {
-             tabContent.style.display = 'block';
-             // Specific logic for each tab
-             if (tabName === 'signup') {
-                 loadSignupSettings();
-             } else if (tabName === 'adminAccess') { // Load admin list when Admin Access tab is active
-                 loadAdminList();
-             } else if (tabName === 'dashboard') {
-                 updateCounters(); // Update dashboard stats when shown
-             } else if (tabName === 'users') {
-                 loadUsersManagement();
-             } else if (tabName === 'skills') {
-                 loadSkillsList(); // Load skills list when shown
-             }
-        }
-    }
+// Handle specific tab content activation (for settings tabs)
+const tabButton = document.querySelector(`.tab-button[data-tab="${tabName}"]`);
+if (tabButton) {
+tabButton.classList.add('active');
+const tabContent = document.getElementById(tabName + 'Tab');
+if (tabContent) {
+     tabContent.style.display = 'block';
+     // Specific logic for each tab
+     if (tabName === 'signup') {
+         loadSignupSettings();
+     } else if (tabName === 'admin') { // Load admin list when Admin Access tab is active
+         loadAdminList();
+     } else if (tabName === 'dashboard') {
+         updateCounters(); // Update dashboard stats when shown
+     } else if (tabName === 'users') {
+         loadUsersManagement();
+     } else if (tabName === 'skills') {
+         loadSkillsList(); // Load skills list when shown
+     }
+}
+}
 }
 
 // CHANGED: Function to toggle profile popup
 function toggleProfilePopup() {
-    const popup = document.getElementById('profilePopup');
-    if (popup.style.display === 'block') {
-        popup.style.display = 'none';
-    } else {
-        popup.style.display = 'block';
-        // Update profile info in popup
-        document.getElementById('profileNameDisplay').textContent = currentUser?.name || 'N/A'; // Fixed ID
-        document.getElementById('profileEmailDisplay').textContent = currentUser?.email || 'N/A'; // Fixed ID
-        document.getElementById('profileRankDisplay').textContent = currentUser?.rank || 'N/A'; // Fixed ID
-        document.getElementById('profileCourseDisplay').textContent = currentUser?.course || 'N/A'; // Fixed ID
-        // Update rank dropdown in popup if needed (e.g., for changing rank)
-        // updateDropdowns(); // Uncomment if you add a rank change feature in the popup
-    }
+const popup = document.getElementById('profilePopup');
+if (popup.style.display === 'block') {
+popup.style.display = 'none';
+} else {
+popup.style.display = 'block';
+// Update profile info in popup
+document.getElementById('profileName').textContent = currentUser?.name || 'N/A';
+document.getElementById('profileRank').textContent = currentUser?.rank || 'N/A';
+document.getElementById('profileCourse').textContent = currentUser?.course || 'N/A';
+document.getElementById('profileEmail').textContent = currentUser?.email || 'N/A';
+// Update rank dropdown in popup if needed (e.g., for changing rank)
+// updateDropdowns(); // Uncomment if you add a rank change feature in the popup
+}
 }
 
 // CHANGED: Function to close profile popup
 function closeProfilePopup() {
-    document.getElementById('profilePopup').style.display = 'none';
+document.getElementById('profilePopup').style.display = 'none';
 }
 
 // CHANGED: Function to switch to admin interface
-function switchToAdmin() { // Renamed function for clarity
-    if (currentUser && currentUser.id) {
-        db.collection("admins").doc(currentUser.id).get().then(adminDoc => {
-            if (adminDoc.exists) {
-                wasInAdminView = true;
-                document.getElementById('userInterface').style.display = 'none';
-                document.getElementById('adminDashboard').style.display = 'block';
-                document.getElementById('adminSwitchBtn').style.display = 'none';
-                document.getElementById('adminBackBtn').style.display = 'inline-block';
-                switchTab('dashboard'); // Default to dashboard
-            } else {
-                alert("You do not have admin privileges.");
-            }
-        }).catch(error => {
-            console.error("Error checking admin status: ", error);
-        });
-    }
+function switchToAdminInterface() { // Renamed function for clarity
+if (currentUser && currentUser.id) {
+db.collection("admins").doc(currentUser.id).get().then(adminDoc => {
+if (adminDoc.exists) {
+wasInAdminView = true;
+document.getElementById('userInterface').style.display = 'none';
+document.getElementById('adminDashboard').style.display = 'block';
+document.getElementById('admin-switch-btn').style.display = 'none';
+// document.getElementById('adminBackBtn').style.display = 'inline-block'; // Assuming this ID doesn't exist in header, removed
+switchTab('dashboard'); // Default to dashboard
+} else {
+alert("You do not have admin privileges.");
+}
+}).catch(error => {
+console.error("Error checking admin status: ", error);
+});
+}
 }
 
 // CHANGED: Function to switch back to user interface
 function switchToUserInterface() { // Renamed function for clarity
-    wasInAdminView = true;
-    document.getElementById('adminDashboard').style.display = 'none';
-    document.getElementById('userInterface').style.display = 'block';
-    document.getElementById('adminSwitchBtn').style.display = 'inline-block';
-    document.getElementById('adminBackBtn').style.display = 'none';
-    // Ensure user view is updated
-    if (document.getElementById('userInterface').style.display === 'block') {
-        loadSkillGrid(); // Reload skills grid for user
-    }
+wasInAdminView = true;
+document.getElementById('adminDashboard').style.display = 'none';
+document.getElementById('userInterface').style.display = 'block';
+document.getElementById('admin-switch-btn').style.display = 'inline-block';
+// document.getElementById('adminBackBtn').style.display = 'none'; // Assuming this ID doesn't exist in header, removed
+// Ensure user view is updated
+if (document.getElementById('userInterface').style.display === 'block') {
+loadSkillGrid(); // Reload skills grid for user
+}
 }
 
 // --- SKILLS MANAGEMENT (ADMIN) ---
 function loadSkillsList() {
-    const container = document.getElementById('skillList'); // Fixed ID
-    if (!container) return; // Guard clause
-    container.innerHTML = ''; // Clear existing content
+const container = document.getElementById('skillList');
+if (!container) return; // Guard clause
+container.innerHTML = ''; // Clear existing content
 
-    skillsData.forEach(skill => {
-        const skillCard = document.createElement('div');
-        skillCard.className = 'skill-card';
-        skillCard.onclick = () => editSkill(skill.id); // Pass the ID
+skillsData.forEach(skill => {
+const skillCard = document.createElement('div');
+skillCard.className = 'skill-card';
+skillCard.onclick = () => editSkill(skill.id); // Pass the ID
 
-        let iconHtml = '<i class="fas fa-toolbox" style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;"></i>';
-        if (skill.imageUrl) {
-            iconHtml = `<img src="${skill.imageUrl}" alt="${skill.name}" style="width: 100%; height: 150px; object-fit: cover;">`;
-        }
+let iconHtml = '<i class="fas fa-toolbox" style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;"></i>';
+if (skill.imageUrl) {
+iconHtml = `<img src="${skill.imageUrl}" alt="${skill.name}" style="width: 100%; height: 150px; object-fit: cover;">`;
+}
 
-        skillCard.innerHTML = `
-            <div style="padding: 1.5rem; text-align: center;">
-                ${iconHtml}
-                <h4>${skill.name}</h4>
-                <p>${skill.description.substring(0, 100)}...</p>
-                <div class="skill-actions">
-                    <button class="action-btn" onclick="event.stopPropagation(); moveSkillUp('${skill.id}', ${skill.order || 0})"><i class="fas fa-arrow-up"></i> Up</button>
-                    <button class="action-btn" onclick="event.stopPropagation(); moveSkillDown('${skill.id}', ${skill.order || 0})"><i class="fas fa-arrow-down"></i> Down</button>
-                    <button class="action-btn" onclick="event.stopPropagation(); deleteSkill('${skill.id}', '${skill.name}')"><i class="fas fa-trash"></i> Delete</button>
-                </div>
-            </div>
-        `;
-        container.appendChild(skillCard);
-    });
+skillCard.innerHTML = `
+<div style="padding: 1.5rem; text-align: center;">
+${iconHtml}
+<h4>${skill.name}</h4>
+<p>${skill.description.substring(0, 100)}...</p>
+<div class="skill-actions">
+<button class="action-btn" onclick="event.stopPropagation(); moveSkillUp('${skill.id}', ${skill.order || 0})"><i class="fas fa-arrow-up"></i> Up</button>
+<button class="action-btn" onclick="event.stopPropagation(); moveSkillDown('${skill.id}', ${skill.order || 0})"><i class="fas fa-arrow-down"></i> Down</button>
+<button class="action-btn" onclick="event.stopPropagation(); deleteSkill('${skill.id}', '${skill.name}')"><i class="fas fa-trash"></i> Delete</button>
+</div>
+</div>
+`;
+container.appendChild(skillCard);
+});
 }
 
 // Safely find skill by ID
 function findSkillById(id) {
-    return skillsData.find(skill => skill.id === id);
+return skillsData.find(skill => skill.id === id);
 }
 
 function editSkill(skillId) {
-    const skill = findSkillById(skillId); // Use the helper function
-    if (!skill) {
-        alert("Skill not found. Please refresh and try again.");
-        console.warn("Skill not found for ID:", skillId);
-        return;
-    }
-    currentEditingSkill = skill;
-    editingSkillId = skill.id; // Store the ID being edited
-    originalEditingSkill = JSON.parse(JSON.stringify(currentEditingSkill)); // Deep copy for cancel
+const skill = findSkillById(skillId); // Use the helper function
+if (!skill) {
+alert("Skill not found. Please refresh and try again.");
+console.warn("Skill not found for ID:", skillId);
+return;
+}
+currentEditingSkill = skill;
+editingSkillId = skill.id; // Store the ID being edited
+originalEditingSkill = JSON.parse(JSON.stringify(currentEditingSkill)); // Deep copy for cancel
 
-    // Populate the edit form fields - Fixed IDs
-    document.getElementById('skillName').value = currentEditingSkill.name || '';
-    document.getElementById('skillDescription').value = currentEditingSkill.description || '';
-    document.getElementById('skillCategory').value = currentEditingSkill.category || ''; // Assuming category field exists
-    document.getElementById('skillIcon').value = currentEditingSkill.iconUrl || ''; // Assuming iconUrl field exists
+// Populate the edit form fields
+document.getElementById('skillName').value = currentEditingSkill.name || '';
+document.getElementById('skillDescription').value = currentEditingSkill.description || '';
+document.getElementById('skillCategory').value = currentEditingSkill.category || ''; // Added field
+document.getElementById('skillIcon').value = currentEditingSkill.iconUrl || ''; // Added field
 
-    // Clear and populate steps - assuming steps container exists in general tab
-    const stepsContainer = document.getElementById('stepsEditor'); // Target the editor div
-    stepsContainer.innerHTML = '';
-    (currentEditingSkill.steps || []).forEach((step, index) => {
-        addStep(index, step.title, step.description, step.imageUrl);
-    });
+// Clear and populate steps
+const stepsContainer = document.getElementById('stepsEditor'); // Target the editor div
+stepsContainer.innerHTML = '';
+(currentEditingSkill.steps || []).forEach((step, index) => {
+addStep(index, step.title, step.description, step.imageUrl);
+});
 
-    // Clear and populate quiz - assuming quiz container exists in quiz tab
-    const quizContainer = document.getElementById('quizEditor'); // Target the editor div
-    quizContainer.innerHTML = '';
-    (currentEditingSkill.quiz || []).forEach((question, index) => {
-        addQuizQuestion(index, question);
-    });
+// Clear and populate quiz
+const quizContainer = document.getElementById('quizEditor'); // Target the editor div
+quizContainer.innerHTML = '';
+(currentEditingSkill.quiz || []).forEach((question, index) => {
+addQuizQuestion(index, question);
+});
 
-    // Show image preview if exists
-    const preview = document.getElementById('imagePreview'); // Fixed ID
-    if (currentEditingSkill.imageUrl) {
-        preview.innerHTML = `<img id="previewImg" src="${currentEditingSkill.imageUrl}" alt="Current Image">`;
-    } else {
-        preview.innerHTML = '<span id="previewText">No image selected</span>';
-    }
+// Show image preview if exists
+const preview = document.getElementById('imagePreview');
+if (currentEditingSkill.imageUrl) {
+preview.innerHTML = `<img id="previewImg" src="${currentEditingSkill.imageUrl}" alt="Current Image">`;
+} else {
+preview.innerHTML = '<span id="previewText">No image selected</span>';
+}
 
-    // Show the edit form
-    document.getElementById('skills-section').style.display = 'none';
-    document.getElementById('editSkillForm').style.display = 'block'; // Fixed ID
-    // Also hide other main sections if needed, handled by switchTab usually
-    switchTab('skills'); // Ensure skills nav is active, though form is shown
+// Show the edit form
+document.getElementById('skills-section').style.display = 'none';
+document.getElementById('editSkillForm').style.display = 'block';
+// Also hide other main sections if needed, handled by switchTab usually
+switchTab('skills'); // Ensure skills nav is active, though form is shown
 }
 
 function cancelEdit() {
-    // Restore original state if editing an existing skill
-    if (editingSkillId && originalEditingSkill) {
-        currentEditingSkill = JSON.parse(JSON.stringify(originalEditingSkill));
-    }
+// Restore original state if editing an existing skill
+if (editingSkillId && originalEditingSkill) {
+currentEditingSkill = JSON.parse(JSON.stringify(originalEditingSkill));
+}
 
-    // Clear editing state
-    currentEditingSkill = null;
-    originalEditingSkill = null;
-    editingSkillId = null; // Reset ID
+// Clear editing state
+currentEditingSkill = null;
+originalEditingSkill = null;
+editingSkillId = null; // Reset ID
 
-    // Hide edit form and show skills list
-    document.getElementById('editSkillForm').style.display = 'none'; // Fixed ID
-    document.getElementById('skills-section').style.display = 'block';
-    switchTab('skills'); // Show the skills list section again
+// Hide edit form and show skills list
+document.getElementById('editSkillForm').style.display = 'none';
+document.getElementById('skills-section').style.display = 'block';
+switchTab('skills'); // Show the skills list section again
 }
 
 function saveSkill() {
-    if (!currentEditingSkill) {
-        console.error("No skill is currently being edited.");
-        return;
-    }
+if (!currentEditingSkill) {
+console.error("No skill is currently being edited.");
+return;
+}
 
-    // Validate required fields
-    if (!currentEditingSkill.name.trim()) {
-        alert("Please enter a skill name.");
-        return;
-    }
+// Validate required fields
+if (!currentEditingSkill.name.trim()) {
+alert("Please enter a skill name.");
+return;
+}
 
-    const skillId = editingSkillId; // Use the stored ID
-    const skillRef = db.collection("skills").doc(skillId);
+const skillId = editingSkillId; // Use the stored ID
+const skillRef = db.collection("skills").doc(skillId);
 
-    // Prepare the data to save (omit ID)
-    const { id, ...skillData } = currentEditingSkill;
+// Prepare the data to save (omit ID)
+const { id, ...skillData } = currentEditingSkill;
 
-    // Upload image if a new one was selected
-    const fileInput = document.getElementById('skillImage'); // Fixed ID
-    if (fileInput.files[0]) {
-        const storageRef = storage.ref();
-        const fileRef = storageRef.child(`skill_images/${Date.now()}_${fileInput.files[0].name}`);
+// Upload image if a new one was selected
+const fileInput = document.getElementById('skillImage');
+if (fileInput.files[0]) {
+const storageRef = storage.ref();
+const fileRef = storageRef.child(`skill_images/${Date.now()}_${fileInput.files[0].name}`);
 
-        fileRef.put(fileInput.files[0]).then(snapshot => {
-            return snapshot.ref.getDownloadURL();
-        }).then(downloadURL => {
-            skillData.imageUrl = downloadURL;
-            return skillRef.set(skillData); // Save to Firestore with image URL
-        }).then(() => {
-            alert("Skill updated successfully!");
-            cancelEdit(); // Return to skills list
-        }).catch(error => {
-            console.error("Error uploading image or saving skill: ", error);
-            alert("Error saving skill: " + error.message);
-        });
-    } else {
-        // No new image, save directly
-        skillRef.set(skillData).then(() => {
-            alert("Skill updated successfully!");
-            cancelEdit(); // Return to skills list
-        }).catch(error => {
-            console.error("Error saving skill: ", error);
-            alert("Error saving skill: " + error.message);
-        });
-    }
+fileRef.put(fileInput.files[0]).then(snapshot => {
+return snapshot.ref.getDownloadURL();
+}).then(downloadURL => {
+skillData.imageUrl = downloadURL;
+return skillRef.set(skillData); // Save to Firestore with image URL
+}).then(() => {
+alert("Skill updated successfully!");
+cancelEdit(); // Return to skills list
+}).catch(error => {
+console.error("Error uploading image or saving skill: ", error);
+alert("Error saving skill: " + error.message);
+});
+} else {
+// No new image, save directly
+skillRef.set(skillData).then(() => {
+alert("Skill updated successfully!");
+cancelEdit(); // Return to skills list
+}).catch(error => {
+console.error("Error saving skill: ", error);
+alert("Error saving skill: " + error.message);
+});
+}
 }
 
 function openNewSkillForm() { // Renamed function for clarity
-    // Calculate the new order value based on the *maximum* existing order in the CURRENTLY KNOWN skillsData + 1
-    // Ensure skillsData is sorted first to get the latest max
-    // Use the same sorting logic as elsewhere to find the max order
-    const sortedSkillsForOrderCalc = [...skillsData].sort((a, b) => {
-        const orderA = a.order !== undefined && a.order !== null ? a.order : -1; // Use -1 or 0 if missing for calculation
-        const orderB = b.order !== undefined && b.order !== null ? b.order : -1;
-        return orderA - orderB;
-    });
-    const maxExistingOrder = sortedSkillsForOrderCalc.length > 0 ? (sortedSkillsForOrderCalc[sortedSkillsForOrderCalc.length - 1].order || 0) : -1;
-    const newOrder = maxExistingOrder + 1;
+// Calculate the new order value based on the *maximum* existing order in the CURRENTLY KNOWN skillsData + 1
+// Ensure skillsData is sorted first to get the latest max
+// Use the same sorting logic as elsewhere to find the max order
+const sortedSkillsForOrderCalc = [...skillsData].sort((a, b) => {
+const orderA = a.order !== undefined && a.order !== null ? a.order : -1; // Use -1 or 0 if missing for calculation
+const orderB = b.order !== undefined && b.order !== null ? b.order : -1;
+return orderA - orderB;
+});
+const maxExistingOrder = sortedSkillsForOrderCalc.length > 0 ? (sortedSkillsForOrderCalc[sortedSkillsForOrderCalc.length - 1].order || 0) : -1;
+const newOrder = maxExistingOrder + 1;
 
-    currentEditingSkill = {
-        id: null, // Will be assigned by Firestore on add
-        name: '',
-        imageUrl: '', // Changed from 'icon'
-        description: '',
-        category: '', // Added
-        iconUrl: '', // Added
-        tools: [], // Structure changed to hold objects with name and imageUrl
-        theory: '',
-        quiz: [],
-        steps: [], // Added steps array
-        order: newOrder // Assign the calculated new order
-    };
-    editingSkillId = null; // Indicate this is a new skill
-    originalEditingSkill = JSON.parse(JSON.stringify(currentEditingSkill)); // Initial state for cancel
+currentEditingSkill = {
+id: null, // Will be assigned by Firestore on add
+name: '',
+imageUrl: '', // Changed from 'icon'
+description: '',
+category: '', // Added
+iconUrl: '', // Added
+tools: [], // Structure changed to hold objects with name and imageUrl
+theory: '',
+quiz: [],
+steps: [], // Added steps array
+order: newOrder // Assign the calculated new order
+};
+editingSkillId = null; // Indicate this is a new skill
+originalEditingSkill = JSON.parse(JSON.stringify(currentEditingSkill)); // Initial state for cancel
 
-    // Clear the form fields - Fixed IDs
-    document.getElementById('skillName').value = '';
-    document.getElementById('skillDescription').value = '';
-    document.getElementById('skillCategory').value = '';
-    document.getElementById('skillIcon').value = '';
+// Clear the form fields
+document.getElementById('skillName').value = '';
+document.getElementById('skillDescription').value = '';
+document.getElementById('skillCategory').value = '';
+document.getElementById('skillIcon').value = '';
 
-    // Clear steps and quiz containers
-    document.getElementById('stepsEditor').innerHTML = '';
-    document.getElementById('quizEditor').innerHTML = '';
+// Clear steps and quiz containers
+document.getElementById('stepsEditor').innerHTML = '';
+document.getElementById('quizEditor').innerHTML = '';
 
-    // Clear image preview
-    document.getElementById('imagePreview').innerHTML = '<span id="previewText">No image selected</span>';
+// Clear image preview
+document.getElementById('imagePreview').innerHTML = '<span id="previewText">No image selected</span>';
 
-    // Show the edit form
-    document.getElementById('skills-section').style.display = 'none';
-    document.getElementById('editSkillForm').style.display = 'block'; // Fixed ID
-    switchTab('skills'); // Ensure skills nav is active
+// Show the edit form
+document.getElementById('skills-section').style.display = 'none';
+document.getElementById('editSkillForm').style.display = 'block';
+switchTab('skills'); // Ensure skills nav is active
 }
 
 // Utility functions for edit form
 function updateSkillField(field, value) {
-    if (currentEditingSkill) {
-        currentEditingSkill[field] = value;
-    }
+if (currentEditingSkill) {
+currentEditingSkill[field] = value;
+}
 }
 
 function addStep(index = null, title = '', description = '', imageUrl = '') {
-    const stepsContainer = document.getElementById('stepsEditor'); // Target the editor div
-    const stepIndex = index !== null ? index : (currentEditingSkill.steps ? currentEditingSkill.steps.length : 0);
-    const stepId = `step-${stepIndex}`;
-    const stepDiv = document.createElement('div');
-    stepDiv.className = 'step-item';
-    stepDiv.id = stepId;
-    stepDiv.innerHTML = `
-        <div class="step-header">
-            <h4>Step ${stepIndex + 1}</h4>
-            <button class="action-btn delete-btn" onclick="removeStep(${stepIndex})"><i class="fas fa-trash"></i></button>
-        </div>
-        <div class="step-content">
-            <div>
-                <label>Title</label>
-                <input type="text" value="${title}" onchange="updateStepField(${stepIndex}, 'title', this.value)">
-            </div>
-            <div>
-                <label>Description</label>
-                <textarea onchange="updateStepField(${stepIndex}, 'description', this.value)">${description}</textarea>
-            </div>
-            <div>
-                <label>Image URL (or upload below)</label>
-                <input type="text" value="${imageUrl}" onchange="updateStepField(${stepIndex}, 'imageUrl', this.value)">
-                <input type="file" accept="image/*" onchange="uploadStepImage(this, ${stepIndex})">
-            </div>
-        </div>
-        <div class="image-upload-preview" id="step-image-preview-${stepIndex}">${imageUrl ? `<img src="${imageUrl}" alt="Step ${stepIndex+1} Preview">` : ''}</div>
-    `;
-    stepsContainer.appendChild(stepDiv);
-    if (!currentEditingSkill.steps) currentEditingSkill.steps = [];
-    if (index === null) { // Adding new step
-        currentEditingSkill.steps.push({ title: '', description: '', imageUrl: '' });
-    }
+const stepsContainer = document.getElementById('stepsEditor'); // Target the editor div
+const stepIndex = index !== null ? index : (currentEditingSkill.steps ? currentEditingSkill.steps.length : 0);
+const stepId = `step-${stepIndex}`;
+const stepDiv = document.createElement('div');
+stepDiv.className = 'step-item';
+stepDiv.id = stepId;
+stepDiv.innerHTML = `
+<div class="step-header">
+<h4>Step ${stepIndex + 1}</h4>
+<button class="action-btn delete-btn" onclick="removeStep(${stepIndex})"><i class="fas fa-trash"></i></button>
+</div>
+<div class="step-content">
+<div>
+<label>Title</label>
+<input type="text" value="${title}" onchange="updateStepField(${stepIndex}, 'title', this.value)">
+</div>
+<div>
+<label>Description</label>
+<textarea onchange="updateStepField(${stepIndex}, 'description', this.value)">${description}</textarea>
+</div>
+<div>
+<label>Image URL (or upload below)</label>
+<input type="text" value="${imageUrl}" onchange="updateStepField(${stepIndex}, 'imageUrl', this.value)">
+<input type="file" accept="image/*" onchange="uploadStepImage(this, ${stepIndex})">
+</div>
+</div>
+<div class="image-upload-preview" id="step-image-preview-${stepIndex}">${imageUrl ? `<img src="${imageUrl}" alt="Step ${stepIndex+1} Preview">` : ''}</div>
+`;
+stepsContainer.appendChild(stepDiv);
+if (!currentEditingSkill.steps) currentEditingSkill.steps = [];
+if (index === null) { // Adding new step
+currentEditingSkill.steps.push({ title: '', description: '', imageUrl: '' });
+}
 }
 
 function updateStepField(index, field, value) {
-    if (currentEditingSkill && currentEditingSkill.steps && currentEditingSkill.steps[index]) {
-        currentEditingSkill.steps[index][field] = value;
-    }
+if (currentEditingSkill && currentEditingSkill.steps && currentEditingSkill.steps[index]) {
+currentEditingSkill.steps[index][field] = value;
+}
 }
 
 function removeStep(index) {
-    if (currentEditingSkill && currentEditingSkill.steps) {
-        currentEditingSkill.steps.splice(index, 1);
-        // Re-render the steps section to update indices correctly
-        const stepsContainer = document.getElementById('stepsEditor'); // Target the editor div
-        stepsContainer.innerHTML = '';
-        (currentEditingSkill.steps || []).forEach((step, idx) => {
-            addStep(idx, step.title, step.description, step.imageUrl);
-        });
-    }
+if (currentEditingSkill && currentEditingSkill.steps) {
+currentEditingSkill.steps.splice(index, 1);
+// Re-render the steps section to update indices correctly
+const stepsContainer = document.getElementById('stepsEditor'); // Target the editor div
+stepsContainer.innerHTML = '';
+(currentEditingSkill.steps || []).forEach((step, idx) => {
+addStep(idx, step.title, step.description, step.imageUrl);
+});
+}
 }
 
 function addQuizQuestion(index = null, questionObj = null) {
-    const quizContainer = document.getElementById('quizEditor'); // Target the editor div
-    const qIndex = index !== null ? index : (currentEditingSkill.quiz ? currentEditingSkill.quiz.length : 0);
-    const questionId = `question-${qIndex}`;
-    const question = questionObj || { question: '', options: ['', '', '', ''], answer: 0 }; // Default structure
+const quizContainer = document.getElementById('quizEditor'); // Target the editor div
+const qIndex = index !== null ? index : (currentEditingSkill.quiz ? currentEditingSkill.quiz.length : 0);
+const questionId = `question-${qIndex}`;
+const question = questionObj || { question: '', options: ['', '', '', ''], answer: 0 }; // Default structure
 
-    const questionDiv = document.createElement('div');
-    questionDiv.className = 'quiz-question';
-    questionDiv.id = questionId;
-    questionDiv.innerHTML = `
-        <div class="quiz-header">
-            <h4>Question ${qIndex + 1}</h4>
-            <button class="action-btn delete-btn" onclick="removeQuizQuestion(${qIndex})"><i class="fas fa-trash"></i></button>
-        </div>
-        <div class="quiz-content">
-            <div>
-                <label>Question Text</label>
-                <input type="text" value="${question.question}" onchange="updateQuizField(${qIndex}, 'question', this.value)" placeholder="Question text">
-            </div>
-            <div class="quiz-options">
-                <div>
-                    <label>Option A</label>
-                    <input type="text" value="${question.options[0]}" onchange="updateQuizOption(${qIndex}, 0, this.value)" placeholder="Option A">
-                </div>
-                <div>
-                    <label>Option B</label>
-                    <input type="text" value="${question.options[1]}" onchange="updateQuizOption(${qIndex}, 1, this.value)" placeholder="Option B">
-                </div>
-                <div>
-                    <label>Option C</label>
-                    <input type="text" value="${question.options[2]}" onchange="updateQuizOption(${qIndex}, 2, this.value)" placeholder="Option C">
-                </div>
-                <div>
-                    <label>Option D</label>
-                    <input type="text" value="${question.options[3]}" onchange="updateQuizOption(${qIndex}, 3, this.value)" placeholder="Option D">
-                </div>
-            </div>
-            <div>
-                <label>Correct Answer (0=A, 1=B, 2=C, 3=D)</label>
-                <input type="number" min="0" max="3" value="${question.answer}" onchange="updateQuizField(${qIndex}, 'answer', parseInt(this.value))">
-            </div>
-        </div>
-    `;
-    quizContainer.appendChild(questionDiv);
-    if (!currentEditingSkill.quiz) currentEditingSkill.quiz = [];
-    if (index === null) { // Adding new question
-        currentEditingSkill.quiz.push({ question: '', options: ['', '', '', ''], answer: 0 });
-    }
+const questionDiv = document.createElement('div');
+questionDiv.className = 'quiz-question';
+questionDiv.id = questionId;
+questionDiv.innerHTML = `
+<div class="quiz-header">
+<h4>Question ${qIndex + 1}</h4>
+<button class="action-btn delete-btn" onclick="removeQuizQuestion(${qIndex})"><i class="fas fa-trash"></i></button>
+</div>
+<div class="quiz-content">
+<div>
+<label>Question Text</label>
+<input type="text" value="${question.question}" onchange="updateQuizField(${qIndex}, 'question', this.value)" placeholder="Question text">
+</div>
+<div class="quiz-options">
+<div>
+<label>Option A</label>
+<input type="text" value="${question.options[0]}" onchange="updateQuizOption(${qIndex}, 0, this.value)" placeholder="Option A">
+</div>
+<div>
+<label>Option B</label>
+<input type="text" value="${question.options[1]}" onchange="updateQuizOption(${qIndex}, 1, this.value)" placeholder="Option B">
+</div>
+<div>
+<label>Option C</label>
+<input type="text" value="${question.options[2]}" onchange="updateQuizOption(${qIndex}, 2, this.value)" placeholder="Option C">
+</div>
+<div>
+<label>Option D</label>
+<input type="text" value="${question.options[3]}" onchange="updateQuizOption(${qIndex}, 3, this.value)" placeholder="Option D">
+</div>
+</div>
+<div>
+<label>Correct Answer (0=A, 1=B, 2=C, 3=D)</label>
+<input type="number" min="0" max="3" value="${question.answer}" onchange="updateQuizField(${qIndex}, 'answer', parseInt(this.value))">
+</div>
+</div>
+`;
+quizContainer.appendChild(questionDiv);
+if (!currentEditingSkill.quiz) currentEditingSkill.quiz = [];
+if (index === null) { // Adding new question
+currentEditingSkill.quiz.push({ question: '', options: ['', '', '', ''], answer: 0 });
+}
 }
 
 function updateQuizField(index, field, value) {
-    if (currentEditingSkill && currentEditingSkill.quiz && currentEditingSkill.quiz[index]) {
-        currentEditingSkill.quiz[index][field] = value;
-    }
+if (currentEditingSkill && currentEditingSkill.quiz && currentEditingSkill.quiz[index]) {
+currentEditingSkill.quiz[index][field] = value;
+}
 }
 
 function updateQuizOption(index, optionIndex, value) {
-    if (currentEditingSkill && currentEditingSkill.quiz && currentEditingSkill.quiz[index] && currentEditingSkill.quiz[index].options) {
-        currentEditingSkill.quiz[index].options[optionIndex] = value;
-    }
+if (currentEditingSkill && currentEditingSkill.quiz && currentEditingSkill.quiz[index] && currentEditingSkill.quiz[index].options) {
+currentEditingSkill.quiz[index].options[optionIndex] = value;
+}
 }
 
 function removeQuizQuestion(index) {
-    if (currentEditingSkill && currentEditingSkill.quiz) {
-        currentEditingSkill.quiz.splice(index, 1);
-        // Re-render the quiz section to update indices correctly
-        const quizContainer = document.getElementById('quizEditor'); // Target the editor div
-        quizContainer.innerHTML = '';
-        (currentEditingSkill.quiz || []).forEach((q, idx) => {
-            addQuizQuestion(idx, q);
-        });
-    }
+if (currentEditingSkill && currentEditingSkill.quiz) {
+currentEditingSkill.quiz.splice(index, 1);
+// Re-render the quiz section to update indices correctly
+const quizContainer = document.getElementById('quiz-editor'); // Target the editor div
+quizContainer.innerHTML = '';
+(currentEditingSkill.quiz || []).forEach((q, idx) => {
+addQuizQuestion(idx, q);
+});
+}
 }
 
 // Image Upload Helpers
 async function uploadStepImage(input, index) {
-    const file = input.files[0];
-    if (!file) return;
-    const storageRef = storage.ref();
-    const fileRef = storageRef.child(`step_images/${Date.now()}_${file.name}`);
+const file = input.files[0];
+if (!file) return;
+const storageRef = storage.ref();
+const fileRef = storageRef.child(`step_images/${Date.now()}_${file.name}`);
 
-    try {
-        await fileRef.put(file);
-        const downloadURL = await fileRef.getDownloadURL();
-        updateStepField(index, 'imageUrl', downloadURL);
-        // Update preview
-        document.getElementById(`step-image-preview-${index}`).innerHTML = `<img src="${downloadURL}" alt="Preview">`;
-    } catch (error) {
-        console.error("Error uploading step image: ", error);
-    }
+try {
+await fileRef.put(file);
+const downloadURL = await fileRef.getDownloadURL();
+updateStepField(index, 'imageUrl', downloadURL);
+// Update preview
+document.getElementById(`step-image-preview-${index}`).innerHTML = `<img src="${downloadURL}" alt="Preview">`;
+} catch (error) {
+console.error("Error uploading step image: ", error);
+}
 }
 
 function previewSkillImage(input) {
-    const preview = document.getElementById('imagePreview'); // Fixed ID
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            preview.innerHTML = `<img id="previewImg" src="${e.target.result}" alt="Preview">`;
-        };
-        reader.readAsDataURL(input.files[0]);
-    } else {
-        preview.innerHTML = '<span id="previewText">No image selected</span>';
-    }
+const preview = document.getElementById('imagePreview');
+if (input.files && input.files[0]) {
+const reader = new FileReader();
+reader.onload = function(e) {
+preview.innerHTML = `<img id="previewImg" src="${e.target.result}" alt="Preview">`;
+};
+reader.readAsDataURL(input.files[0]);
+} else {
+preview.innerHTML = '<span id="previewText">No image selected</span>';
+}
 }
 
 // Reordering functions (Admin Skills)
 async function moveSkillUp(skillId, currentOrder) {
-    const minOrder = Math.min(...skillsData.map(s => s.order !== undefined && s.order !== null ? s.order : Infinity));
-    if (currentOrder <= minOrder) {
-        console.log("Skill is already at the top or not found, cannot move up.");
-        return; // Already at the top
-    }
-    const targetOrder = currentOrder - 1;
+const minOrder = Math.min(...skillsData.map(s => s.order !== undefined && s.order !== null ? s.order : Infinity));
+if (currentOrder <= minOrder) {
+console.log("Skill is already at the top or not found, cannot move up.");
+return; // Already at the top
+}
+const targetOrder = currentOrder - 1;
 
-    try {
-        // Find the skill that currently has the target order
-        const targetSkillSnapshot = await db.collection("skills").where("order", "==", targetOrder).limit(1).get();
-        if (targetSkillSnapshot.empty) {
-            console.error("Target skill for swap not found for order:", targetOrder);
-            return;
-        }
-        const targetSkillDoc = targetSkillSnapshot.docs[0];
-        const targetSkillId = targetSkillDoc.id;
+try {
+// Find the skill that currently has the target order
+const targetSkillSnapshot = await db.collection("skills").where("order", "==", targetOrder).limit(1).get();
+if (targetSkillSnapshot.empty) {
+console.error("Target skill for swap not found for order:", targetOrder);
+return;
+}
+const targetSkillDoc = targetSkillSnapshot.docs[0];
+const targetSkillId = targetSkillDoc.id;
 
-        // Perform a batch write to swap orders atomically
-        const batch = db.batch();
-        batch.update(db.collection("skills").doc(skillId), { order: targetOrder });
-        batch.update(db.collection("skills").doc(targetSkillId), { order: currentOrder });
-        await batch.commit();
-        console.log("Orders swapped successfully.");
-        // The listener will automatically update the UI
-    } catch (error) {
-        console.error("Error moving skill up: ", error);
-    }
+// Perform a batch write to swap orders atomically
+const batch = db.batch();
+batch.update(db.collection("skills").doc(skillId), { order: targetOrder });
+batch.update(db.collection("skills").doc(targetSkillId), { order: currentOrder });
+await batch.commit();
+console.log("Orders swapped successfully.");
+// The listener will automatically update the UI
+} catch (error) {
+console.error("Error moving skill up: ", error);
+}
 }
 
 async function moveSkillDown(skillId, currentOrder) {
-    const maxOrder = Math.max(...skillsData.map(s => s.order !== undefined && s.order !== null ? s.order : -Infinity));
-    if (currentOrder >= maxOrder) {
-        console.log("Skill is already at the bottom or not found, cannot move down.");
-        return; // Already at the bottom
-    }
-    const targetOrder = currentOrder + 1;
+const maxOrder = Math.max(...skillsData.map(s => s.order !== undefined && s.order !== null ? s.order : -Infinity));
+if (currentOrder >= maxOrder) {
+console.log("Skill is already at the bottom or not found, cannot move down.");
+return; // Already at the bottom
+}
+const targetOrder = currentOrder + 1;
 
-    try {
-        // Find the skill that currently has the target order
-        const targetSkillSnapshot = await db.collection("skills").where("order", "==", targetOrder).limit(1).get();
-        if (targetSkillSnapshot.empty) {
-            console.error("Target skill for swap not found for order:", targetOrder);
-            return;
-        }
-        const targetSkillDoc = targetSkillSnapshot.docs[0];
-        const targetSkillId = targetSkillDoc.id;
+try {
+// Find the skill that currently has the target order
+const targetSkillSnapshot = await db.collection("skills").where("order", "==", targetOrder).limit(1).get();
+if (targetSkillSnapshot.empty) {
+console.error("Target skill for swap not found for order:", targetOrder);
+return;
+}
+const targetSkillDoc = targetSkillSnapshot.docs[0];
+const targetSkillId = targetSkillDoc.id;
 
-        // Perform a batch write to swap orders atomically
-        const batch = db.batch();
-        batch.update(db.collection("skills").doc(skillId), { order: targetOrder });
-        batch.update(db.collection("skills").doc(targetSkillId), { order: currentOrder });
-        await batch.commit();
-        console.log("Orders swapped successfully.");
-        // The listener will automatically update the UI
-    } catch (error) {
-        console.error("Error moving skill down: ", error);
-    }
+// Perform a batch write to swap orders atomically
+const batch = db.batch();
+batch.update(db.collection("skills").doc(skillId), { order: targetOrder });
+batch.update(db.collection("skills").doc(targetSkillId), { order: currentOrder });
+await batch.commit();
+console.log("Orders swapped successfully.");
+// The listener will automatically update the UI
+} catch (error) {
+console.error("Error moving skill down: ", error);
+}
 }
 
 // Delete Skill (Admin)
 async function deleteSkill(skillId, skillName) {
-    if (!confirm(`Are you sure you want to delete the skill "${skillName}"?`)) {
-        return;
-    }
-    try {
-        await db.collection("skills").doc(skillId).delete();
-        alert(`Skill "${skillName}" has been deleted successfully.`);
-        // The listener will automatically update the UI
-    } catch (error) {
-        console.error("Error deleting skill: ", error);
-        alert('Error deleting skill: ' + error.message);
-    }
+if (!confirm(`Are you sure you want to delete the skill "${skillName}"?`)) {
+return;
+}
+try {
+await db.collection("skills").doc(skillId).delete();
+alert(`Skill "${skillName}" has been deleted successfully.`);
+// The listener will automatically update the UI
+} catch (error) {
+console.error("Error deleting skill: ", error);
+alert('Error deleting skill: ' + error.message);
+}
 }
 
 // --- USERS MANAGEMENT (ADMIN) ---
 async function loadUsersManagement() {
-    try {
-        const usersSnapshot = await db.collection("users").get();
-        usersData = []; // Reset the global array
-        usersSnapshot.forEach(doc => {
-            usersData.push({ id: doc.id, ...doc.data() });
-        });
+try {
+const usersSnapshot = await db.collection("users").get();
+usersData = []; // Reset the global array
+usersSnapshot.forEach(doc => {
+usersData.push({ id: doc.id, ...doc.data() });
+});
 
-        // Group users by course
-        const groupedUsers = {};
-        usersData.forEach(user => {
-            if (!groupedUsers[user.course]) {
-                groupedUsers[user.course] = [];
-            }
-            groupedUsers[user.course].push(user);
-        });
+// Group users by course
+const groupedUsers = {};
+usersData.forEach(user => {
+if (!groupedUsers[user.course]) {
+groupedUsers[user.course] = [];
+}
+groupedUsers[user.course].push(user);
+});
 
-        const usersContent = document.getElementById('userManagementContent'); // Fixed ID
-        usersContent.innerHTML = '';
+const usersContent = document.getElementById('userManagementContent'); // Fixed ID
+usersContent.innerHTML = '';
 
-        // Sort courses alphabetically
-        const sortedCourses = Object.keys(groupedUsers).sort();
-        sortedCourses.forEach(course => {
-            const courseGroup = document.createElement('div');
-            courseGroup.className = 'course-group';
-            courseGroup.innerHTML = `<h3 class="course-title">${course}</h3>`;
+// Sort courses alphabetically
+const sortedCourses = Object.keys(groupedUsers).sort();
+sortedCourses.forEach(course => {
+const courseGroup = document.createElement('div');
+courseGroup.className = 'course-group';
+courseGroup.innerHTML = `<h3 class="course-title">${course}</h3>`;
 
-            const userList = document.createElement('div');
-            userList.className = 'user-list';
+const userList = document.createElement('div');
+userList.className = 'user-list';
 
-            // Sort users within each course by name
-            groupedUsers[course].sort((a, b) => (a.name || a.email).localeCompare(b.name || b.email)).forEach(user => {
-                const userCard = document.createElement('div');
-                userCard.className = 'user-card';
-                userCard.innerHTML = `
-                    <div class="user-details">
-                        <div class="user-name">${user.name || user.email}</div>
-                        <div class="user-rank">${user.rank}</div>
-                        <div class="user-course">${user.course}</div>
-                        <div class="user-email">${user.email}</div>
-                    </div>
-                    <div>
-                        <button class="edit-user-btn" onclick="openEditUserModal('${user.id}')">Edit</button>
-                        <button class="action-btn delete-btn" onclick="deleteUser('${user.id}', '${user.name || user.email}')">Delete</button>
-                    </div>
-                `;
-                userList.appendChild(userCard);
-            });
-            courseGroup.appendChild(userList);
-            usersContent.appendChild(courseGroup);
-        });
-    } catch (error) {
-        console.error("Error loading users: ", error);
-    }
+// Sort users within each course by name
+groupedUsers[course].sort((a, b) => (a.name || a.email).localeCompare(b.name || b.email)).forEach(user => {
+const userCard = document.createElement('div');
+userCard.className = 'user-card';
+userCard.innerHTML = `
+<div class="user-details">
+<div class="user-name">${user.name || user.email}</div>
+<div class="user-rank">${user.rank}</div>
+<div class="user-course">${user.course}</div>
+<div class="user-email">${user.email}</div>
+</div>
+<div>
+<button class="edit-user-btn" onclick="openEditUserModal('${user.id}')">Edit</button>
+<button class="action-btn delete-btn" onclick="deleteUser('${user.id}', '${user.name || user.email}')">Delete</button>
+</div>
+`;
+userList.appendChild(userCard);
+});
+courseGroup.appendChild(userList);
+usersContent.appendChild(courseGroup);
+});
+} catch (error) {
+console.error("Error loading users: ", error);
+}
 }
 
 function openEditUserModal(userId) {
-    // Add a check for userId validity
-    if (!userId) {
-        console.error("Invalid user ID provided to openEditUserModal:", userId);
-        alert("Cannot edit user: Invalid user ID.");
-        return;
-    }
+// Add a check for userId validity
+if (!userId) {
+console.error("Invalid user ID provided to openEditUserModal:", userId);
+alert("Cannot edit user: Invalid user ID.");
+return;
+}
 
-    // Find user by the passed ID, not relying on potentially stale usersData lookup
-    // Although usersData should be fresh if loadUsersManagement ran recently
-    const user = usersData.find(u => u.id === userId);
-    if (!user) {
-        console.error("User not found for editing:", userId);
-        alert("User not found.");
-        return; // Exit if user not found
-    }
+// Find user by the passed ID, not relying on potentially stale usersData lookup
+// Although usersData should be fresh if loadUsersManagement ran recently
+const user = usersData.find(u => u.id === userId);
+if (!user) {
+console.error("User not found for editing:", userId);
+alert("User not found.");
+return; // Exit if user not found
+}
 
-    // Fixed IDs for setting values
-    document.getElementById('editUserName').value = user.name;
-    document.getElementById('editUserRank').value = user.rank;
-    document.getElementById('editUserCourse').value = user.course;
+// Fixed IDs for setting values
+document.getElementById('editUserName').value = user.name;
+document.getElementById('editUserRank').value = user.rank;
+document.getElementById('editUserCourse').value = user.course;
 
-    document.getElementById('editUserModal').style.display = 'flex';
-    // Store the ID of the user being edited
-    document.getElementById('editUserModal').setAttribute('data-editing-id', userId);
+document.getElementById('editUserModal').style.display = 'flex';
+// Store the ID of the user being edited
+document.getElementById('editUserModal').setAttribute('data-editing-id', userId);
 }
 
 function closeEditUserModal() {
-    document.getElementById('editUserModal').style.display = 'none';
+document.getElementById('editUserModal').style.display = 'none';
 }
 
 // Renamed function to match button onclick
 function saveUserChanges() {
-    saveEditedUser();
+saveEditedUser();
 }
 
 async function saveEditedUser() {
-    const userId = document.getElementById('editUserModal').getAttribute('data-editing-id');
-    if (!userId) {
-        console.error("No user ID found for editing.");
-        return;
-    }
+const userId = document.getElementById('editUserModal').getAttribute('data-editing-id');
+if (!userId) {
+console.error("No user ID found for editing.");
+return;
+}
 
-    // Fixed IDs for getting values
-    const name = document.getElementById('editUserName').value.toUpperCase(); // Auto-convert to uppercase
-    const rank = document.getElementById('editUserRank').value;
-    const course = document.getElementById('editUserCourse').value;
+// Fixed IDs for getting values
+const name = document.getElementById('editUserName').value.toUpperCase(); // Auto-convert to uppercase
+const rank = document.getElementById('editUserRank').value;
+const course = document.getElementById('editUserCourse').value;
 
-    if (!name || !rank || !course) {
-        alert('Please fill in all fields');
-        return;
-    }
+if (!name || !rank || !course) {
+alert('Please fill in all fields');
+return;
+}
 
-    try {
-        await db.collection("users").doc(userId).update({
-            name: name,
-            rank: rank,
-            course: course
-        });
-        alert('User updated successfully!');
-        closeEditUserModal();
-        loadUsersManagement(); // Refresh the user list
-    } catch (error) {
-        console.error("Error updating user: ", error);
-        alert('Error updating user: ' + error.message);
-    }
+try {
+await db.collection("users").doc(userId).update({
+name: name,
+rank: rank,
+course: course
+});
+alert('User updated successfully!');
+closeEditUserModal();
+loadUsersManagement(); // Refresh the user list
+} catch (error) {
+console.error("Error updating user: ", error);
+alert('Error updating user: ' + error.message);
+}
 }
 
 // Delete User (Admin) - NEW FUNCTION ADDED
 async function deleteUser(userId, userName) {
-    if (!confirm(`Are you sure you want to delete the user "${userName}"? This action cannot be undone.`)) {
-        return;
-    }
-    try {
-        // First, attempt to remove the user from the admins collection if they are an admin
-        await db.collection("admins").doc(userId).delete().catch(error => {
-            // It's okay if the user wasn't an admin, just log the specific error
-            if (error.code !== 'not-found') {
-                console.error("Error removing user from admins during deletion: ", error);
-            }
-        });
+if (!confirm(`Are you sure you want to delete the user "${userName}"? This action cannot be undone.`)) {
+return;
+}
+try {
+// First, attempt to remove the user from the admins collection if they are an admin
+await db.collection("admins").doc(userId).delete().catch(error => {
+// It's okay if the user wasn't an admin, just log the specific error
+if (error.code !== 'not-found') {
+console.error("Error removing user from admins during deletion: ", error);
+}
+});
 
-        // Then, delete the user document from the users collection
-        await db.collection("users").doc(userId).delete();
-        alert(`User "${userName}" has been deleted successfully.`);
+// Then, delete the user document from the users collection
+await db.collection("users").doc(userId).delete();
+alert(`User "${userName}" has been deleted successfully.`);
 
-        // Optionally, refresh the user list to reflect the deletion
-        if (document.getElementById('users-section').style.display === 'block') {
-            loadUsersManagement(); // Reload the user list if currently viewing
-        }
-    } catch (error) {
-        console.error("Error deleting user: ", error);
-        alert('Error deleting user: ' + error.message);
-    }
+// Optionally, refresh the user list to reflect the deletion
+if (document.getElementById('users-section').style.display === 'block') {
+loadUsersManagement(); // Reload the user list if currently viewing
+}
+} catch (error) {
+console.error("Error deleting user: ", error);
+alert('Error deleting user: ' + error.message);
+}
 }
 
 // --- SETTINGS (ADMIN) ---
 async function loadSignupSettings() {
-    try {
-        // Load Ranks
-        const ranksSnapshot = await db.collection("ranks").orderBy("order").get();
-        let ranksHTML = '';
-        ranksSnapshot.forEach((doc, index) => {
-            const rank = doc.data();
-            const isTop = index === 0;
-            const isBottom = index === ranksSnapshot.size - 1;
-            ranksHTML += `
-                <div class="setting-item">
-                    <span>${rank.name}</span>
-                    <div class="setting-actions">
-                        <button class="move-up-btn" ${isTop ? 'disabled' : ''} onclick="moveRankUp('${doc.id}', ${rank.order})" title="Move Up"><i class="fas fa-arrow-up"></i></button>
-                        <button class="move-down-btn" ${isBottom ? 'disabled' : ''} onclick="moveRankDown('${doc.id}', ${rank.order})" title="Move Down"><i class="fas fa-arrow-down"></i></button>
-                        <button class="delete-btn-setting" onclick="deleteRank('${doc.id}', '${rank.name}')" title="Delete"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>
-            `;
-        });
-        document.getElementById('ranksList').innerHTML = ranksHTML;
+try {
+// Load Ranks
+const ranksSnapshot = await db.collection("ranks").orderBy("order").get();
+let ranksHTML = '';
+ranksSnapshot.forEach((doc, index) => {
+const rank = doc.data();
+const isTop = index === 0;
+const isBottom = index === ranksSnapshot.size - 1;
+ranksHTML += `
+<div class="setting-item">
+<span>${rank.name}</span>
+<div class="setting-actions">
+<button class="move-up-btn" ${isTop ? 'disabled' : ''} onclick="moveRankUp('${doc.id}', ${rank.order})" title="Move Up"><i class="fas fa-arrow-up"></i></button>
+<button class="move-down-btn" ${isBottom ? 'disabled' : ''} onclick="moveRankDown('${doc.id}', ${rank.order})" title="Move Down"><i class="fas fa-arrow-down"></i></button>
+<button class="delete-btn-setting" onclick="deleteRank('${doc.id}', '${rank.name}')" title="Delete"><i class="fas fa-trash"></i></button>
+</div>
+</div>
+`;
+});
+document.getElementById('ranksList').innerHTML = ranksHTML;
 
-        // Load Courses
-        const coursesSnapshot = await db.collection("courses").orderBy("order").get();
-        let coursesHTML = '';
-        coursesSnapshot.forEach((doc, index) => {
-            const course = doc.data();
-            const isTop = index === 0;
-            const isBottom = index === coursesSnapshot.size - 1;
-            coursesHTML += `
-                <div class="setting-item">
-                    <span>${course.name}</span>
-                    <div class="setting-actions">
-                        <button class="move-up-btn" ${isTop ? 'disabled' : ''} onclick="moveCourseUp('${doc.id}', ${course.order})" title="Move Up"><i class="fas fa-arrow-up"></i></button>
-                        <button class="move-down-btn" ${isBottom ? 'disabled' : ''} onclick="moveCourseDown('${doc.id}', ${course.order})" title="Move Down"><i class="fas fa-arrow-down"></i></button>
-                        <button class="delete-btn-setting" onclick="deleteCourse('${doc.id}', '${course.name}')" title="Delete"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>
-            `;
-        });
-        document.getElementById('coursesList').innerHTML = coursesHTML;
-    } catch (error) {
-        console.error("Error loading signup settings: ", error);
-    }
+// Load Courses
+const coursesSnapshot = await db.collection("courses").orderBy("order").get();
+let coursesHTML = '';
+coursesSnapshot.forEach((doc, index) => {
+const course = doc.data();
+const isTop = index === 0;
+const isBottom = index === coursesSnapshot.size - 1;
+coursesHTML += `
+<div class="setting-item">
+<span>${course.name}</span>
+<div class="setting-actions">
+<button class="move-up-btn" ${isTop ? 'disabled' : ''} onclick="moveCourseUp('${doc.id}', ${course.order})" title="Move Up"><i class="fas fa-arrow-up"></i></button>
+<button class="move-down-btn" ${isBottom ? 'disabled' : ''} onclick="moveCourseDown('${doc.id}', ${course.order})" title="Move Down"><i class="fas fa-arrow-down"></i></button>
+<button class="delete-btn-setting" onclick="deleteCourse('${doc.id}', '${course.name}')" title="Delete"><i class="fas fa-trash"></i></button>
+</div>
+</div>
+`;
+});
+document.getElementById('coursesList').innerHTML = coursesHTML;
+} catch (error) {
+console.error("Error loading signup settings: ", error);
+}
 }
 
 // Rank Management
 async function addRank() {
-    const newName = document.getElementById('newRankInput').value.trim();
-    if (!newName) {
-        document.getElementById('rankMessage').textContent = 'Rank name cannot be empty!'; // Fixed ID
-        document.getElementById('rankMessage').style.display = 'block'; // Fixed ID
-        setTimeout(() => { document.getElementById('rankMessage').style.display = 'none'; }, 3000); // Fixed ID
-        return;
-    }
-    try {
-        // Calculate new order
-        const ranksSnapshot = await db.collection("ranks").orderBy("order").get();
-        const newOrder = ranksSnapshot.size; // Order starts from 0
+const newName = document.getElementById('newRankInput').value.trim();
+if (!newName) {
+// Assuming you have a message div like rankMessage
+const messageDiv = document.getElementById('rankMessage');
+if(messageDiv) {
+messageDiv.textContent = 'Rank name cannot be empty!';
+messageDiv.style.display = 'block';
+setTimeout(() => { messageDiv.style.display = 'none'; }, 3000);
+}
+return;
+}
+try {
+// Calculate new order
+const ranksSnapshot = await db.collection("ranks").orderBy("order").get();
+const newOrder = ranksSnapshot.size; // Order starts from 0
 
-        await db.collection("ranks").add({
-            name: newName,
-            order: newOrder
-        });
+await db.collection("ranks").add({
+name: newName,
+order: newOrder
+});
 
-        document.getElementById('newRankInput').value = '';
-        document.getElementById('rankMessage').textContent = 'Rank added successfully!'; // Fixed ID
-        document.getElementById('rankMessage').style.display = 'block'; // Fixed ID
-        setTimeout(() => { document.getElementById('rankMessage').style.display = 'none'; }, 3000); // Fixed ID
-    } catch (error) {
-        console.error("Error adding rank: ", error);
-        document.getElementById('rankMessage').textContent = 'Error adding rank: ' + error.message; // Fixed ID
-        document.getElementById('rankMessage').style.display = 'block'; // Fixed ID
-        setTimeout(() => { document.getElementById('rankMessage').style.display = 'none'; }, 3000); // Fixed ID
-    }
+document.getElementById('newRankInput').value = '';
+const messageDiv = document.getElementById('rankMessage');
+if(messageDiv) {
+messageDiv.textContent = 'Rank added successfully!';
+messageDiv.style.display = 'block';
+setTimeout(() => { messageDiv.style.display = 'none'; }, 3000);
+}
+} catch (error) {
+console.error("Error adding rank: ", error);
+const messageDiv = document.getElementById('rankMessage');
+if(messageDiv) {
+messageDiv.textContent = 'Error adding rank: ' + error.message;
+messageDiv.style.display = 'block';
+setTimeout(() => { messageDiv.style.display = 'none'; }, 3000);
+}
+}
 }
 
 async function deleteRank(rankId, rankName) {
-    if (!confirm(`Are you sure you want to delete the rank "${rankName}"?`)) {
-        return;
-    }
-    try {
-        await db.collection("ranks").doc(rankId).delete();
-        // Optionally, update users who had this rank (e.g., set to default or prompt)
-        // db.collection("users").where("rank", "==", rankName).get().then(...)
-    } catch (error) {
-        console.error("Error deleting rank: ", error);
-        alert('Error deleting rank: ' + error.message);
-    }
+if (!confirm(`Are you sure you want to delete the rank "${rankName}"?`)) {
+return;
+}
+try {
+await db.collection("ranks").doc(rankId).delete();
+// Optionally, update users who had this rank (e.g., set to default or prompt)
+// db.collection("users").where("rank", "==", rankName).get().then(...)
+} catch (error) {
+console.error("Error deleting rank: ", error);
+alert('Error deleting rank: ' + error.message);
+}
 }
 
 async function moveRankUp(rankId, currentOrder) {
-    if (currentOrder <= 0) return; // Already at the top
-    const targetOrder = currentOrder - 1;
+if (currentOrder <= 0) return; // Already at the top
+const targetOrder = currentOrder - 1;
 
-    try {
-        const targetRankSnapshot = await db.collection("ranks").where("order", "==", targetOrder).limit(1).get();
-        if (targetRankSnapshot.empty) return; // Should not happen if data is consistent
-        const targetRankId = targetRankSnapshot.docs[0].id;
+try {
+const targetRankSnapshot = await db.collection("ranks").where("order", "==", targetOrder).limit(1).get();
+if (targetRankSnapshot.empty) return; // Should not happen if data is consistent
+const targetRankId = targetRankSnapshot.docs[0].id;
 
-        const batch = db.batch();
-        batch.update(db.collection("ranks").doc(rankId), { order: targetOrder });
-        batch.update(db.collection("ranks").doc(targetRankId), { order: currentOrder });
-        await batch.commit();
-    } catch (error) {
-        console.error("Error moving rank up: ", error);
-    }
+const batch = db.batch();
+batch.update(db.collection("ranks").doc(rankId), { order: targetOrder });
+batch.update(db.collection("ranks").doc(targetRankId), { order: currentOrder });
+await batch.commit();
+} catch (error) {
+console.error("Error moving rank up: ", error);
+}
 }
 
 async function moveRankDown(rankId, currentOrder) {
-    const allRanksSnapshot = await db.collection("ranks").orderBy("order").get();
-    const maxOrder = allRanksSnapshot.size - 1;
-    if (currentOrder >= maxOrder) return; // Already at the bottom
-    const targetOrder = currentOrder + 1;
+const allRanksSnapshot = await db.collection("ranks").orderBy("order").get();
+const maxOrder = allRanksSnapshot.size - 1;
+if (currentOrder >= maxOrder) return; // Already at the bottom
+const targetOrder = currentOrder + 1;
 
-    try {
-        const targetRankSnapshot = await db.collection("ranks").where("order", "==", targetOrder).limit(1).get();
-        if (targetRankSnapshot.empty) return; // Should not happen if data is consistent
-        const targetRankId = targetRankSnapshot.docs[0].id;
+try {
+const targetRankSnapshot = await db.collection("ranks").where("order", "==", targetOrder).limit(1).get();
+if (targetRankSnapshot.empty) return; // Should not happen if data is consistent
+const targetRankId = targetRankSnapshot.docs[0].id;
 
-        const batch = db.batch();
-        batch.update(db.collection("ranks").doc(rankId), { order: targetOrder });
-        batch.update(db.collection("ranks").doc(targetRankId), { order: currentOrder });
-        await batch.commit();
-    } catch (error) {
-        console.error("Error moving rank down: ", error);
-    }
+const batch = db.batch();
+batch.update(db.collection("ranks").doc(rankId), { order: targetOrder });
+batch.update(db.collection("ranks").doc(targetRankId), { order: currentOrder });
+await batch.commit();
+} catch (error) {
+console.error("Error moving rank down: ", error);
+}
 }
 
 // Course Management
 async function addCourse() {
-    const newName = document.getElementById('newCourseInput').value.trim();
-    if (!newName) {
-        document.getElementById('courseMessage').textContent = 'Course name cannot be empty!'; // Fixed ID
-        document.getElementById('courseMessage').style.display = 'block'; // Fixed ID
-        setTimeout(() => { document.getElementById('courseMessage').style.display = 'none'; }, 3000); // Fixed ID
-        return;
-    }
-    try {
-        // Calculate new order
-        const coursesSnapshot = await db.collection("courses").orderBy("order").get();
-        const newOrder = coursesSnapshot.size; // Order starts from 0
+const newName = document.getElementById('newCourseInput').value.trim();
+if (!newName) {
+// Assuming you have a message div like courseMessage
+const messageDiv = document.getElementById('courseMessage');
+if(messageDiv) {
+messageDiv.textContent = 'Course name cannot be empty!';
+messageDiv.style.display = 'block';
+setTimeout(() => { messageDiv.style.display = 'none'; }, 3000);
+}
+return;
+}
+try {
+// Calculate new order
+const coursesSnapshot = await db.collection("courses").orderBy("order").get();
+const newOrder = coursesSnapshot.size; // Order starts from 0
 
-        await db.collection("courses").add({
-            name: newName,
-            order: newOrder
-        });
+await db.collection("courses").add({
+name: newName,
+order: newOrder
+});
 
-        document.getElementById('newCourseInput').value = '';
-        document.getElementById('courseMessage').textContent = 'Course added successfully!'; // Fixed ID
-        document.getElementById('courseMessage').style.display = 'block'; // Fixed ID
-        setTimeout(() => { document.getElementById('courseMessage').style.display = 'none'; }, 3000); // Fixed ID
-    } catch (error) {
-        console.error("Error adding course: ", error);
-        document.getElementById('courseMessage').textContent = 'Error adding course: ' + error.message; // Fixed ID
-        document.getElementById('courseMessage').style.display = 'block'; // Fixed ID
-        setTimeout(() => { document.getElementById('courseMessage').style.display = 'none'; }, 3000); // Fixed ID
-    }
+document.getElementById('newCourseInput').value = '';
+const messageDiv = document.getElementById('courseMessage');
+if(messageDiv) {
+messageDiv.textContent = 'Course added successfully!';
+messageDiv.style.display = 'block';
+setTimeout(() => { messageDiv.style.display = 'none'; }, 3000);
+}
+} catch (error) {
+console.error("Error adding course: ", error);
+const messageDiv = document.getElementById('courseMessage');
+if(messageDiv) {
+messageDiv.textContent = 'Error adding course: ' + error.message;
+messageDiv.style.display = 'block';
+setTimeout(() => { messageDiv.style.display = 'none'; }, 3000);
+}
+}
 }
 
 async function deleteCourse(courseId, courseName) {
-    if (!confirm(`Are you sure you want to delete the course "${courseName}"?`)) {
-        return;
-    }
-    try {
-        await db.collection("courses").doc(courseId).delete();
-        // Optionally, update users who had this course (e.g., set to default or prompt)
-        // db.collection("users").where("course", "==", courseName).get().then(...)
-    } catch (error) {
-        console.error("Error deleting course: ", error);
-        alert('Error deleting course: ' + error.message);
-    }
+if (!confirm(`Are you sure you want to delete the course "${courseName}"?`)) {
+return;
+}
+try {
+await db.collection("courses").doc(courseId).delete();
+// Optionally, update users who had this course (e.g., set to default or prompt)
+// db.collection("users").where("course", "==", courseName).get().then(...)
+} catch (error) {
+console.error("Error deleting course: ", error);
+alert('Error deleting course: ' + error.message);
+}
 }
 
 async function moveCourseUp(courseId, currentOrder) {
-    if (currentOrder <= 0) return; // Already at the top
-    const targetOrder = currentOrder - 1;
+if (currentOrder <= 0) return; // Already at the top
+const targetOrder = currentOrder - 1;
 
-    try {
-        const targetCourseSnapshot = await db.collection("courses").where("order", "==", targetOrder).limit(1).get();
-        if (targetCourseSnapshot.empty) return; // Should not happen if data is consistent
-        const targetCourseId = targetCourseSnapshot.docs[0].id;
+try {
+const targetCourseSnapshot = await db.collection("courses").where("order", "==", targetOrder).limit(1).get();
+if (targetCourseSnapshot.empty) return; // Should not happen if data is consistent
+const targetCourseId = targetCourseSnapshot.docs[0].id;
 
-        const batch = db.batch();
-        batch.update(db.collection("courses").doc(courseId), { order: targetOrder });
-        batch.update(db.collection("courses").doc(targetCourseId), { order: currentOrder });
-        await batch.commit();
-    } catch (error) {
-        console.error("Error moving course up: ", error);
-    }
+const batch = db.batch();
+batch.update(db.collection("courses").doc(courseId), { order: targetOrder });
+batch.update(db.collection("courses").doc(targetCourseId), { order: currentOrder });
+await batch.commit();
+} catch (error) {
+console.error("Error moving course up: ", error);
+}
 }
 
 async function moveCourseDown(courseId, currentOrder) {
-    const allCoursesSnapshot = await db.collection("courses").orderBy("order").get();
-    const maxOrder = allCoursesSnapshot.size - 1;
-    if (currentOrder >= maxOrder) return; // Already at the bottom
-    const targetOrder = currentOrder + 1;
+const allCoursesSnapshot = await db.collection("courses").orderBy("order").get();
+const maxOrder = allCoursesSnapshot.size - 1;
+if (currentOrder >= maxOrder) return; // Already at the bottom
+const targetOrder = currentOrder + 1;
 
-    try {
-        const targetCourseSnapshot = await db.collection("courses").where("order", "==", targetOrder).limit(1).get();
-        if (targetCourseSnapshot.empty) return; // Should not happen if data is consistent
-        const targetCourseId = targetCourseSnapshot.docs[0].id;
+try {
+const targetCourseSnapshot = await db.collection("courses").where("order", "==", targetOrder).limit(1).get();
+if (targetCourseSnapshot.empty) return; // Should not happen if data is consistent
+const targetCourseId = targetCourseSnapshot.docs[0].id;
 
-        const batch = db.batch();
-        batch.update(db.collection("courses").doc(courseId), { order: targetOrder });
-        batch.update(db.collection("courses").doc(targetCourseId), { order: currentOrder });
-        await batch.commit();
-    } catch (error) {
-        console.error("Error moving course down: ", error);
-    }
+const batch = db.batch();
+batch.update(db.collection("courses").doc(courseId), { order: targetOrder });
+batch.update(db.collection("courses").doc(targetCourseId), { order: currentOrder });
+await batch.commit();
+} catch (error) {
+console.error("Error moving course down: ", error);
+}
 }
 
 // Admin Access Management
 async function loadAdminList() {
-    try {
-        const adminSnapshot = await db.collection("admins").get();
-        const adminListDiv = document.getElementById('adminList');
-        adminListDiv.innerHTML = ''; // Clear existing list
+try {
+const adminSnapshot = await db.collection("admins").get();
+const adminListDiv = document.getElementById('adminList');
+adminListDiv.innerHTML = ''; // Clear existing list
 
-        adminSnapshot.forEach(doc => {
-            const adminData = doc.data();
-            const adminEmail = adminData.email; // Assuming email is stored in the admin doc
-            const adminId = doc.id; // Use the document ID for revocation
+adminSnapshot.forEach(doc => {
+const adminData = doc.data();
+const adminEmail = adminData.email; // Assuming email is stored in the admin doc
+const adminId = doc.id; // Use the document ID for revocation
 
-            const adminItem = document.createElement('div');
-            adminItem.className = 'setting-item';
-            adminItem.innerHTML = `
-                <span>${adminEmail}</span>
-                <button class="btn danger-btn" onclick="revokeAdminAccess('${adminId}', '${adminEmail}')">Revoke Access</button>
-            `;
-            adminListDiv.appendChild(adminItem);
-        });
-    } catch (error) {
-        console.error("Error loading admin list: ", error);
-        // Consider displaying an error message in the UI
-    }
+const adminItem = document.createElement('div');
+adminItem.className = 'setting-item';
+adminItem.innerHTML = `
+<span>${adminEmail}</span>
+<button class="btn" onclick="revokeAdminAccess('${adminId}', '${adminEmail}')">Revoke Access</button>
+`;
+adminListDiv.appendChild(adminItem);
+});
+} catch (error) {
+console.error("Error loading admin list: ", error);
+// Consider displaying an error message in the UI
+}
 }
 
 async function grantAdminAccess() {
-    const email = document.getElementById('adminEmail').value; // Fixed ID
-    if (!email) {
-        alert('Please enter an email address');
-        return;
-    }
-    try {
-        // Find user by email
-        const userQuery = await db.collection("users").where("email", "==", email).limit(1).get();
-        if (userQuery.empty) {
-            alert('No user found with that email address.');
-            return;
-        }
-        const userDoc = userQuery.docs[0];
-        const userId = userDoc.id;
+const email = document.getElementById('adminEmail').value; // Fixed ID
+if (!email) {
+alert('Please enter an email address');
+return;
+}
+try {
+// Find user by email
+const userQuery = await db.collection("users").where("email", "==", email).limit(1).get();
+if (userQuery.empty) {
+alert('No user found with that email address.');
+return;
+}
+const userDoc = userQuery.docs[0];
+const userId = userDoc.id;
 
-        // Add user to admins collection
-        await db.collection("admins").doc(userId).set({
-            email: email,
-            grantedBy: currentUser.email, // Optional: track who granted access
-            grantedAt: new Date()
-        });
+// Add user to admins collection
+await db.collection("admins").doc(userId).set({
+email: email,
+grantedBy: currentUser.email, // Optional: track who granted access
+grantedAt: new Date()
+});
 
-        alert(`Admin access granted to ${email}`);
-        document.getElementById('adminEmail').value = ''; // Clear input - Fixed ID
-        loadAdminList(); // Refresh the list
-    } catch (error) {
-        console.error("Error granting admin access: ", error);
-        alert('Error granting admin access: ' + error.message);
-    }
+alert(`Admin access granted to ${email}`);
+document.getElementById('adminEmail').value = ''; // Clear input - Fixed ID
+loadAdminList(); // Refresh the list
+} catch (error) {
+console.error("Error granting admin access: ", error);
+alert('Error granting admin access: ' + error.message);
+}
 }
 
 async function revokeAdminAccess(adminId, adminEmail) {
-    if (!confirm(`Are you sure you want to revoke admin access for ${adminEmail}?`)) {
-        return;
-    }
-    try {
-        // Remove user from admins collection using the document ID
-        await db.collection("admins").doc(adminId).delete();
-        alert(`Admin access revoked for ${adminEmail}`);
-        loadAdminList(); // Refresh the list
-    } catch (error) {
-        console.error("Error revoking admin access: ", error);
-        alert('Error revoking admin access: ' + error.message);
-    }
+if (!confirm(`Are you sure you want to revoke admin access for ${adminEmail}?`)) {
+return;
+}
+try {
+// Remove user from admins collection using the document ID
+await db.collection("admins").doc(adminId).delete();
+alert(`Admin access revoked for ${adminEmail}`);
+loadAdminList(); // Refresh the list
+} catch (error) {
+console.error("Error revoking admin access: ", error);
+alert('Error revoking admin access: ' + error.message);
+}
 }
 
 // --- USER INTERFACE (SKILLS GRID & DETAIL) ---
 function loadSkillGrid() {
-    const grid = document.getElementById('skillGrid'); // Fixed ID
-    if (!grid) return; // Guard clause
-    grid.innerHTML = ''; // Clear existing content
+const grid = document.getElementById('skillGrid'); // Fixed ID
+if (!grid) return; // Guard clause
+grid.innerHTML = ''; // Clear existing content
 
-    skillsData.forEach(skill => {
-        const skillCard = document.createElement('div');
-        skillCard.className = 'skill-card-ui';
-        skillCard.onclick = () => loadSkillDetail(skill.id); // Pass the ID
+skillsData.forEach(skill => {
+const skillCard = document.createElement('div');
+skillCard.className = 'skill-card-ui';
+skillCard.onclick = () => loadSkillDetail(skill.id); // Pass the ID
 
-        let iconHtml = '<i class="fas fa-toolbox"></i>';
-        if (skill.imageUrl) {
-            iconHtml = `<img src="${skill.imageUrl}" alt="${skill.name}">`;
-        }
+let iconHtml = '<i class="fas fa-toolbox"></i>';
+if (skill.imageUrl) {
+iconHtml = `<img src="${skill.imageUrl}" alt="${skill.name}">`;
+}
 
-        skillCard.innerHTML = `
-            <div class="skill-icon">
-                ${iconHtml}
-            </div>
-            <div class="skill-content">
-                <h3 class="skill-name">${skill.name}</h3>
-                <p class="skill-desc">${skill.description.substring(0, 100)}...</p>
-                <button class="skill-btn">View Details</button>
-            </div>
-        `;
-        grid.appendChild(skillCard);
-    });
+skillCard.innerHTML = `
+<div class="skill-icon">
+${iconHtml}
+</div>
+<div class="skill-content">
+<h3 class="skill-name">${skill.name}</h3>
+<p class="skill-desc">${skill.description.substring(0, 100)}...</p>
+<button class="skill-btn">View Details</button>
+</div>
+`;
+grid.appendChild(skillCard);
+});
 }
 
 function loadSkillDetail(skillId) {
-    const skill = findSkillById(skillId); // Use the helper function
-    if (!skill) {
-        console.error("Skill not found:", skillId);
-        document.getElementById('skillDetail').innerHTML = '<p>Skill details not available.</p>';
-        document.getElementById('skillDetail').style.display = 'block';
-        return;
-    }
+const skill = findSkillById(skillId); // Use the helper function
+if (!skill) {
+console.error("Skill not found:", skillId);
+document.getElementById('skillDetail').innerHTML = '<p>Skill details not available.</p>';
+document.getElementById('skillDetail').style.display = 'block';
+return;
+}
 
-    let html = `<div class="skill-header">
-                    ${skill.imageUrl ? `<img src="${skill.imageUrl}" alt="${skill.name}">` : '<i class="fas fa-toolbox" style="font-size: 3rem;"></i>'}
-                    <h2>${skill.name}</h2>
-                </div>
-                <div class="skill-section">
-                    <h3 class="section-title-ui">Description</h3>
-                    <p>${skill.description}</p>
-                </div>`;
+let html = `<div class="skill-header">
+${skill.imageUrl ? `<img src="${skill.imageUrl}" alt="${skill.name}">` : '<i class="fas fa-toolbox" style="font-size: 3rem;"></i>'}
+<h2>${skill.name}</h2>
+</div>
+<div class="skill-section">
+<h3 class="section-title-ui">Description</h3>
+<p>${skill.description}</p>
+</div>`;
 
-    if (skill.tools && skill.tools.length > 0) {
-        html += `<div class="skill-section">
-                    <h3 class="section-title-ui">Required Tools</h3>
-                    <div class="tools-grid">`;
-        skill.tools.forEach(tool => {
-            html += `<div class="tool-item">
-                        ${tool.imageUrl ? `<img src="${tool.imageUrl}" alt="${tool.name}">` : '<i class="fas fa-wrench"></i>'}
-                        <span>${tool.name}</span>
-                     </div>`;
-        });
-        html += `</div></div>`;
-    }
+if (skill.tools && skill.tools.length > 0) {
+html += `<div class="skill-section">
+<h3 class="section-title-ui">Required Tools</h3>
+<div class="tools-grid">`;
+skill.tools.forEach(tool => {
+html += `<div class="tool-item">
+${tool.imageUrl ? `<img src="${tool.imageUrl}" alt="${tool.name}">` : '<i class="fas fa-wrench"></i>'}
+<span>${tool.name}</span>
+</div>`;
+});
+html += `</div></div>`;
+}
 
-    if (skill.steps && skill.steps.length > 0) {
-        html += `<div class="skill-section">
-                    <h3 class="section-title-ui">Steps</h3>
-                    <div class="steps-container">`;
-        skill.steps.forEach(step => {
-            html += `<div class="step-card">
-                        ${step.imageUrl ? `<img src="${step.imageUrl}" alt="${step.title}" class="step-image">` : ''}
-                        <div class="step-content">
-                            <h4 class="step-title">${step.title}</h4>
-                            <p>${step.description}</p>
-                        </div>
-                     </div>`;
-        });
-        html += `</div></div>`;
-    }
+if (skill.steps && skill.steps.length > 0) {
+html += `<div class="skill-section">
+<h3 class="section-title-ui">Steps</h3>
+<div class="steps-container">`;
+skill.steps.forEach(step => {
+html += `<div class="step-card">
+${step.imageUrl ? `<img src="${step.imageUrl}" alt="${step.title}" class="step-image">` : ''}
+<div class="step-content">
+<h4 class="step-title">${step.title}</h4>
+<p>${step.description}</p>
+</div>
+</div>`;
+});
+html += `</div></div>`;
+}
 
-    if (skill.theory) {
-        html += `<div class="skill-section">
-                    <h3 class="section-title-ui">Theory</h3>
-                    <div class="theory-content">${skill.theory}</div>
-                 </div>`;
-    }
+if (skill.theory) {
+html += `<div class="skill-section">
+<h3 class="section-title-ui">Theory</h3>
+<div class="theory-content">${skill.theory}</div>
+</div>`;
+}
 
-    if (skill.quiz && skill.quiz.length > 0) {
-        html += `<div class="skill-section">
-                    <h3 class="section-title-ui">Quiz</h3>
-                    <div class="quiz-container">`;
-        skill.quiz.forEach((q, index) => {
-            html += `<div class="question">
-                        <div class="question-text">${q.question}</div>
-                        <div class="options">`;
-            q.options.forEach((opt, optIndex) => {
-                html += `<div class="option" data-question="${index}" data-option="${optIndex}">
-                            <input type="radio" name="q${index}" id="q${index}o${optIndex}">
-                            <label for="q${index}o${optIndex}">${String.fromCharCode(65 + optIndex)}. ${opt}</label>
-                         </div>`;
-            });
-            html += `</div>
-                     <div class="quiz-result" id="result-${index}" style="display:none;"></div>
-                  </div>`;
-        });
-        html += `</div>
-                 <button class="back-btn" onclick="checkQuizAnswers('${skill.id}')">Check Answers</button>`;
-    }
+if (skill.quiz && skill.quiz.length > 0) {
+html += `<div class="skill-section">
+<h3 class="section-title-ui">Quiz</h3>
+<div class="quiz-container">`;
+skill.quiz.forEach((q, index) => {
+html += `<div class="question">
+<div class="question-text">${q.question}</div>
+<div class="options">`;
+q.options.forEach((opt, optIndex) => {
+html += `<div class="option" data-question="${index}" data-option="${optIndex}">
+<input type="radio" name="q${index}" id="q${index}o${optIndex}">
+<label for="q${index}o${optIndex}">${String.fromCharCode(65 + optIndex)}. ${opt}</label>
+</div>`;
+});
+html += `</div>
+<div class="quiz-result" id="result-${index}" style="display:none;"></div>
+</div>`;
+});
+html += `</div>
+<button class="back-btn" onclick="checkQuizAnswers('${skill.id}')">Check Answers</button>`;
+}
 
-    html += `<button class="back-btn" onclick="closeSkillDetail()">← Back to Skills</button>`; // Renamed function call
+html += `<button class="back-btn" onclick="closeSkillDetail()">← Back to Skills</button>`; // Renamed function call
 
-    document.getElementById('skillDetail').innerHTML = html;
-    document.getElementById('skillGrid').style.display = 'grid'; // Fixed ID
-    document.getElementById('skillDetail').style.display = 'block';
+document.getElementById('skillDetail').innerHTML = html;
+document.getElementById('skillGrid').style.display = 'grid'; // Fixed ID
+document.getElementById('skillDetail').style.display = 'block';
 
-    // Add event listeners for quiz options
-    document.querySelectorAll('.option').forEach(optionEl => {
-        optionEl.addEventListener('click', function() {
-            // Deselect other options in the same question
-            const questionIndex = this.getAttribute('data-question');
-            document.querySelectorAll(`.option[data-question="${questionIndex}"]`).forEach(opt => {
-                opt.classList.remove('selected');
-            });
-            // Select this option
-            this.classList.add('selected');
-        });
-    });
+// Add event listeners for quiz options
+document.querySelectorAll('.option').forEach(optionEl => {
+optionEl.addEventListener('click', function() {
+// Deselect other options in the same question
+const questionIndex = this.getAttribute('data-question');
+document.querySelectorAll(`.option[data-question="${questionIndex}"]`).forEach(opt => {
+opt.classList.remove('selected');
+});
+// Select this option
+this.classList.add('selected');
+});
+});
 }
 
 // Renamed function to match button onclick
 function closeSkillDetail() {
-    document.getElementById('skillGrid').style.display = 'grid'; // Fixed ID
-    document.getElementById('skillDetail').style.display = 'none';
+document.getElementById('skillGrid').style.display = 'grid'; // Fixed ID
+document.getElementById('skillDetail').style.display = 'none';
 }
 
 function checkQuizAnswers(skillId) {
-    const skill = findSkillById(skillId);
-    if (!skill || !skill.quiz) return;
+const skill = findSkillById(skillId);
+if (!skill || !skill.quiz) return;
 
-    let score = 0;
-    let allAnswered = true;
+let score = 0;
+let allAnswered = true;
 
-    skill.quiz.forEach((q, index) => {
-        const selectedOption = document.querySelector(`.option[data-question="${index}"].selected`);
-        if (!selectedOption) {
-            allAnswered = false;
-            return;
-        }
-        const selectedValue = parseInt(selectedOption.getAttribute('data-option'));
-        const resultDiv = document.getElementById(`result-${index}`);
+skill.quiz.forEach((q, index) => {
+const selectedOption = document.querySelector(`.option[data-question="${index}"].selected`);
+if (!selectedOption) {
+allAnswered = false;
+return;
+}
+const selectedValue = parseInt(selectedOption.getAttribute('data-option'));
+const resultDiv = document.getElementById(`result-${index}`);
 
-        if (selectedValue === q.answer) {
-            resultDiv.textContent = 'Correct!';
-            resultDiv.className = 'quiz-result correct';
-            score++;
-        } else {
-            resultDiv.textContent = `Incorrect. Correct answer: ${String.fromCharCode(65 + q.answer)}`;
-            resultDiv.className = 'quiz-result incorrect';
-        }
-        resultDiv.style.display = 'block';
-    });
+if (selectedValue === q.answer) {
+resultDiv.textContent = 'Correct!';
+resultDiv.className = 'quiz-result correct';
+score++;
+} else {
+resultDiv.textContent = `Incorrect. Correct answer: ${String.fromCharCode(65 + q.answer)}`;
+resultDiv.className = 'quiz-result incorrect';
+}
+resultDiv.style.display = 'block';
+});
 
-    if (!allAnswered) {
-        alert('Please answer all questions before checking your answers.');
-        return;
-    }
+if (!allAnswered) {
+alert('Please answer all questions before checking your answers.');
+return;
+}
 
-    // Show overall score
-    const totalQuestions = skill.quiz.length;
-    const percentage = Math.round((score / totalQuestions) * 100);
+// Show overall score
+const totalQuestions = skill.quiz.length;
+const percentage = Math.round((score / totalQuestions) * 100);
 
-    // Mark skill as completed if passed
-    if (percentage >= 70 && currentUser) {
-        if (!currentUser.completedSkills.includes(skillId)) {
-            db.collection("users").doc(currentUser.id).update({
-                completedSkills: firebase.firestore.FieldValue.arrayUnion(skillId)
-            }).then(() => {
-                // Update local user data
-                if (!currentUser.completedSkills) currentUser.completedSkills = [];
-                currentUser.completedSkills.push(skillId);
-                // localStorage.setItem('currentUser', JSON.stringify(currentUser)); // Optional: persist locally
-                alert(`Quiz completed! Score: ${score}/${totalQuestions} (${percentage}%) Congratulations! You've completed this skill.`);
-            }).catch(console.error);
-        } else {
-            alert(`Quiz completed! Score: ${score}/${totalQuestions} (${percentage}%) You had already completed this skill.`);
-        }
-    } else {
-        alert(`Quiz completed! Score: ${score}/${totalQuestions} (${percentage}%) You need at least 70% to pass. Try again!`);
-    }
+// Mark skill as completed if passed
+if (percentage >= 70 && currentUser) {
+if (!currentUser.completedSkills.includes(skillId)) {
+db.collection("users").doc(currentUser.id).update({
+completedSkills: firebase.firestore.FieldValue.arrayUnion(skillId)
+}).then(() => {
+// Update local user data
+if (!currentUser.completedSkills) currentUser.completedSkills = [];
+currentUser.completedSkills.push(skillId);
+// localStorage.setItem('currentUser', JSON.stringify(currentUser)); // Optional: persist locally
+alert(`Quiz completed! Score: ${score}/${totalQuestions} (${percentage}%) Congratulations! You've completed this skill.`);
+}).catch(console.error);
+} else {
+alert(`Quiz completed! Score: ${score}/${totalQuestions} (${percentage}%) You had already completed this skill.`);
+}
+} else {
+alert(`Quiz completed! Score: ${score}/${totalQuestions} (${percentage}%) You need at least 70% to pass. Try again!`);
+}
 }
 
 // --- PROFILE POPUP (User View) ---
 function updateDropdowns() {
-    // Populate rank dropdowns (Profile Completion, Profile Popup, Edit User Modal)
-    const rankSelects = [
-        document.getElementById('profileRank'), // Fixed ID
-        document.getElementById('changeRankSelect'), // Profile popup rank select
-        document.getElementById('editUserRank')    // In edit modal - Fixed ID
-    ];
+// Populate rank dropdowns (Profile Completion, Profile Popup, Edit User Modal)
+const rankSelects = [
+document.getElementById('profileRank'), // Fixed ID
+document.getElementById('changeRankSelect'), // Profile popup rank select
+document.getElementById('editUserRank')    // In edit modal - Fixed ID
+];
 
-    rankSelects.forEach(select => {
-        if (select) {
-            select.innerHTML = '<option value="">Select Rank</option>'; // Clear
-            ranksData.forEach(rank => {
-                const option = document.createElement('option');
-                option.value = rank.name;
-                option.textContent = rank.name;
-                select.appendChild(option);
-            });
-            // Set the selected value if currentUser exists
-            if (currentUser && select.id !== 'editUserRank') { // Don't set for edit modal here
-                select.value = currentUser.rank;
-            }
-        }
-    });
+rankSelects.forEach(select => {
+if (select) {
+select.innerHTML = '<option value="">Select Rank</option>'; // Clear
+ranksData.forEach(rank => {
+const option = document.createElement('option');
+option.value = rank.name;
+option.textContent = rank.name;
+select.appendChild(option);
+});
+// Set the selected value if currentUser exists
+if (currentUser && select.id !== 'editUserRank') { // Don't set for edit modal here
+select.value = currentUser.rank;
+}
+}
+});
 
-    // Populate course dropdowns (Profile Completion, Profile Popup, Edit User Modal)
-    const courseSelects = [
-        document.getElementById('profileCourse'), // Fixed ID
-        // document.getElementById('popup-course-select'), // Assuming you have this in popup HTML - not present
-        document.getElementById('editUserCourse')    // In edit modal - Fixed ID
-    ];
+// Populate course dropdowns (Profile Completion, Profile Popup, Edit User Modal)
+const courseSelects = [
+document.getElementById('profileCourse'), // Fixed ID
+// document.getElementById('popup-course-select'), // Assuming you have this in popup HTML - not present
+document.getElementById('editUserCourse')    // In edit modal - Fixed ID
+];
 
-    courseSelects.forEach(select => {
-        if (select) {
-            select.innerHTML = '<option value="">Select Course</option>'; // Clear
-            coursesData.forEach(course => {
-                const option = document.createElement('option');
-                option.value = course.name;
-                option.textContent = course.name;
-                select.appendChild(option);
-            });
-            // Set the selected value if currentUser exists
-            if (currentUser && select.id !== 'editUserCourse') { // Don't set for edit modal here
-                select.value = currentUser.course;
-            }
-        }
-    });
+courseSelects.forEach(select => {
+if (select) {
+select.innerHTML = '<option value="">Select Course</option>'; // Clear
+coursesData.forEach(course => {
+const option = document.createElement('option');
+option.value = course.name;
+option.textContent = course.name;
+select.appendChild(option);
+});
+// Set the selected value if currentUser exists
+if (currentUser && select.id !== 'editUserCourse') { // Don't set for edit modal here
+select.value = currentUser.course;
+}
+}
+});
 }
 
 // Renamed function to match button onclick
 function updateUserRank() {
-    updateProfileRank();
+updateProfileRank();
 }
 
 async function updateProfileRank() {
-    const newRank = document.getElementById('changeRankSelect').value; // Fixed ID
-    if (!newRank) {
-        alert('Please select a rank');
-        return;
-    }
-    try {
-        await db.collection("users").doc(currentUser.id).update({ rank: newRank });
-        currentUser.rank = newRank; // Update local data
-        document.getElementById('profileRankDisplay').textContent = newRank; // Update display - Fixed ID
-        alert('Rank updated successfully!');
-    } catch (error) {
-        console.error("Error updating rank: ", error);
-        alert('Error updating rank: ' + error.message);
-    }
+const newRank = document.getElementById('changeRankSelect').value; // Fixed ID
+if (!newRank) {
+alert('Please select a rank');
+return;
+}
+try {
+await db.collection("users").doc(currentUser.id).update({ rank: newRank });
+currentUser.rank = newRank; // Update local data
+document.getElementById('profileRank').textContent = newRank; // Update display - Fixed ID
+alert('Rank updated successfully!');
+} catch (error) {
+console.error("Error updating rank: ", error);
+alert('Error updating rank: ' + error.message);
+}
 }
 
 // --- TAB FUNCTIONALITY (Settings) - REMOVED REDUNDANT JS AS SWITCHTAB HANDLES IT ---
