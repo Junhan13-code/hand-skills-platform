@@ -116,6 +116,7 @@ object-fit: cover;
 .admin-dashboard {
 display: none;
 padding: 2rem 0;
+background-color: #f0f4f8; /* Light background for admin panel */
 }
 .admin-header {
 display: flex;
@@ -124,9 +125,14 @@ align-items: center;
 margin-bottom: 2rem;
 padding-bottom: 1rem;
 border-bottom: 1px solid var(--light);
+background: white;
+border-radius: 10px;
+padding: 1rem 2rem;
+box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 .admin-header h1 {
 color: var(--primary);
+font-size: 1.8rem; /* Slightly larger font */
 }
 .logout-btn {
 background: var(--danger);
@@ -138,7 +144,7 @@ cursor: pointer;
 }
 .admin-content {
 display: grid;
-grid-template-columns: 1fr 2fr;
+grid-template-columns: 250px 1fr; /* Sidebar + Main Content */
 gap: 2rem;
 }
 /* Navigation Panel */
@@ -146,19 +152,32 @@ gap: 2rem;
 background: white;
 border-radius: 10px;
 padding: 1.5rem;
-box-shadow: var(--shadow);
+box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+height: fit-content; /* Keeps it sticky */
+position: sticky;
+top: 2rem;
 }
 .nav-panel h3 {
 margin-bottom: 1.2rem;
 padding-bottom: 0.5rem;
-border-bottom: 1px solid var(--light);
+border-bottom: 1px solid #e2e8f0;
+color: var(--primary);
+font-size: 1.2rem;
 }
 .nav-item {
 padding: 0.8rem;
 margin-bottom: 0.5rem;
-border-radius: 5px;
+border-radius: 8px; /* Rounded corners */
 cursor: pointer;
 transition: var(--transition);
+display: flex;
+align-items: center; /* Align icon and text */
+font-weight: 500;
+}
+.nav-item i {
+margin-right: 0.75rem; /* Space between icon and text */
+width: 20px; /* Fixed width for alignment */
+text-align: center;
 }
 .nav-item:hover, .nav-item.active {
 background: var(--primary);
@@ -169,7 +188,7 @@ color: white;
 background: white;
 border-radius: 10px;
 padding: 2rem;
-box-shadow: var(--shadow);
+box-shadow: 0 4px 6px rgba(0,0,0,0.05);
 }
 .section-title {
 font-size: 1.5rem;
@@ -189,6 +208,7 @@ border-radius: 8px;
 padding: 1.2rem;
 cursor: pointer;
 transition: var(--transition);
+background: #f8fafc; /* Lighter background */
 }
 .skill-card:hover {
 border-color: var(--primary);
@@ -228,7 +248,6 @@ color: white;
 background: var(--primary);
 color: white;
 }
-
 /* Buttons inside the Profile Popup */
 .profile-content .update-rank-btn,
 .profile-content .close-profile-btn,
@@ -257,7 +276,6 @@ background: var(--danger); /* Example color */
 .profile-content .logout-btn-popup:hover {
 background: #e53e3e;
 }
-
 /* Buttons in the Admin Skills List Header and Skill Cards */
 #skills-section .section-title ~ div button.btn, /* Target the "Add New Skill" button */
 .skill-card-ui .skill-content .skill-btn { /* Target buttons in skill cards (Edit, Delete, Move Up/Down) */
@@ -278,7 +296,6 @@ background: var(--danger);
 .skill-card-ui .skill-content .skill-btn[style*="var(--primary)"] { /* Example: Move Up/Down buttons */
 background: var(--primary);
 }
-
 /* Buttons in the User Management Section (User Cards) */
 .user-card .edit-user-btn,
 .user-card .action-btn.delete-btn { /* Target the Edit and Delete buttons in user cards */
@@ -298,7 +315,6 @@ background: #e4bb0b;
 .user-card .action-btn.delete-btn {
 background: var(--danger);
 }
-
 /* Buttons in the Settings Section (Signup Settings) */
 .setting-actions .delete-btn-setting,
 .setting-actions .move-up-btn,
@@ -317,7 +333,6 @@ background: var(--danger);
 .setting-actions .move-down-btn {
 background: var(--primary);
 }
-
 /* Buttons in the Settings Section (Admin Access) */
 .admin-access-form button.btn,
 #adminList button.btn { /* Target buttons in admin access section */
@@ -332,54 +347,139 @@ background: var(--primary);
 #adminList button.btn { /* Revoke button */
 background: var(--danger);
 }
-
-
-/* Edit Form */
+/* Edit Form - NEW STYLES FOR TABS AND STRUCTURE */
 .edit-form {
 display: none;
 }
-.form-row {
+/* --- TABS STYLING --- */
+.tabs {
 display: flex;
+gap: 0.5rem;
+margin-bottom: 1.5rem;
+border-bottom: 1px solid #e2e8f0;
+}
+.tab-btn {
+background: none;
+border: none;
+padding: 0.75rem 1.25rem;
+font-weight: 600;
+color: var(--gray);
+cursor: pointer;
+border-radius: 6px 6px 0 0;
+transition: var(--transition);
+}
+.tab-btn:hover {
+color: var(--primary);
+}
+.tab-btn.active {
+color: var(--primary);
+background: #f0f4ff;
+border-bottom: 3px solid var(--primary);
+}
+
+.tab-content {
+display: none;
+padding: 1rem 0; /* Add some internal padding */
+}
+.tab-content.active {
+display: block;
+}
+
+/* Better spacing for form groups in tabs */
+.form-row {
+display: grid;
+grid-template-columns: 1fr 1fr; /* Two equal columns */
 gap: 1rem;
-margin-bottom: 1.2rem;
+margin-bottom: 1.5rem;
 }
 .form-col {
 flex: 1;
 }
-textarea {
+.form-group {
+margin-bottom: 1.5rem;
+}
+.form-group label {
+display: block;
+margin-bottom: 0.5rem;
+font-weight: 600;
+color: var(--dark);
+}
+.form-group input,
+.form-group textarea,
+.form-group select {
 width: 100%;
-padding: 0.8rem;
+padding: 0.75rem;
 border: 1px solid #ddd;
-border-radius: 5px;
-resize: vertical;
-min-height: 100px;
+border-radius: 6px;
+font-size: 1rem;
+transition: border-color 0.2s;
 }
-.form-actions {
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+outline: none;
+border-color: var(--primary);
+}
+
+/* Image preview styling */
+.image-upload-preview {
+height: 100px;
+border: 1px dashed #ccc;
+border-radius: 6px;
 display: flex;
-justify-content: flex-end;
-gap: 1rem;
-margin-top: 1.5rem;
+align-items: center;
+justify-content: center;
+margin-top: 0.5rem;
+background: #fafafa;
+font-size: 0.85rem;
+color: #777;
+overflow: hidden;
 }
+.image-upload-preview img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+}
+
+/* Section title override for edit form */
+.edit-form .section-title {
+font-size: 1.8rem;
+color: var(--primary);
+margin-bottom: 1.5rem;
+padding-bottom: 0.75rem;
+border-bottom: 2px solid var(--light);
+}
+
+/* Responsive: stack columns on mobile */
+@media (max-width: 768px) {
+.form-row {
+grid-template-columns: 1fr; /* Stack columns on smaller screens */
+}
+}
+
 /* Steps Editor */
 .steps-editor {
 margin-top: 1.5rem;
 }
 .step-item {
 border: 1px solid var(--light);
-border-radius: 5px;
-padding: 1rem;
-margin-bottom: 1rem;
+border-radius: 8px; /* More rounded */
+padding: 1.2rem; /* Increased padding */
+margin-bottom: 1.2rem; /* Increased margin */
 position: relative;
+background: #f9fafb; /* Light background for steps */
 }
 .step-header {
 display: flex;
 justify-content: space-between;
 align-items: center;
 margin-bottom: 0.8rem;
+padding-bottom: 0.5rem;
+border-bottom: 1px solid #e2e8f0; /* Subtle separator */
 }
 .step-content {
 display: grid;
-grid-template-columns: 1fr 1fr;
+grid-template-columns: 1fr 1fr; /* Consistent grid */
 gap: 1rem;
 }
 /* Quiz Editor */
@@ -388,25 +488,28 @@ margin-top: 1.5rem;
 }
 .quiz-question {
 border: 1px solid var(--light);
-border-radius: 5px;
-padding: 1rem;
-margin-bottom: 1rem;
+border-radius: 8px; /* More rounded */
+padding: 1.2rem; /* Increased padding */
+margin-bottom: 1.2rem; /* Increased margin */
 position: relative;
+background: #f9fafb; /* Light background for questions */
 }
 .quiz-header {
 display: flex;
 justify-content: space-between;
 align-items: center;
 margin-bottom: 0.8rem;
+padding-bottom: 0.5rem;
+border-bottom: 1px solid #e2e8f0; /* Subtle separator */
 }
 .quiz-content {
 display: grid;
-grid-template-columns: 1fr 1fr;
+grid-template-columns: 1fr 1fr; /* Consistent grid */
 gap: 1rem;
 }
 .quiz-options {
 display: grid;
-grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Responsive grid for options */
 gap: 1rem;
 }
 /* Settings Tabs */
@@ -898,7 +1001,7 @@ margin-top: 3rem;
 /* Responsive Design */
 @media (max-width: 992px) {
 .admin-content {
-grid-template-columns: 1fr;
+grid-template-columns: 1fr; /* Stack sidebar and main content on medium screens */
 }
 .nav-panel {
 margin-bottom: 2rem;
@@ -956,17 +1059,17 @@ z-index: 3001; /* Ensure it's above other modals */
 #skills-section .btn,
 #users-section .btn,
 #settings-section .btn {
-  background: var(--success);
-  color: white;
-  border: none;
-  border-radius: 5px;
-  padding: 0.5rem 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition);
+background: var(--success);
+color: white;
+border: none;
+border-radius: 5px;
+padding: 0.5rem 1rem;
+font-weight: 600;
+cursor: pointer;
+transition: var(--transition);
 }
 #skills-section .btn:hover {
-  background: #38c172; /* Slightly darker green on hover */
+background: #38c172; /* Slightly darker green on hover */
 }
 /* No specific additional styling needed unless customization is desired */
 </style>
@@ -1144,10 +1247,10 @@ z-index: 3001; /* Ensure it's above other modals */
 <div class="admin-content">
 <div class="nav-panel">
 <h3>Navigation</h3>
-<div class="nav-item active" onclick="showSection('dashboard')">Dashboard</div>
-<div class="nav-item" onclick="showSection('skills')">Manage Skills</div>
-<div class="nav-item" onclick="showSection('users')">Manage Users</div>
-<div class="nav-item" onclick="showSection('settings')">Settings</div>
+<div class="nav-item active" onclick="showSection('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</div>
+<div class="nav-item" onclick="showSection('skills')"><i class="fas fa-tools"></i> Manage Skills</div>
+<div class="nav-item" onclick="showSection('users')"><i class="fas fa-users"></i> Manage Users</div>
+<div class="nav-item" onclick="showSection('settings')"><i class="fas fa-cog"></i> Settings</div>
 </div>
 <div class="main-content-area">
 <!-- Dashboard Section -->
@@ -1227,63 +1330,84 @@ z-index: 3001; /* Ensure it's above other modals */
 </div>
 </div>
 </div>
-<!-- Edit Skill Form -->
+<!-- Edit Skill Form - REDESIGNED -->
 <div id="edit-skill-form" class="edit-form">
-<h2 class="section-title">Edit Skill</h2>
-<div class="form-row">
-<div class="form-col">
-<label for="edit-skill-name">Skill Name</label>
-<input type="text" id="edit-skill-name" placeholder="Enter skill name">
-</div>
-<div class="form-col">
-<label for="edit-skill-image">Skill Image</label>
-<input type="file" id="edit-skill-image" accept="image/*">
-<div class="image-upload-preview" id="skill-image-preview">
-<!-- Preview will be shown here -->
-</div>
-<!-- Hidden input to store the image URL -->
-<input type="hidden" id="edit-skill-image-url">
-</div>
-</div>
-<div class="form-row">
-<div class="form-col">
-<label for="edit-skill-description">Description</label>
-<textarea id="edit-skill-description" placeholder="Enter skill description"></textarea>
-</div>
-</div>
-<div class="form-row">
-<div class="form-col">
-<label for="edit-tools">Tools Required</label>
-<div id="tools-container">
-<!-- Tool inputs will be added here -->
-</div>
-<button class="btn add-step-btn" type="button" onclick="addTool()">Add Tool</button>
-</div>
-</div>
-<div class="form-row">
-<div class="form-col">
-<label for="edit-theory">Theory Section</label>
-<textarea id="edit-theory" placeholder="Enter theoretical content"></textarea>
-</div>
-</div>
-<div class="steps-editor">
-<h3>Steps</h3>
-<div id="steps-container">
-<!-- Steps will be added here -->
-</div>
-<button class="btn add-step-btn" onclick="addStep()">Add Step</button>
-</div>
-<div class="quiz-editor">
-<h3>Quiz Questions</h3>
-<div id="quiz-container">
-<!-- Quiz questions will be added here -->
-</div>
-<button class="btn add-quiz-btn" onclick="addQuizQuestion()">Add Question</button>
-</div>
-<div class="form-actions">
-<button class="btn btn-secondary" onclick="cancelEdit()">Cancel</button>
-<button class="btn" onclick="saveSkill()">Save Changes</button>
-</div>
+  <div class="section-title">Edit Skill</div>
+
+  <!-- Tabs -->
+  <div class="tabs" style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid #e2e8f0;">
+    <button class="tab-btn active" data-tab="info">📌 Skill Info</button>
+    <button class="tab-btn" data-tab="tools">🛠️ Tools</button>
+    <button class="tab-btn" data-tab="steps">📋 Steps</button>
+    <button class="tab-btn" data-tab="quiz">❓ Quiz</button>
+    <button class="tab-btn" data-tab="theory">📖 Theory</button>
+  </div>
+
+  <!-- Tab Content -->
+  <div id="tab-info" class="tab-content active">
+    <div class="form-row">
+      <div class="form-col">
+        <label for="edit-skill-name">Skill Name *</label>
+        <input type="text" id="edit-skill-name" placeholder="e.g., Soldering Basics" required>
+      </div>
+      <div class="form-col">
+        <label for="edit-skill-image">Skill Image *</label>
+        <input type="file" id="edit-skill-image" accept="image/*" onchange="previewSkillImage(this)">
+        <div class="image-upload-preview" id="skill-image-preview">
+          <span style="color: #999; font-size: 0.9rem;">No file chosen</span>
+        </div>
+        <input type="hidden" id="edit-skill-image-url">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="edit-skill-description">Description *</label>
+      <textarea id="edit-skill-description" rows="3" placeholder="Brief overview of the skill..."></textarea>
+    </div>
+  </div>
+
+  <div id="tab-tools" class="tab-content">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <h3>🛠️ Tools Required</h3>
+      <button class="btn add-step-btn" onclick="addTool()">+ Add Tool</button>
+    </div>
+    <div id="tools-container">
+      <!-- Tools will be added here dynamically -->
+    </div>
+  </div>
+
+  <div id="tab-steps" class="tab-content">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <h3>📋 Step-by-Step Guide</h3>
+      <button class="btn add-step-btn" onclick="addStep()">+ Add Step</button>
+    </div>
+    <div id="steps-container">
+      <!-- Steps will be added here dynamically -->
+    </div>
+  </div>
+
+  <div id="tab-quiz" class="tab-content">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <h3>❓ Knowledge Check (Quiz)</h3>
+      <button class="btn add-quiz-btn" onclick="addQuizQuestion()">+ Add Question</button>
+    </div>
+    <div id="quiz-container">
+      <!-- Quiz questions will be added here dynamically -->
+    </div>
+  </div>
+
+  <div id="tab-theory" class="tab-content">
+    <div class="form-group">
+      <label for="edit-theory">Theory & Principles</label>
+      <textarea id="edit-theory" rows="6" placeholder="Explain key concepts, safety, best practices..."></textarea>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="form-actions" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #eee;">
+    <button class="btn btn-secondary" onclick="cancelEdit()">Cancel</button>
+    <button class="btn" onclick="saveSkill()">Save Changes</button>
+  </div>
 </div>
 </div>
 </div>
@@ -1386,6 +1510,21 @@ document.getElementById('loginBtn').style.display = 'block';
 // Load ranks and courses from Firestore
 loadRanksAndCourses();
 };
+
+// Tab switching for Edit Skill Form
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    // Remove active from all
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+    // Activate clicked tab
+    btn.classList.add('active');
+    const tabId = btn.getAttribute('data-tab');
+    document.getElementById(`tab-${tabId}`).classList.add('active');
+  });
+});
+
 // Load ranks and courses from Firestore
 async function loadRanksAndCourses() {
 try {
@@ -2320,9 +2459,7 @@ document.getElementById('courseMessage').textContent = '';
 }, 3000);
 }
 }
-
 // --- NEW FUNCTIONS FOR IMAGE UPLOAD AND TOOL MANAGEMENT ---
-
 // Function to handle skill image upload
 async function uploadSkillImage(file) {
 if (!file) return null;
@@ -2337,7 +2474,6 @@ console.error("Error uploading skill image: ", error);
 return null;
 }
 }
-
 // Function to handle tool image upload
 async function uploadToolImage(file) {
 if (!file) return null;
@@ -2352,7 +2488,6 @@ console.error("Error uploading tool image: ", error);
 return null;
 }
 }
-
 // Function to preview skill image
 function previewSkillImage(input) {
 const preview = document.getElementById('skill-image-preview');
@@ -2366,7 +2501,6 @@ reader.readAsDataURL(input.files[0]);
 preview.innerHTML = '';
 }
 }
-
 // Function to preview tool image
 function previewToolImage(input, index) {
 const previewId = `tool-image-preview-${index}`;
@@ -2381,16 +2515,13 @@ reader.readAsDataURL(input.files[0]);
 preview.innerHTML = '';
 }
 }
-
 // Function to add a new tool input field
 function addTool(index = null) {
 const container = document.getElementById('tools-container');
 const toolIndex = index !== null ? index : container.children.length; // Use provided index or next available
-
 const toolDiv = document.createElement('div');
 toolDiv.className = 'form-group';
 toolDiv.id = `tool-item-${toolIndex}`;
-
 toolDiv.innerHTML = `
 <label>Tool ${toolIndex + 1}</label>
 <input type="text" id="tool-name-${toolIndex}" placeholder="Tool name">
@@ -2401,9 +2532,7 @@ toolDiv.innerHTML = `
 <input type="hidden" id="tool-image-url-${toolIndex}"> <!-- Hidden input for URL -->
 <button type="button" class="btn btn-secondary" onclick="removeTool(${toolIndex})">Remove Tool</button>
 `;
-
 container.appendChild(toolDiv);
-
 // Pre-populate fields if editing existing tool data
 if (currentEditingSkill && Array.isArray(currentEditingSkill.tools) && currentEditingSkill.tools[toolIndex]) {
 const existingTool = currentEditingSkill.tools[toolIndex];
@@ -2414,7 +2543,6 @@ document.getElementById(`tool-image-preview-${toolIndex}`).innerHTML = `<img src
 }
 }
 }
-
 // Function to remove a tool input field
 function removeTool(index) {
 const toolElement = document.getElementById(`tool-item-${index}`);
@@ -2422,9 +2550,7 @@ if (toolElement) {
 toolElement.remove();
 }
 }
-
 // --- END NEW FUNCTIONS ---
-
 // Logout function
 function logout() {
 auth.signOut().then(() => {
@@ -2877,96 +3003,86 @@ addQuizQuestionToForm(idx, question);
 // Save skill
 // Save skill
 async function saveSkill() {
-    // Update current skill with form values
-    currentEditingSkill.name = document.getElementById('edit-skill-name').value;
-
-    // --- HANDLE SKILL IMAGE UPLOAD ---
-    const skillImageFile = document.getElementById('edit-skill-image').files[0]; // This gets the file object
-    let skillImageUrl = document.getElementById('edit-skill-image-url').value; // Get existing URL
-    if (skillImageFile) { // If a new file is selected
-        console.log("Uploading new skill image..."); // Debug log
-        skillImageUrl = await uploadSkillImage(skillImageFile); // Upload new file if selected
-        if (!skillImageUrl) {
-            alert("Error uploading skill image. Skill not saved.");
-            console.error("Failed to get skill image URL from uploadSkillImage"); // Debug log
-            return; // Stop saving if upload fails
-        }
-    } else {
-        // If no new file selected, keep the existing URL stored in the hidden field
-        console.log("No new skill image selected, keeping existing URL:", skillImageUrl); // Debug log
-    }
-    currentEditingSkill.imageUrl = skillImageUrl; // Store the final URL (existing or new)
-
-    // --- HANDLE TOOLS UPLOAD ---
-    const toolsContainer = document.getElementById('tools-container');
-    currentEditingSkill.tools = []; // Reset tools array
-    let toolIndex = 0;
-    while (true) { // Loop through potential tool inputs until one doesn't exist
-        const toolNameInput = document.getElementById(`tool-name-${toolIndex}`);
-        const toolImageFileInput = document.getElementById(`tool-image-${toolIndex}`);
-        const toolImageUrlHidden = document.getElementById(`tool-image-url-${toolIndex}`); // Get the hidden input for existing URL
-
-        if (!toolNameInput) break; // No more tool inputs found
-
-        let toolImageUrl = toolImageUrlHidden ? toolImageUrlHidden.value : ''; // Get existing URL from hidden input
-        const toolImageFile = toolImageFileInput ? toolImageFileInput.files[0] : null; // Get the file object if input exists
-
-        if (toolImageFile) { // If a new file is selected for this tool
-            console.log(`Uploading new image for tool ${toolIndex + 1}...`); // Debug log
-            toolImageUrl = await uploadToolImage(toolImageFile); // Upload new file if selected
-            if (!toolImageUrl) {
-                alert(`Error uploading image for tool ${toolIndex + 1}. Skill not saved.`);
-                console.error(`Failed to get tool image URL for tool ${toolIndex + 1}`); // Debug log
-                return; // Stop saving if upload fails
-            }
-        } else {
-             // If no new file selected for this tool, keep the existing URL from the hidden input
-             console.log(`No new image for tool ${toolIndex + 1}, keeping existing URL:`, toolImageUrl); // Debug log
-        }
-
-        currentEditingSkill.tools.push({
-            name: toolNameInput.value,
-            imageUrl: toolImageUrl
-        });
-
-        toolIndex++;
-    }
-
-    currentEditingSkill.description = document.getElementById('edit-skill-description').value;
-    // currentEditingSkill.tools handled above
-    currentEditingSkill.theory = document.getElementById('edit-theory').value;
-
-    console.log("Attempting to save skill to Firestore:", currentEditingSkill); // Debug log
-
-    // If it's a new skill, add to Firestore
-    if (!currentEditingSkill.id) {
-        db.collection("skills").add(currentEditingSkill)
-            .then((docRef) => {
-                console.log("Skill added with ID: ", docRef.id); // Debug log
-                alert('Skill saved successfully!');
-                document.getElementById('edit-skill-form').style.display = 'none';
-                document.getElementById('skills-section').style.display = 'block';
-                showSection('skills'); // This will trigger loadSkillsList
-            })
-            .catch((error) => {
-                console.error("Error adding skill to Firestore: ", error); // More specific error log
-                alert('Error saving skill to database: ' + error.message);
-            });
-    } else {
-        // Update existing skill in Firestore
-        db.collection("skills").doc(currentEditingSkill.id).set(currentEditingSkill)
-            .then(() => {
-                console.log("Skill updated with ID: ", currentEditingSkill.id); // Debug log
-                alert('Skill updated successfully!');
-                document.getElementById('edit-skill-form').style.display = 'none';
-                document.getElementById('skills-section').style.display = 'block';
-                showSection('skills'); // This will trigger loadSkillsList
-            })
-            .catch((error) => {
-                console.error("Error updating skill in Firestore: ", error); // More specific error log
-                alert('Error saving skill to database: ' + error.message);
-            });
-    }
+// Update current skill with form values
+currentEditingSkill.name = document.getElementById('edit-skill-name').value;
+// --- HANDLE SKILL IMAGE UPLOAD ---
+const skillImageFile = document.getElementById('edit-skill-image').files[0]; // This gets the file object
+let skillImageUrl = document.getElementById('edit-skill-image-url').value; // Get existing URL
+if (skillImageFile) { // If a new file is selected
+console.log("Uploading new skill image..."); // Debug log
+skillImageUrl = await uploadSkillImage(skillImageFile); // Upload new file if selected
+if (!skillImageUrl) {
+alert("Error uploading skill image. Skill not saved.");
+console.error("Failed to get skill image URL from uploadSkillImage"); // Debug log
+return; // Stop saving if upload fails
+}
+} else {
+// If no new file selected, keep the existing URL stored in the hidden field
+console.log("No new skill image selected, keeping existing URL:", skillImageUrl); // Debug log
+}
+currentEditingSkill.imageUrl = skillImageUrl; // Store the final URL (existing or new)
+// --- HANDLE TOOLS UPLOAD ---
+const toolsContainer = document.getElementById('tools-container');
+currentEditingSkill.tools = []; // Reset tools array
+let toolIndex = 0;
+while (true) { // Loop through potential tool inputs until one doesn't exist
+const toolNameInput = document.getElementById(`tool-name-${toolIndex}`);
+const toolImageFileInput = document.getElementById(`tool-image-${toolIndex}`);
+const toolImageUrlHidden = document.getElementById(`tool-image-url-${toolIndex}`); // Get the hidden input for existing URL
+if (!toolNameInput) break; // No more tool inputs found
+let toolImageUrl = toolImageUrlHidden ? toolImageUrlHidden.value : ''; // Get existing URL from hidden input
+const toolImageFile = toolImageFileInput ? toolImageFileInput.files[0] : null; // Get the file object if input exists
+if (toolImageFile) { // If a new file is selected for this tool
+console.log(`Uploading new image for tool ${toolIndex + 1}...`); // Debug log
+toolImageUrl = await uploadToolImage(toolImageFile); // Upload new file if selected
+if (!toolImageUrl) {
+alert(`Error uploading image for tool ${toolIndex + 1}. Skill not saved.`);
+console.error(`Failed to get tool image URL for tool ${toolIndex + 1}`); // Debug log
+return; // Stop saving if upload fails
+}
+} else {
+// If no new file selected for this tool, keep the existing URL from the hidden input
+console.log(`No new image for tool ${toolIndex + 1}, keeping existing URL:`, toolImageUrl); // Debug log
+}
+currentEditingSkill.tools.push({
+name: toolNameInput.value,
+imageUrl: toolImageUrl
+});
+toolIndex++;
+}
+currentEditingSkill.description = document.getElementById('edit-skill-description').value;
+// currentEditingSkill.tools handled above
+currentEditingSkill.theory = document.getElementById('edit-theory').value;
+console.log("Attempting to save skill to Firestore:", currentEditingSkill); // Debug log
+// If it's a new skill, add to Firestore
+if (!currentEditingSkill.id) {
+db.collection("skills").add(currentEditingSkill)
+.then((docRef) => {
+console.log("Skill added with ID: ", docRef.id); // Debug log
+alert('Skill saved successfully!');
+document.getElementById('edit-skill-form').style.display = 'none';
+document.getElementById('skills-section').style.display = 'block';
+showSection('skills'); // This will trigger loadSkillsList
+})
+.catch((error) => {
+console.error("Error adding skill to Firestore: ", error); // More specific error log
+alert('Error saving skill to database: ' + error.message);
+});
+} else {
+// Update existing skill in Firestore
+db.collection("skills").doc(currentEditingSkill.id).set(currentEditingSkill)
+.then(() => {
+console.log("Skill updated with ID: ", currentEditingSkill.id); // Debug log
+alert('Skill updated successfully!');
+document.getElementById('edit-skill-form').style.display = 'none';
+document.getElementById('skills-section').style.display = 'block';
+showSection('skills'); // This will trigger loadSkillsList
+})
+.catch((error) => {
+console.error("Error updating skill in Firestore: ", error); // More specific error log
+alert('Error saving skill to database: ' + error.message);
+});
+}
 }
 // Delete skill
 function deleteSkill(skillId) {
@@ -3206,5 +3322,3 @@ loadAdminList(); // Load admin list specifically when the Admin Access tab is cl
 </script>
 </body>
 </html>
-
-
