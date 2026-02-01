@@ -1,1461 +1,1528 @@
 <style>
 * {
-margin: 0;
-padding: 0;
-box-sizing: border-box;
-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 :root {
---primary: #4361ee;
---secondary: #3f37c9;
---accent: #4cc9f0;
---light: #f8f9fa;
---dark: #212529;
---gray: #6c757d;
---success: #4ade80;
---warning: #facc15;
---danger: #f87171;
---shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
---transition: all 0.3s ease;
---admin-bg: #0f172a;
---admin-card: #1e293b;
---admin-sidebar: #1e293b;
---admin-text: #e2e8f0;
---admin-border: #334155;
+  --primary: #4361ee;
+  --secondary: #3f37c9;
+  --accent: #4cc9f0;
+  --light: #f8f9fa;
+  --dark: #212529;
+  --gray: #6c757d;
+  --success: #4ade80;
+  --warning: #facc15;
+  --danger: #f87171;
+  --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s ease;
+  --admin-bg: #0f172a; /* Kept for potential use in specific elements */
+  --admin-card: #1e293b; /* Kept for potential use in specific elements */
+  --admin-sidebar: #1e293b; /* Kept for potential use in specific elements */
+  --admin-text: #e2e8f0; /* Kept for potential use in specific elements */
+  --admin-border: #334155; /* Kept for potential use in specific elements */
 }
 body {
-background-color: #f5f7fb;
-color: var(--dark);
-line-height: 1.6;
+  background-color: #f5f7fb;
+  color: var(--dark);
+  line-height: 1.6;
 }
 .container {
-width: 100%;
-max-width: 1200px;
-margin: 0 auto;
-padding: 0 20px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
 /* Login Popup */
 .login-popup {
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-background: rgba(0,0,0,0.7);
-display: flex;
-justify-content: center;
-align-items: center;
-z-index: 2000;
-display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  display: none;
 }
 .login-box {
-background: white;
-padding: 2.5rem;
-border-radius: 10px;
-box-shadow: var(--shadow);
-width: 100%;
-max-width: 450px;
-text-align: center;
-position: relative;
+  background: white;
+  padding: 2.5rem;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  width: 100%;
+  max-width: 450px;
+  text-align: center;
+  position: relative;
 }
 .login-box h2 {
-margin-bottom: 1.5rem;
-color: var(--primary);
+  margin-bottom: 1.5rem;
+  color: var(--primary);
 }
 .close-btn {
-position: absolute;
-top: 15px;
-right: 15px;
-font-size: 1.5rem;
-cursor: pointer;
-color: var(--gray);
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--gray);
 }
 .close-btn:hover {
-color: var(--dark);
+  color: var(--dark);
 }
 .form-group {
-margin-bottom: 1.2rem;
-text-align: left;
+  margin-bottom: 1.2rem;
+  text-align: left;
 }
 .form-group label {
-display: block;
-margin-bottom: 0.5rem;
-font-weight: 500;
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
 }
 .form-group input, .form-group select, .form-group textarea {
-width: 100%;
-padding: 0.8rem;
-border: 1px solid #ddd;
-border-radius: 5px;
-font-size: 1rem;
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
 }
 .image-upload-preview {
-width: 100px;
-height: 100px;
-border: 1px dashed #ccc;
-display: flex;
-align-items: center;
-justify-content: center;
-margin-top: 0.5rem;
-overflow: hidden;
+  width: 100px;
+  height: 100px;
+  border: 1px dashed #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.5rem;
+  overflow: hidden;
 }
 .image-upload-preview img {
-width: 100%;
-height: 100%;
-object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* ========================================
    REDESIGNED ADMIN DASHBOARD
 ======================================== */
 .admin-dashboard {
-display: none;
-min-height: 100vh;
-background: linear-gradient(135deg, var(--admin-bg) 0%, #1e3a5f 100%);
-padding: 0;
+  display: none;
+  min-height: 100vh;
+  /* CHANGED: Removed dark gradient, used light background to match user interface */
+  background-color: #f5f7fb;
+  padding: 0;
 }
 
-/* Admin Header - Modern Top Bar */
+/* Admin Header - Updated to match user interface style */
 .admin-header {
-background: var(--admin-card);
-border-bottom: 1px solid var(--admin-border);
-padding: 1rem 2rem;
-position: sticky;
-top: 0;
-z-index: 100;
-box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-margin: 0;
+  /* CHANGED: Used gradient matching user interface */
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border-bottom: 1px solid rgba(255,255,255, 0.2); /* Adjusted border color */
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow);
+  margin: 0;
 }
 
 .admin-header .container {
-display: flex;
-justify-content: space-between;
-align-items: center;
-max-width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 100%;
 }
 
 .admin-header h1 {
-color: white;
-font-size: 1.5rem;
-font-weight: 600;
-display: flex;
-align-items: center;
-gap: 0.75rem;
-margin: 0;
+  /* CHANGED: Matched user interface header style */
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
 }
 
 .admin-header h1 i {
-color: var(--accent);
-font-size: 1.75rem;
+  /* CHANGED: Matched user interface header icon style */
+  color: var(--accent);
+  font-size: 1.75rem;
 }
 
 .logout-btn {
-background: linear-gradient(135deg, var(--danger), #dc2626);
-color: white;
-border: none;
-padding: 0.6rem 1.5rem;
-border-radius: 8px;
-cursor: pointer;
-font-weight: 600;
-transition: var(--transition);
-box-shadow: 0 2px 8px rgba(248, 113, 113, 0.3);
+  /* CHANGED: Simplified logout button style to match user interface pattern */
+  background: var(--danger);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.5rem;
+  border-radius: 5px; /* Changed from 8px to match user interface buttons */
+  cursor: pointer;
+  font-weight: 600;
+  transition: var(--transition);
+  /* Removed gradient and shadow */
 }
 
 .logout-btn:hover {
-transform: translateY(-2px);
-box-shadow: 0 4px 12px rgba(248, 113, 113, 0.4);
+  /* CHANGED: Simplified hover effect */
+  background: #e53e3e; /* Darker shade of danger */
+  transform: translateY(-2px);
+  /* Removed box shadow */
 }
 
 /* Admin Content Layout */
 .admin-content {
-display: grid;
-grid-template-columns: 280px 1fr;
-gap: 2rem;
-padding: 2rem;
-max-width: 1600px;
-margin: 0 auto;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 2rem;
+  padding: 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
 }
 
 /* Navigation Panel - Sleek Sidebar */
 .nav-panel {
-background: var(--admin-card);
-border-radius: 16px;
-padding: 1.5rem;
-box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-height: fit-content;
-position: sticky;
-top: 100px;
-border: 1px solid var(--admin-border);
+  /* CHANGED: Made sidebar lighter to match user interface theme */
+  background: white; /* Changed from --admin-card */
+  border-radius: 10px; /* Changed from 16px */
+  padding: 1.5rem;
+  box-shadow: var(--shadow); /* Changed from heavy shadow */
+  height: fit-content;
+  position: sticky;
+  top: 100px;
+  border: 1px solid var(--light); /* Changed from --admin-border */
 }
 
 .nav-panel h3 {
-margin-bottom: 1.5rem;
-padding-bottom: 1rem;
-border-bottom: 2px solid var(--admin-border);
-color: white;
-font-size: 1rem;
-text-transform: uppercase;
-letter-spacing: 1px;
-font-weight: 700;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--light); /* Changed from 2px --admin-border */
+  color: var(--primary); /* Changed from white */
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
 }
 
 .nav-item {
-padding: 1rem 1.25rem;
-margin-bottom: 0.5rem;
-border-radius: 12px;
-cursor: pointer;
-transition: var(--transition);
-display: flex;
-align-items: center;
-font-weight: 500;
-color: var(--admin-text);
-background: transparent;
-border: 1px solid transparent;
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.5rem;
+  border-radius: 8px; /* Changed from 12px */
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  color: var(--dark); /* Changed from --admin-text */
+  background: transparent;
+  border: 1px solid transparent;
 }
 
 .nav-item i {
-margin-right: 1rem;
-width: 24px;
-text-align: center;
-font-size: 1.1rem;
-color: var(--accent);
+  margin-right: 1rem;
+  width: 24px;
+  text-align: center;
+  font-size: 1.1rem;
+  color: var(--primary); /* Changed from --accent */
 }
 
 .nav-item:hover {
-background: rgba(67, 97, 238, 0.1);
-border-color: var(--primary);
-transform: translateX(5px);
+  background: var(--light); /* Changed from gradient */
+  border-color: var(--primary);
+  transform: translateX(5px);
 }
 
 .nav-item.active {
-background: linear-gradient(135deg, var(--primary), var(--secondary));
-color: white;
-box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+  background: var(--primary); /* Changed from gradient */
+  color: white;
+  /* Removed box shadow */
 }
 
 .nav-item.active i {
-color: white;
+  color: white;
 }
 
-/* Main Content Area - Enhanced Cards */
+/* Main Content Area - Updated to match user interface theme */
 .main-content-area {
-background: var(--admin-card);
-border-radius: 16px;
-padding: 2.5rem;
-box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-border: 1px solid var(--admin-border);
-min-height: 600px;
+  /* CHANGED: Made main area lighter */
+  background: white; /* Changed from --admin-card */
+  border-radius: 10px; /* Changed from 16px */
+  padding: 2.5rem;
+  box-shadow: var(--shadow); /* Changed from heavy shadow */
+  border: 1px solid var(--light); /* Changed from --admin-border */
+  min-height: 600px;
 }
 
 .section-title {
-font-size: 1.75rem;
-color: white;
-margin-bottom: 2rem;
-padding-bottom: 1rem;
-border-bottom: 2px solid var(--admin-border);
-font-weight: 700;
-display: flex;
-align-items: center;
-gap: 0.75rem;
+  /* CHANGED: Matched user interface section title style */
+  font-size: 1.75rem;
+  color: var(--primary); /* Changed from white */
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--light); /* Changed from --admin-border */
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .section-title::before {
-content: '';
-width: 4px;
-height: 32px;
-background: linear-gradient(180deg, var(--primary), var(--accent));
-border-radius: 4px;
+  /* CHANGED: Removed the colored bar before the title */
+  content: none;
+  /* content: '';
+  width: 4px;
+  height: 32px;
+  background: linear-gradient(180deg, var(--primary), var(--accent));
+  border-radius: 4px; */
 }
 
 .skill-list {
-display: grid;
-grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-gap: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
 }
 
 .skill-card {
-border: 1px solid var(--admin-border);
-border-radius: 12px;
-padding: 0;
-cursor: pointer;
-transition: var(--transition);
-background: var(--admin-bg);
-overflow: hidden;
+  /* CHANGED: Made skill cards lighter */
+  border: 1px solid var(--light); /* Changed from --admin-border */
+  border-radius: 10px; /* Changed from 12px */
+  padding: 0;
+  cursor: pointer;
+  transition: var(--transition);
+  background: white; /* Changed from --admin-bg */
+  overflow: hidden;
+  box-shadow: var(--shadow); /* Added subtle shadow */
 }
 
 .skill-card:hover {
-border-color: var(--primary);
-transform: translateY(-5px);
-box-shadow: 0 8px 24px rgba(67, 97, 238, 0.3);
+  border-color: var(--primary);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15); /* Added stronger shadow on hover */
 }
 
 .skill-card h4 {
-margin-bottom: 0.5rem;
-color: white;
+  margin-bottom: 0.5rem;
+  color: var(--dark); /* Changed from white */
 }
 
 .skill-actions {
-margin-top: 1rem;
-display: flex;
-gap: 0.5rem;
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
 }
 
-/* Buttons */
+/* Buttons - Updated to match user interface theme */
 #edit-skill-form .btn,
 #edit-skill-form .action-btn {
-padding: 0.5rem 1rem;
-border-radius: 8px;
-border: none;
-cursor: pointer;
-font-size: 0.9rem;
-font-weight: 600;
-transition: var(--transition);
+  padding: 0.5rem 1rem;
+  border-radius: 5px; /* Changed from 8px */
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: var(--transition);
+  color: white; /* Ensure text contrast */
 }
 
 #edit-skill-form .btn.add-step-btn,
 #edit-skill-form .btn.add-quiz-btn {
-background: linear-gradient(135deg, var(--success), #22c55e);
-color: white;
-box-shadow: 0 2px 8px rgba(74, 222, 128, 0.3);
+  /* CHANGED: Simplified button style */
+  background: var(--success); /* Removed gradient */
+  color: white;
+  /* Removed shadow */
 }
 
 #edit-skill-form .btn.add-step-btn:hover,
 #edit-skill-form .btn.add-quiz-btn:hover {
-transform: translateY(-2px);
-box-shadow: 0 4px 12px rgba(74, 222, 128, 0.4);
+  background: #22c55e; /* Darker shade of success */
+  transform: translateY(-2px);
+  /* Removed shadow */
 }
 
 #edit-skill-form .btn.btn-secondary {
-background: var(--gray);
-color: white;
+  background: var(--gray);
+  color: white;
 }
 
 #edit-skill-form .btn.btn-secondary:hover {
-background: #5a6268;
+  background: #5a6268;
 }
 
 #edit-skill-form .btn.btn-primary {
-background: linear-gradient(135deg, var(--primary), var(--secondary));
-color: white;
-box-shadow: 0 2px 8px rgba(67, 97, 238, 0.3);
+  /* CHANGED: Simplified button style */
+  background: var(--primary); /* Removed gradient */
+  color: white;
+  /* Removed shadow */
 }
 
 #edit-skill-form .btn.btn-primary:hover {
-transform: translateY(-2px);
-box-shadow: 0 4px 12px rgba(67, 97, 238, 0.4);
+  background: var(--secondary); /* Darker shade of primary */
+  transform: translateY(-2px);
+  /* Removed shadow */
 }
 
 .profile-content .update-rank-btn,
 .profile-content .close-profile-btn,
 .profile-content .logout-btn-popup {
-padding: 0.5rem 1rem;
-border-radius: 5px;
-border: none;
-cursor: pointer;
-font-size: 1rem;
-width: 100%;
-margin-bottom: 0.5rem;
-color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  width: 100%;
+  margin-bottom: 0.5rem;
+  color: white;
 }
 
 .profile-content .update-rank-btn {
-background: var(--primary);
+  background: var(--primary);
 }
 
 .profile-content .close-profile-btn {
-background: var(--gray);
+  background: var(--gray);
 }
 
 .profile-content .close-profile-btn:hover {
-background: #5a6268;
+  background: #5a6268;
 }
 
 .profile-content .logout-btn-popup {
-background: var(--danger);
+  background: var(--danger);
 }
 
 .profile-content .logout-btn-popup:hover {
-background: #e53e3e;
+  background: #e53e3e;
 }
 
 #skills-section .section-title ~ div button.btn,
 .skill-card-ui .skill-content .skill-btn {
-padding: 0.5rem 1rem;
-border-radius: 8px;
-border: none;
-cursor: pointer;
-font-size: 0.9rem;
-color: white;
-font-weight: 600;
-transition: var(--transition);
+  padding: 0.5rem 1rem;
+  border-radius: 5px; /* Changed from 8px */
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: white;
+  font-weight: 600;
+  transition: var(--transition);
 }
 
 .user-card .edit-user-btn,
 .user-card .action-btn.delete-btn {
-padding: 0.5rem 1rem;
-border-radius: 8px;
-border: none;
-cursor: pointer;
-font-size: 0.9rem;
-color: white;
-font-weight: 600;
-transition: var(--transition);
+  padding: 0.5rem 1rem;
+  border-radius: 5px; /* Changed from 8px */
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: white;
+  font-weight: 600;
+  transition: var(--transition);
 }
 
 .user-card .edit-user-btn {
-background: linear-gradient(135deg, var(--warning), #eab308);
-box-shadow: 0 2px 8px rgba(250, 204, 21, 0.3);
+  /* CHANGED: Simplified button style */
+  background: var(--warning); /* Removed gradient */
+  color: white;
+  /* Removed shadow */
 }
 
 .user-card .edit-user-btn:hover {
-transform: translateY(-2px);
-box-shadow: 0 4px 12px rgba(250, 204, 21, 0.4);
+  background: #eab308; /* Darker shade of warning */
+  transform: translateY(-2px);
+  /* Removed shadow */
 }
 
 .user-card .action-btn.delete-btn {
-background: linear-gradient(135deg, var(--danger), #dc2626);
-box-shadow: 0 2px 8px rgba(248, 113, 113, 0.3);
+  /* CHANGED: Simplified button style */
+  background: var(--danger); /* Removed gradient */
+  color: white;
+  /* Removed shadow */
 }
 
 .user-card .action-btn.delete-btn:hover {
-transform: translateY(-2px);
-box-shadow: 0 4px 12px rgba(248, 113, 113, 0.4);
+  background: #dc2626; /* Darker shade of danger */
+  transform: translateY(-2px);
+  /* Removed shadow */
 }
 
 .setting-actions .delete-btn-setting,
 .setting-actions .move-up-btn,
 .setting-actions .move-down-btn {
-padding: 0.4rem 0.8rem;
-border-radius: 6px;
-border: none;
-cursor: pointer;
-font-size: 0.85rem;
-color: white;
-font-weight: 600;
-transition: var(--transition);
+  padding: 0.4rem 0.8rem;
+  border-radius: 5px; /* Changed from 6px */
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: white;
+  font-weight: 600;
+  transition: var(--transition);
 }
 
 .setting-actions .delete-btn-setting {
-background: linear-gradient(135deg, var(--danger), #dc2626);
+  background: var(--danger); /* Removed gradient */
 }
 
 .setting-actions .delete-btn-setting:hover {
-transform: translateY(-1px);
+  background: #dc2626; /* Darker shade of danger */
+  transform: translateY(-1px);
 }
 
 .setting-actions .move-up-btn,
 .setting-actions .move-down-btn {
-background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: var(--primary); /* Removed gradient */
 }
 
 .setting-actions .move-up-btn:hover,
 .setting-actions .move-down-btn:hover {
-transform: translateY(-1px);
+  background: var(--secondary); /* Darker shade of primary */
+  transform: translateY(-1px);
 }
 
 .admin-access-form button.btn,
 #adminList button.btn {
-padding: 0.6rem 1.5rem;
-border-radius: 8px;
-border: none;
-cursor: pointer;
-font-size: 1rem;
-color: white;
-font-weight: 600;
-background: linear-gradient(135deg, var(--primary), var(--secondary));
-box-shadow: 0 2px 8px rgba(67, 97, 238, 0.3);
-transition: var(--transition);
+  padding: 0.6rem 1.5rem;
+  border-radius: 5px; /* Changed from 8px */
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: white;
+  font-weight: 600;
+  /* CHANGED: Simplified button style */
+  background: var(--primary); /* Removed gradient */
+  /* Removed shadow */
+  transition: var(--transition);
 }
 
 .admin-access-form button.btn:hover,
 #adminList button.btn:hover {
-transform: translateY(-2px);
-box-shadow: 0 4px 12px rgba(67, 97, 238, 0.4);
+  background: var(--secondary); /* Darker shade of primary */
+  transform: translateY(-2px);
+  /* Removed shadow */
 }
 
 #adminList button.btn {
-background: linear-gradient(135deg, var(--danger), #dc2626);
-box-shadow: 0 2px 8px rgba(248, 113, 113, 0.3);
+  /* CHANGED: Simplified button style */
+  background: var(--danger); /* Removed gradient */
+  /* Removed shadow */
 }
 
 #adminList button.btn:hover {
-box-shadow: 0 4px 12px rgba(248, 113, 113, 0.4);
+  background: #dc2626; /* Darker shade of danger */
+  /* Removed shadow */
 }
 
 /* Edit Form */
 .edit-form {
-display: none;
+  display: none;
 }
 
 .tabs {
-display: flex;
-gap: 0.5rem;
-margin-bottom: 2rem;
-border-bottom: 2px solid var(--admin-border);
-padding-bottom: 0;
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--light); /* Changed from --admin-border */
+  padding-bottom: 0;
 }
 
 .tab-btn {
-background: transparent;
-border: none;
-padding: 1rem 1.5rem;
-font-weight: 600;
-color: var(--admin-text);
-cursor: pointer;
-border-radius: 12px 12px 0 0;
-transition: var(--transition);
-border: 1px solid transparent;
-position: relative;
+  background: transparent;
+  border: none;
+  padding: 1rem 1.5rem;
+  font-weight: 600;
+  color: var(--gray); /* Changed from --admin-text */
+  cursor: pointer;
+  border-radius: 8px 8px 0 0; /* Changed from 12px */
+  transition: var(--transition);
+  border: 1px solid transparent;
+  position: relative;
 }
 
 .tab-btn:hover {
-color: var(--accent);
-background: rgba(67, 97, 238, 0.1);
+  color: var(--primary); /* Changed from --accent */
+  background: var(--light); /* Changed from gradient */
 }
 
 .tab-btn.active {
-color: white;
-background: linear-gradient(135deg, var(--primary), var(--secondary));
-border-color: var(--primary);
+  color: var(--primary); /* Changed from white */
+  background: white; /* Changed from gradient */
+  border-color: var(--primary);
+  border-bottom: 3px solid var(--primary); /* Added bottom border indicator */
 }
 
 .tab-btn.active::after {
-content: '';
-position: absolute;
-bottom: -2px;
-left: 0;
-right: 0;
-height: 2px;
-background: var(--accent);
+  /* CHANGED: Removed ::after pseudo-element, using border-bottom instead */
+  content: none;
+  /* content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent); */
 }
 
 .tab-content {
-display: none;
-padding: 1.5rem 0;
+  display: none;
+  padding: 1.5rem 0;
 }
 
 .tab-content.active {
-display: block;
+  display: block;
 }
 
 .form-row {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 1.5rem;
-margin-bottom: 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .form-col {
-flex: 1;
+  flex: 1;
 }
 
 .form-group {
-margin-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .form-group label {
-display: block;
-margin-bottom: 0.5rem;
-font-weight: 600;
-color: var(--dark);
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--dark); /* Changed from --admin-text */
 }
 
 .form-group input,
 .form-group textarea,
 .form-group select {
-width: 100%;
-padding: 0.75rem;
-border: 1px solid #ddd;
-border-radius: 8px;
-font-size: 1rem;
-transition: border-color 0.2s;
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd; /* Changed from --admin-border */
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  background: white; /* Changed from --admin-bg */
+  color: var(--dark); /* Changed from white */
 }
 
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
-outline: none;
-border-color: var(--primary);
+  outline: none;
+  border-color: var(--primary);
+  /* CHANGED: Removed custom box shadow */
+  /* box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1); */
 }
 
-.admin-dashboard .form-group label {
-color: var(--admin-text);
+/* Removed specific overrides for admin dashboard inputs */
+/* .admin-dashboard .form-group label {
+  color: var(--admin-text);
 }
 
 .admin-dashboard .form-group input,
 .admin-dashboard .form-group textarea,
 .admin-dashboard .form-group select {
-background: var(--admin-bg);
-color: white;
-border: 1px solid var(--admin-border);
+  background: var(--admin-bg);
+  color: white;
+  border: 1px solid var(--admin-border);
 }
 
 .admin-dashboard .form-group input:focus,
 .admin-dashboard .form-group textarea:focus,
 .admin-dashboard .form-group select:focus {
-border-color: var(--primary);
-box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
-}
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+} */
 
 .image-upload-preview {
-height: 100px;
-border: 2px dashed #ccc;
-border-radius: 8px;
-display: flex;
-align-items: center;
-justify-content: center;
-margin-top: 0.5rem;
-background: #fafafa;
-font-size: 0.85rem;
-color: #777;
-overflow: hidden;
+  height: 100px;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.5rem;
+  background: #fafafa;
+  font-size: 0.85rem;
+  color: #777;
+  overflow: hidden;
 }
 
-.admin-dashboard .image-upload-preview {
-background: var(--admin-bg);
-border: 2px dashed var(--admin-border);
-color: var(--admin-text);
-}
+/* Removed specific override for admin dashboard image preview */
+/* .admin-dashboard .image-upload-preview {
+  background: var(--admin-bg);
+  border: 2px dashed var(--admin-border);
+  color: var(--admin-text);
+} */
 
 .image-upload-preview img {
-width: 100%;
-height: 100%;
-object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .edit-form .section-title {
-font-size: 1.8rem;
-color: white;
-margin-bottom: 1.5rem;
-padding-bottom: 0.75rem;
-border-bottom: 2px solid var(--admin-border);
+  /* CHANGED: Matched user interface section title style */
+  font-size: 1.8rem;
+  color: var(--primary); /* Changed from white */
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--light); /* Changed from --admin-border */
 }
 
 /* Steps & Quiz */
 .steps-editor,
 .quiz-editor {
-margin-top: 1.5rem;
+  margin-top: 1.5rem;
 }
 
 .step-item,
 .quiz-question {
-border: 1px solid #e2e8f0;
-border-radius: 12px;
-padding: 1.5rem;
-margin-bottom: 1.5rem;
-position: relative;
-background: #f9fafb;
+  /* CHANGED: Made step/question items lighter */
+  border: 1px solid var(--light); /* Changed from #e2e8f0 */
+  border-radius: 8px; /* Changed from 12px */
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  background: #f9fafb; /* Changed from #f9fafb */
 }
 
-.admin-dashboard .step-item,
+/* Removed specific override for admin dashboard step/quiz items */
+/* .admin-dashboard .step-item,
 .admin-dashboard .quiz-question {
-background: var(--admin-bg);
-border: 1px solid var(--admin-border);
-}
+  background: var(--admin-bg);
+  border: 1px solid var(--admin-border);
+} */
 
 .step-header,
 .quiz-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 1rem;
-padding-bottom: 0.75rem;
-border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--light); /* Changed from #e2e8f0 */
 }
 
-.admin-dashboard .step-header,
+/* Removed specific override for admin dashboard headers */
+/* .admin-dashboard .step-header,
 .admin-dashboard .quiz-header {
-border-bottom: 1px solid var(--admin-border);
-}
+  border-bottom: 1px solid var(--admin-border);
+} */
 
 .step-header h4,
 .quiz-header h4 {
-color: var(--primary);
-font-size: 1.1rem;
+  color: var(--primary); /* Changed from --primary */
+  font-size: 1.1rem;
 }
 
-.admin-dashboard .step-header h4,
+/* Removed specific override for admin dashboard header text */
+/* .admin-dashboard .step-header h4,
 .admin-dashboard .quiz-header h4 {
-color: white;
-}
+  color: white;
+} */
 
 .step-content,
 .quiz-content {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
 }
 
 .quiz-options {
-display: grid;
-grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-gap: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
 }
 
 /* Settings */
 .settings-tabs {
-display: flex;
-border-bottom: 2px solid var(--light);
-margin-bottom: 2rem;
-gap: 0.5rem;
+  display: flex;
+  border-bottom: 1px solid var(--light); /* Changed from --light */
+  margin-bottom: 2rem;
+  gap: 0.5rem;
 }
 
-.admin-dashboard .settings-tabs {
-border-bottom: 2px solid var(--admin-border);
-}
+/* Removed specific override for admin dashboard settings tabs */
+/* .admin-dashboard .settings-tabs {
+  border-bottom: 2px solid var(--admin-border);
+} */
 
 .tab-button {
-padding: 1rem 1.5rem;
-background: transparent;
-border: none;
-border-bottom: 3px solid transparent;
-cursor: pointer;
-font-weight: 600;
-color: var(--gray);
-transition: var(--transition);
-border-radius: 8px 8px 0 0;
+  padding: 1rem 1.5rem;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--gray); /* Changed from --gray */
+  transition: var(--transition);
+  border-radius: 8px 8px 0 0;
 }
 
-.admin-dashboard .tab-button {
-color: var(--admin-text);
-}
+/* Removed specific override for admin dashboard tab buttons */
+/* .admin-dashboard .tab-button {
+  color: var(--admin-text);
+} */
 
 .tab-button:hover {
-color: var(--primary);
+  color: var(--primary); /* Changed from --primary */
 }
 
-.admin-dashboard .tab-button:hover {
-color: var(--accent);
-background: rgba(67, 97, 238, 0.1);
-}
+/* Removed specific override for admin dashboard tab button hover */
+/* .admin-dashboard .tab-button:hover {
+  color: var(--accent);
+  background: rgba(67, 97, 238, 0.1);
+} */
 
 .tab-button.active {
-border-bottom: 3px solid var(--primary);
-color: var(--primary);
+  border-bottom: 3px solid var(--primary);
+  color: var(--primary); /* Changed from --primary */
 }
 
-.admin-dashboard .tab-button.active {
-border-bottom-color: var(--accent);
-color: white;
-background: rgba(67, 97, 238, 0.2);
-}
+/* Removed specific override for admin dashboard active tab button */
+/* .admin-dashboard .tab-button.active {
+  border-bottom-color: var(--accent);
+  color: white;
+  background: rgba(67, 97, 238, 0.2);
+} */
 
 /* User Management */
 .users-section {
-display: none;
+  display: none;
 }
 
 .course-group {
-margin-bottom: 3rem;
+  margin-bottom: 3rem;
 }
 
 .course-title {
-font-size: 1.4rem;
-color: var(--secondary);
-margin-bottom: 1.5rem;
-padding-bottom: 0.75rem;
-border-bottom: 2px solid var(--light);
-font-weight: 700;
+  /* CHANGED: Matched user interface course title style */
+  font-size: 1.4rem;
+  color: var(--primary); /* Changed from --secondary */
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--light); /* Changed from --light */
+  font-weight: 700;
 }
 
-.admin-dashboard .course-title {
-color: var(--accent);
-border-bottom: 2px solid var(--admin-border);
-}
+/* Removed specific override for admin dashboard course title */
+/* .admin-dashboard .course-title {
+  color: var(--accent);
+  border-bottom: 2px solid var(--admin-border);
+} */
 
 .user-list {
-display: grid;
-grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-gap: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1rem;
 }
 
 .user-card {
-background: var(--light);
-border-radius: 12px;
-padding: 1.5rem;
-display: flex;
-justify-content: space-between;
-align-items: center;
-transition: var(--transition);
+  background: var(--light);
+  border-radius: 10px; /* Changed from 12px */
+  padding: 1.5rem; /* Changed from 1.5rem */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: var(--transition);
 }
 
-.admin-dashboard .user-card {
-background: var(--admin-bg);
-border: 1px solid var(--admin-border);
+/* Removed specific override for admin dashboard user cards */
+/* .admin-dashboard .user-card {
+  background: var(--admin-bg);
+  border: 1px solid var(--admin-border);
 }
 
 .admin-dashboard .user-card:hover {
-border-color: var(--primary);
-box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2);
-}
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2);
+} */
 
 .user-details {
-flex-grow: 1;
+  flex-grow: 1;
 }
 
 .user-name {
-font-weight: 600;
-margin-bottom: 0.5rem;
-font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
 }
 
-.admin-dashboard .user-name {
-color: white;
-}
+/* Removed specific override for admin dashboard user name */
+/* .admin-dashboard .user-name {
+  color: white;
+} */
 
 .user-rank {
-font-size: 0.9rem;
-color: var(--gray);
-margin-bottom: 0.25rem;
+  font-size: 0.9rem;
+  color: var(--gray); /* Changed from --gray */
+  margin-bottom: 0.25rem;
 }
 
-.admin-dashboard .user-rank {
-color: var(--admin-text);
-}
+/* Removed specific override for admin dashboard user rank */
+/* .admin-dashboard .user-rank {
+  color: var(--admin-text);
+} */
 
 .user-course {
-font-size: 0.9rem;
-color: var(--primary);
+  font-size: 0.9rem;
+  color: var(--primary); /* Changed from --primary */
 }
 
-.admin-dashboard .user-course {
-color: var(--accent);
-}
+/* Removed specific override for admin dashboard user course */
+/* .admin-dashboard .user-course {
+  color: var(--accent);
+} */
 
 .user-email {
-font-size: 0.85rem;
-color: var(--gray);
-margin-top: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--gray); /* Changed from --gray */
+  margin-top: 0.25rem;
 }
 
 .edit-user-modal {
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-background: rgba(0,0,0,0.7);
-display: flex;
-justify-content: center;
-align-items: center;
-z-index: 3000;
-display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+  display: none;
 }
 
 .edit-user-box {
-background: white;
-padding: 2rem;
-border-radius: 10px;
-box-shadow: var(--shadow);
-width: 100%;
-max-width: 500px;
-text-align: center;
-position: relative;
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+  position: relative;
 }
 
 .edit-user-box h3 {
-margin-bottom: 1.5rem;
-color: var(--primary);
+  margin-bottom: 1.5rem;
+  color: var(--primary); /* Changed from --primary */
 }
 
 /* Settings */
 .signup-settings-section {
-display: none;
+  display: none;
 }
 
 .settings-controls {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
 }
 
 .settings-column {
-background: var(--light);
-padding: 2rem;
-border-radius: 12px;
+  background: var(--light); /* Changed from --light */
+  padding: 2rem; /* Changed from 2rem */
+  border-radius: 10px; /* Changed from 12px */
 }
 
-.admin-dashboard .settings-column {
-background: var(--admin-bg);
-border: 1px solid var(--admin-border);
-}
+/* Removed specific override for admin dashboard settings columns */
+/* .admin-dashboard .settings-column {
+  background: var(--admin-bg);
+  border: 1px solid var(--admin-border);
+} */
 
 .setting-title {
-font-size: 1.3rem;
-margin-bottom: 1.5rem;
-color: var(--primary);
-font-weight: 700;
-display: flex;
-align-items: center;
-gap: 0.5rem;
+  /* CHANGED: Matched user interface setting title style */
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  color: var(--primary); /* Changed from --primary */
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.admin-dashboard .setting-title {
-color: white;
+/* Removed specific override for admin dashboard setting title */
+/* .admin-dashboard .setting-title {
+  color: white;
 }
 
 .admin-dashboard .setting-title::before {
-content: '';
-width: 4px;
-height: 24px;
-background: var(--accent);
-border-radius: 2px;
-}
+  content: '';
+  width: 4px;
+  height: 24px;
+  background: var(--accent);
+  border-radius: 2px;
+} */
 
 .setting-item {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 0.75rem;
-padding: 1rem;
-border-bottom: 1px solid rgba(0,0,0,0.1);
-border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding: 1rem;
+  border-bottom: 1px solid rgba(0,0,0,0.1); /* Changed from rgba(0,0,0,0.1) */
+  border-radius: 8px; /* Added border radius */
+  background: white; /* Added background */
 }
 
-.admin-dashboard .setting-item {
-background: rgba(67, 97, 238, 0.05);
-border-bottom: 1px solid var(--admin-border);
-color: white;
-}
+/* Removed specific override for admin dashboard setting items */
+/* .admin-dashboard .setting-item {
+  background: rgba(67, 97, 238, 0.05);
+  border-bottom: 1px solid var(--admin-border);
+  color: white;
+} */
 
 .setting-actions {
-display: flex;
-gap: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
 }
 
 .add-item-input {
-display: flex;
-margin-top: 1.5rem;
-gap: 0.5rem;
+  display: flex;
+  margin-top: 1.5rem;
+  gap: 0.5rem;
 }
 
 .add-item-input input {
-flex: 1;
-padding: 0.75rem;
-border: 1px solid #ddd;
-border-radius: 8px;
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #ddd; /* Changed from #ddd */
+  border-radius: 8px; /* Changed from 8px */
+  background: white; /* Added background */
+  color: var(--dark); /* Added color */
 }
 
-.admin-dashboard .add-item-input input {
-background: var(--admin-bg);
-color: white;
-border: 1px solid var(--admin-border);
-}
+/* Removed specific override for admin dashboard add item input */
+/* .admin-dashboard .add-item-input input {
+  background: var(--admin-bg);
+  color: white;
+  border: 1px solid var(--admin-border);
+} */
 
 .add-item-input button {
-background: var(--success);
-color: white;
-border: none;
-padding: 0.75rem 1.5rem;
-border-radius: 8px;
-cursor: pointer;
-font-weight: 600;
-transition: var(--transition);
+  background: var(--success);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px; /* Changed from 8px */
+  cursor: pointer;
+  font-weight: 600;
+  transition: var(--transition);
 }
 
-.admin-dashboard .add-item-input button {
-background: linear-gradient(135deg, var(--success), #22c55e);
-box-shadow: 0 2px 8px rgba(74, 222, 128, 0.3);
+/* Removed specific override for admin dashboard add item button */
+/* .admin-dashboard .add-item-input button {
+  background: linear-gradient(135deg, var(--success), #22c55e);
+  box-shadow: 0 2px 8px rgba(74, 222, 128, 0.3);
 }
 
 .admin-dashboard .add-item-input button:hover {
-transform: translateY(-2px);
-box-shadow: 0 4px 12px rgba(74, 222, 128, 0.4);
-}
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 222, 128, 0.4);
+} */
 
 .operation-message {
-margin-top: 1rem;
-padding: 0.75rem;
-border-radius: 8px;
-text-align: center;
-font-weight: 600;
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 600;
 }
 
-.admin-dashboard .operation-message {
-color: white;
-}
+/* Removed specific override for admin dashboard operation message */
+/* .admin-dashboard .operation-message {
+  color: white;
+} */
 
 /* Primary Buttons */
 #skills-section .btn,
 #users-section .btn,
 #settings-section .btn {
-background: var(--success);
-color: white;
-border: none;
-border-radius: 8px;
-padding: 0.75rem 1.5rem;
-font-weight: 600;
-cursor: pointer;
-transition: var(--transition);
+  background: var(--success); /* Changed from --success */
+  color: white;
+  border: none;
+  border-radius: 5px; /* Changed from 8px */
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
 }
 
-.admin-dashboard #skills-section .btn,
+/* Removed specific override for admin dashboard buttons */
+/* .admin-dashboard #skills-section .btn,
 .admin-dashboard #users-section .btn,
 .admin-dashboard #settings-section .btn {
-background: linear-gradient(135deg, var(--success), #22c55e);
-box-shadow: 0 2px 8px rgba(74, 222, 128, 0.3);
+  background: linear-gradient(135deg, var(--success), #22c55e);
+  box-shadow: 0 2px 8px rgba(74, 222, 128, 0.3);
 }
 
 .admin-dashboard #skills-section .btn:hover,
 .admin-dashboard #users-section .btn:hover,
 .admin-dashboard #settings-section .btn:hover {
-transform: translateY(-2px);
-box-shadow: 0 4px 12px rgba(74, 222, 128, 0.4);
-}
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 222, 128, 0.4);
+} */
 
-/* Dashboard Stats */
+/* Dashboard Stats - Updated to match user interface theme */
 .admin-dashboard #dashboard-section p {
-color: var(--admin-text);
+  color: var(--dark); /* Changed from --admin-text */
 }
 
 /* USER INTERFACE (Unchanged) */
 .user-interface {
-display: none;
-padding: 2rem 0;
+  display: none;
+  padding: 2rem 0;
 }
 
 header {
-background: linear-gradient(135deg, var(--primary), var(--secondary));
-color: white;
-padding: 2rem 0;
-text-align: center;
-margin-bottom: 2rem;
-position: relative;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  padding: 2rem 0;
+  text-align: center;
+  margin-bottom: 2rem;
+  position: relative;
 }
 
 header h1 {
-font-size: 2.5rem;
-margin-bottom: 0.5rem;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
 }
 
 header p {
-font-size: 1.1rem;
-opacity: 0.9;
+  font-size: 1.1rem;
+  opacity: 0.9;
 }
 
 .profile-btn {
-position: absolute;
-top: 20px;
-right: 120px;
-background: rgba(0,0,0,0.3);
-color: white;
-border: none;
-padding: 0.75rem 1.5rem;
-border-radius: 5px;
-cursor: pointer;
-font-weight: 600;
-transition: var(--transition);
+  position: absolute;
+  top: 20px;
+  right: 120px;
+  background: rgba(0,0,0,0.3);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: var(--transition);
 }
 
 .profile-btn:hover {
-background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.5);
 }
 
 .admin-switch {
-position: absolute;
-top: 20px;
-right: 20px;
-z-index: 100;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 100;
 }
 
 .admin-switch-btn {
-background: rgba(0,0,0,0.3);
-color: white;
-border: none;
-padding: 0.75rem 1.5rem;
-border-radius: 5px;
-cursor: pointer;
-font-weight: 600;
-transition: var(--transition);
+  background: rgba(0,0,0,0.3);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: var(--transition);
 }
 
 .admin-switch-btn:hover {
-background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.5);
 }
 
 .profile-popup {
-position: fixed;
-top: 70px;
-right: 20px;
-width: 300px;
-background: white;
-border-radius: 10px;
-box-shadow: var(--shadow);
-z-index: 1000;
-display: none;
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  width: 300px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  z-index: 1000;
+  display: none;
 }
 
 .profile-header {
-display: flex;
-align-items: center;
-padding: 1rem;
-border-bottom: 1px solid var(--light);
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid var(--light);
 }
 
 .profile-header i {
-font-size: 1.5rem;
-margin-right: 0.5rem;
-color: var(--primary);
+  font-size: 1.5rem;
+  margin-right: 0.5rem;
+  color: var(--primary);
 }
 
 .profile-header h3 {
-font-size: 1.2rem;
-margin: 0;
+  font-size: 1.2rem;
+  margin: 0;
 }
 
 .profile-content {
-padding: 1rem;
+  padding: 1rem;
 }
 
 .profile-info {
-margin-bottom: 1rem;
+  margin-bottom: 1rem;
 }
 
 .info-item {
-margin-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .info-label {
-font-weight: 600;
-color: var(--gray);
-font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--gray);
+  font-size: 0.9rem;
 }
 
 .info-value {
-font-size: 1rem;
+  font-size: 1rem;
 }
 
 .change-rank-select {
-width: 100%;
-margin-bottom: 1rem;
-padding: 0.5rem;
-border: 1px solid #ddd;
-border-radius: 5px;
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
 }
 
 .skill-grid {
-display: grid;
-grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-gap: 1.5rem;
-margin-top: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
 }
 
 .skill-card-ui {
-background: white;
-border-radius: 10px;
-overflow: hidden;
-box-shadow: var(--shadow);
-transition: var(--transition);
-cursor: pointer;
-height: 100%;
-display: flex;
-flex-direction: column;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  cursor: pointer;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .skill-card-ui:hover {
-transform: translateY(-5px);
-box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 }
 
 .skill-icon {
-font-size: 3rem;
-height: 150px;
-display: flex;
-align-items: center;
-justify-content: center;
+  font-size: 3rem;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .skill-icon img {
-width: 100%;
-height: 100%;
-object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .skill-content {
-padding: 1.5rem;
-flex-grow: 1;
-display: flex;
-flex-direction: column;
+  padding: 1.5rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .skill-name {
-font-size: 1.5rem;
-margin-bottom: 0.75rem;
-color: var(--primary);
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: var(--primary);
 }
 
 .skill-desc {
-color: var(--gray);
-flex-grow: 1;
+  color: var(--gray);
+  flex-grow: 1;
 }
 
 .skill-btn {
-background: var(--primary);
-color: white;
-border: none;
-padding: 0.75rem;
-border-radius: 5px;
-cursor: pointer;
-font-weight: 600;
-margin-top: 1rem;
-transition: var(--transition);
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 1rem;
+  transition: var(--transition);
 }
 
 .skill-btn:hover {
-background: var(--secondary);
+  background: var(--secondary);
 }
 
 .skill-detail {
-background: white;
-border-radius: 10px;
-padding: 2rem;
-box-shadow: var(--shadow);
-margin-top: 1.5rem;
-display: none;
+  background: white;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: var(--shadow);
+  margin-top: 1.5rem;
+  display: none;
 }
 
 .skill-header {
-display: flex;
-align-items: center;
-margin-bottom: 2rem;
-padding-bottom: 1rem;
-border-bottom: 2px solid var(--light);
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--light);
 }
 
 .skill-header img {
-width: 50px;
-height: 50px;
-margin-right: 1rem;
-object-fit: cover;
+  width: 50px;
+  height: 50px;
+  margin-right: 1rem;
+  object-fit: cover;
 }
 
 .skill-header h2 {
-font-size: 2rem;
-color: var(--dark);
+  font-size: 2rem;
+  color: var(--dark);
 }
 
 .skill-section {
-margin-bottom: 2.5rem;
+  margin-bottom: 2.5rem;
 }
 
 .section-title-ui {
-font-size: 1.5rem;
-color: var(--primary);
-margin-bottom: 1rem;
-padding-bottom: 0.5rem;
-border-bottom: 1px solid var(--light);
+  font-size: 1.5rem;
+  color: var(--primary);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--light);
 }
 
 .tools-grid {
-display: grid;
-grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-gap: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
 }
 
 .tool-item {
-background: var(--light);
-border-radius: 8px;
-padding: 1rem;
-text-align: center;
-transition: var(--transition);
+  background: var(--light);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  transition: var(--transition);
 }
 
 .tool-item:hover {
-background: var(--primary);
-color: white;
+  background: var(--primary);
+  color: white;
 }
 
 .tool-item img {
-width: 50px;
-height: 50px;
-object-fit: cover;
-margin-bottom: 0.5rem;
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  margin-bottom: 0.5rem;
 }
 
 .tool-item:hover img {
-opacity: 0.8;
+  opacity: 0.8;
 }
 
 .tool-item span {
-display: block;
+  display: block;
 }
 
 .steps-container {
-display: flex;
-flex-direction: column;
-gap: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .step-card {
-display: flex;
-gap: 1.5rem;
-background: var(--light);
-border-radius: 8px;
-overflow: hidden;
+  display: flex;
+  gap: 1.5rem;
+  background: var(--light);
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .step-image {
-width: 200px;
-height: 150px;
-object-fit: cover;
+  width: 200px;
+  height: 150px; /* Changed from 150px */
+  object-fit: cover;
 }
 
 .step-content {
-padding: 1.2rem;
-flex-grow: 1;
+  padding: 1.2rem;
+  flex-grow: 1;
 }
 
 .step-title {
-font-size: 1.2rem;
-margin-bottom: 0.5rem;
-color: var(--primary);
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: var(--primary);
 }
 
 .theory-content {
-background: var(--light);
-padding: 1.5rem;
-border-radius: 8px;
-line-height: 1.8;
+  background: var(--light);
+  padding: 1.5rem;
+  border-radius: 8px;
+  line-height: 1.8;
 }
 
 .quiz-container {
-background: var(--light);
-padding: 1.5rem;
-border-radius: 8px;
+  background: var(--light);
+  padding: 1.5rem;
+  border-radius: 8px;
 }
 
 .question {
-margin-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .question-text {
-font-weight: 600;
-margin-bottom: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
 }
 
 .options {
-display: flex;
-flex-direction: column;
-gap: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .option {
-display: flex;
-align-items: center;
-padding: 0.75rem;
-background: white;
-border-radius: 5px;
-cursor: pointer;
-transition: var(--transition);
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: var(--transition);
 }
 
 .option:hover {
-background: #e9ecef;
+  background: #e9ecef;
 }
 
 .option.selected {
-background: var(--primary);
-color: white;
+  background: var(--primary);
+  color: white;
 }
 
 .quiz-result {
-margin-top: 1.5rem;
-padding: 1rem;
-border-radius: 5px;
-text-align: center;
-font-weight: 600;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: 5px;
+  text-align: center;
+  font-weight: 600;
 }
 
 .quiz-result.correct {
-background: var(--success);
-color: white;
+  background: var(--success);
+  color: white;
 }
 
 .quiz-result.incorrect {
-background: var(--danger);
-color: white;
+  background: var(--danger);
+  color: white;
 }
 
 .quiz-nav {
-display: flex;
-justify-content: space-between;
-margin-top: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.5rem;
 }
 
 .back-btn {
-background: var(--gray);
-color: white;
-border: none;
-padding: 0.75rem 1.5rem;
-border-radius: 5px;
-cursor: pointer;
-font-weight: 600;
+  background: var(--gray);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
 }
 
 footer {
-background: var(--dark);
-color: white;
-text-align: center;
-padding: 1.5rem 0;
-margin-top: 3rem;
+  background: var(--dark);
+  color: white;
+  text-align: center;
+  padding: 1.5rem 0;
+  margin-top: 3rem;
 }
 
 .login-popup.confirmation-modal {
-z-index: 3001;
+  z-index: 3001;
 }
 
 /* Responsive */
 @media (max-width: 992px) {
-.admin-content {
-grid-template-columns: 1fr;
-}
-.nav-panel {
-margin-bottom: 2rem;
-position: static;
-}
-.settings-controls {
-grid-template-columns: 1fr;
-}
-.settings-tabs {
-flex-wrap: wrap;
-}
-.tab-button {
-padding: 0.5rem;
-}
+  .admin-content {
+    grid-template-columns: 1fr;
+  }
+  .nav-panel {
+    margin-bottom: 2rem;
+    position: static;
+  }
+  .settings-controls {
+    grid-template-columns: 1fr;
+  }
+  .settings-tabs {
+    flex-wrap: wrap;
+  }
+  .tab-button {
+    padding: 0.5rem;
+  }
 }
 
 @media (max-width: 768px) {
-.step-card {
-flex-direction: column;
-}
-.step-image {
-width: 100%;
-height: 200px;
-}
-.skill-header {
-flex-direction: column;
-text-align: center;
-}
-.skill-header img {
-margin-right: 0;
-margin-bottom: 1rem;
-}
-.form-row {
-grid-template-columns: 1fr;
-}
-.profile-btn, .admin-switch {
-position: static;
-text-align: center;
-margin-top: 1rem;
-}
-.profile-btn {
-margin-right: 1rem;
-}
-.profile-popup {
-position: absolute;
-top: 50px;
-right: 10px;
-}
+  .step-card {
+    flex-direction: column;
+  }
+  .step-image {
+    width: 100%;
+    height: 200px;
+  }
+  .skill-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  .skill-header img {
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  .profile-btn, .admin-switch {
+    position: static;
+    text-align: center;
+    margin-top: 1rem;
+  }
+  .profile-btn {
+    margin-right: 1rem;
+  }
+  .profile-popup {
+    position: absolute;
+    top: 50px;
+    right: 10px;
+  }
 }
 </style>
