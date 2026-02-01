@@ -30,9 +30,13 @@
             <label for="password">Password</label>
             <input type="password" id="password" required>
           </div>
-          <button class="btn" onclick="login()">Login</button>
-          <button class="btn" onclick="showForgotPassword()">Forgot Password?</button>
-          <button class="btn" onclick="showSignupForm()">Sign Up</button>
+          <button class="btn primary-btn" onclick="login()">Login</button> <!-- Added class -->
+          <button class="btn secondary-btn" onclick="showForgotPassword()">Forgot Password?</button> <!-- Added class -->
+          <button class="btn secondary-btn" onclick="showSignupForm()">Sign Up</button> <!-- Added class -->
+          <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid #eee;"> <!-- Visual separator -->
+          <button class="btn google-btn" onclick="googleLogin()"> <!-- Added class -->
+            <i class="fab fa-google"></i> Sign in with Google
+          </button>
         </div>
         <div id="signupForm" style="display: none;">
           <div class="form-group">
@@ -47,16 +51,16 @@
             <label for="signup-confirm-password">Confirm Password</label>
             <input type="password" id="signup-confirm-password" required>
           </div>
-          <button class="btn" onclick="signup()">Sign Up</button>
-          <button class="btn" onclick="showLoginForm()">Back to Login</button>
+          <button class="btn primary-btn" onclick="signup()">Sign Up</button> <!-- Added class -->
+          <button class="btn secondary-btn" onclick="showLoginForm()">Back to Login</button> <!-- Added class -->
         </div>
         <div id="forgotPasswordForm" style="display: none;">
           <div class="form-group">
             <label for="forgot-email">Enter your Email</label>
             <input type="email" id="forgot-email" required>
           </div>
-          <button class="btn" onclick="sendPasswordReset()">Send Reset Email</button>
-          <button class="btn" onclick="showLoginForm()">Back to Login</button>
+          <button class="btn primary-btn" onclick="sendPasswordReset()">Send Reset Email</button> <!-- Added class -->
+          <button class="btn secondary-btn" onclick="showLoginForm()">Back to Login</button> <!-- Added class -->
         </div>
         <div id="profileForm" style="display: none;">
           <h3>Complete Your Profile</h3>
@@ -72,7 +76,7 @@
             <label for="profile-name">Full Name</label>
             <input type="text" id="profile-name" placeholder="Enter your full name">
           </div>
-          <button class="btn" onclick="completeProfile()">Save Profile</button>
+          <button class="btn primary-btn" onclick="completeProfile()">Save Profile</button> <!-- Added class -->
         </div>
         <div class="error-message" id="auth-error"></div>
       </div>
@@ -178,6 +182,7 @@
               <!-- Admin list will be loaded here -->
             </div>
           </div>
+
         </div>
 
         <!-- Edit Skill Form -->
@@ -262,7 +267,7 @@
           <!-- Populated dynamically -->
         </select>
       </div>
-      <button class="btn" onclick="saveEditedUser()">Save Changes</button>
+      <button class="btn primary-btn" onclick="saveEditedUser()">Save Changes</button> <!-- Added class -->
     </div>
   </div>
 
@@ -322,7 +327,8 @@
     let editingSkillId = null; // Track the ID of the skill being edited
     let wasInAdminView = false; // Track previous view state
     let firestoreListenersSetup = false; // Guard to prevent duplicate listeners
-    let usersData = []; 
+    // Define a global variable to hold users data fetched in loadUsersManagement
+    let usersData = [];
 
     // Function to update dashboard counters
     function updateCounters() {
@@ -546,7 +552,7 @@
               showProfileCompletion();
             }
           }).catch(error => {
-            console.error("Error fetching user data: ", error);
+            console.error("Error fetching user  ", error);
             document.getElementById('auth-error').textContent = 'Error logging in.';
           });
         })
@@ -610,7 +616,7 @@
           alert("User data error. Please contact support.");
         }
       } catch (error) {
-        console.error("Error loading user data: ", error);
+        console.error("Error loading user  ", error);
       }
     }
 
@@ -1257,86 +1263,85 @@
 
     // --- USERS MANAGEMENT (ADMIN) ---
     async function loadUsersManagement() {
-  try {
-    const usersSnapshot = await db.collection("users").get();
-    usersData = []; // Reset the global array
-    usersSnapshot.forEach(doc => {
-      usersData.push({ id: doc.id, ...doc.data() });
-    });
+      try {
+        const usersSnapshot = await db.collection("users").get();
+        usersData = []; // Reset the global array
+        usersSnapshot.forEach(doc => {
+          usersData.push({ id: doc.id, ...doc.data() });
+        });
 
-    // Group users by course
-    const groupedUsers = {};
-    usersData.forEach(user => { // Use the global usersData array
-      if (!groupedUsers[user.course]) {
-        groupedUsers[user.course] = [];
+        // Group users by course
+        const groupedUsers = {};
+        usersData.forEach(user => {
+          if (!groupedUsers[user.course]) {
+            groupedUsers[user.course] = [];
+          }
+          groupedUsers[user.course].push(user);
+        });
+
+        const usersContent = document.getElementById('usersContent');
+        usersContent.innerHTML = '';
+
+        // Sort courses alphabetically
+        const sortedCourses = Object.keys(groupedUsers).sort();
+
+        sortedCourses.forEach(course => {
+          const courseGroup = document.createElement('div');
+          courseGroup.className = 'course-group';
+          courseGroup.innerHTML = `<h3 class="course-title">${course}</h3>`;
+          const userList = document.createElement('div');
+          userList.className = 'user-list';
+
+          // Sort users within each course by name
+          groupedUsers[course].sort((a, b) => a.name.localeCompare(b.name)).forEach(user => {
+            const userCard = document.createElement('div');
+            userCard.className = 'user-card';
+            userCard.innerHTML = `
+              <div class="user-details">
+                <div class="user-name">${user.name || user.email}</div>
+                <div class="user-rank">${user.rank}</div>
+                <div class="user-course">${user.course}</div>
+                <div class="user-email">${user.email}</div>
+              </div>
+              <div>
+                <button class="edit-user-btn" onclick="openEditUserModal('${user.id}')">Edit</button>
+                <button class="action-btn delete-btn" onclick="deleteUser('${user.id}', '${user.name || user.email}')">Delete</button>
+              </div>
+            `;
+            userList.appendChild(userCard);
+          });
+
+          courseGroup.appendChild(userList);
+          usersContent.appendChild(courseGroup);
+        });
+
+      } catch (error) {
+        console.error("Error loading users: ", error);
       }
-      groupedUsers[user.course].push(user);
-    });
+    }
 
-    const usersContent = document.getElementById('usersContent');
-    usersContent.innerHTML = '';
-
-    // Sort courses alphabetically
-    const sortedCourses = Object.keys(groupedUsers).sort();
-
-    sortedCourses.forEach(course => {
-      const courseGroup = document.createElement('div');
-      courseGroup.className = 'course-group';
-      courseGroup.innerHTML = `<h3 class="course-title">${course}</h3>`;
-      const userList = document.createElement('div');
-      userList.className = 'user-list';
-
-      // Sort users within each course by name
-      groupedUsers[course].sort((a, b) => a.name.localeCompare(b.name)).forEach(user => {
-        const userCard = document.createElement('div');
-        userCard.className = 'user-card';
-        userCard.innerHTML = `
-          <div class="user-details">
-            <div class="user-name">${user.name || user.email}</div>
-            <div class="user-rank">${user.rank}</div>
-            <div class="user-course">${user.course}</div>
-            <div class="user-email">${user.email}</div>
-          </div>
-          <div>
-            <button class="edit-user-btn" onclick="openEditUserModal('${user.id}')">Edit</button>
-            <button class="action-btn delete-btn" onclick="deleteUser('${user.id}', '${user.name || user.email}')">Delete</button>
-          </div>
-        `;
-        userList.appendChild(userCard);
-      });
-
-      courseGroup.appendChild(userList);
-      usersContent.appendChild(courseGroup);
-    });
-
-  } catch (error) {
-    console.error("Error loading users: ", error);
-  }
-}
-
-function openEditUserModal(userId) {
-  // Add a check for userId validity
-  if (!userId) {
-      console.error("Invalid user ID provided to openEditUserModal:", userId);
-      alert("Cannot edit user: Invalid user ID.");
-      return;
-  }
-  // Find user by the passed ID, not relying on potentially stale usersData lookup
-  // Although usersData should be fresh if loadUsersManagement ran recently
-  const user = usersData.find(u => u.id === userId);
-  if (!user) {
-      console.error("User not found for editing:", userId);
-      alert("User not found.");
-      return; // Exit if user not found
-  }
-  document.getElementById('edit-user-name').value = user.name;
-  document.getElementById('edit-user-rank').value = user.rank;
-  document.getElementById('edit-user-course').value = user.course;
-  document.getElementById('editUserModal').style.display = 'flex';
-  // Store the ID of the user being edited
-  document.getElementById('editUserModal').setAttribute('data-editing-id', userId);
-}
-
+    function openEditUserModal(userId) {
+      // Add a check for userId validity
+      if (!userId) {
+          console.error("Invalid user ID provided to openEditUserModal:", userId);
+          alert("Cannot edit user: Invalid user ID.");
+          return;
+      }
+      // Find user by the passed ID, not relying on potentially stale usersData lookup
+      // Although usersData should be fresh if loadUsersManagement ran recently
+      const user = usersData.find(u => u.id === userId);
+      if (!user) {
+          console.error("User not found for editing:", userId);
+          alert("User not found.");
+          return; // Exit if user not found
+      }
+      document.getElementById('edit-user-name').value = user.name;
+      document.getElementById('edit-user-rank').value = user.rank;
+      document.getElementById('edit-user-course').value = user.course;
+      document.getElementById('editUserModal').style.display = 'flex';
+      // Store the ID of the user being edited
+      document.getElementById('editUserModal').setAttribute('data-editing-id', userId);
+    }
 
     function closeEditUserModal() {
       document.getElementById('editUserModal').style.display = 'none';
@@ -1373,38 +1378,32 @@ function openEditUserModal(userId) {
     }
 
     // Delete User (Admin) - NEW FUNCTION ADDED
-async function deleteUser(userId, userName) {
-    // Add validation for userId here too
-    if (!userId) {
-        console.error("Invalid user ID provided to deleteUser:", userId);
-        alert("Cannot delete user: Invalid user ID.");
-        return;
-    }
-    if (!confirm(`Are you sure you want to delete the user "${userName}"? This action cannot be undone.`)) {
-        return;
-    }
-    try {
-        // First, attempt to remove the user from the admins collection if they are an admin
-        await db.collection("admins").doc(userId).delete().catch(error => {
-            // It's okay if the user wasn't an admin, just log the specific error
-            if (error.code !== 'not-found') {
-                console.error("Error removing user from admins during deletion: ", error);
-            }
-        });
-
-        // Then, delete the user document from the users collection
-        await db.collection("users").doc(userId).delete(); // userId is now validated
-
-        alert(`User "${userName}" has been deleted successfully.`);
-        // Optionally, refresh the user list to reflect the deletion
-        if (document.getElementById('users-section').style.display === 'block') {
-            loadUsersManagement(); // Reload the user list if currently viewing
+    async function deleteUser(userId, userName) {
+        if (!confirm(`Are you sure you want to delete the user "${userName}"? This action cannot be undone.`)) {
+            return;
         }
-    } catch (error) {
-        console.error("Error deleting user: ", error);
-        alert('Error deleting user: ' + error.message);
+        try {
+            // First, attempt to remove the user from the admins collection if they are an admin
+            await db.collection("admins").doc(userId).delete().catch(error => {
+                // It's okay if the user wasn't an admin, just log the specific error
+                if (error.code !== 'not-found') {
+                    console.error("Error removing user from admins during deletion: ", error);
+                }
+            });
+
+            // Then, delete the user document from the users collection
+            await db.collection("users").doc(userId).delete();
+
+            alert(`User "${userName}" has been deleted successfully.`);
+            // Optionally, refresh the user list to reflect the deletion
+            if (document.getElementById('users-section').style.display === 'block') {
+                loadUsersManagement(); // Reload the user list if currently viewing
+            }
+        } catch (error) {
+            console.error("Error deleting user: ", error);
+            alert('Error deleting user: ' + error.message);
+        }
     }
-}
 
 
     // --- SETTINGS (ADMIN) ---
@@ -1806,7 +1805,7 @@ async function deleteUser(userId, userName) {
       html += `<button class="back-btn" onclick="goBackToGrid()">← Back to Skills</button>`;
 
       document.getElementById('skill-detail').innerHTML = html;
-      document.getElementById('skill-grid').style.display = 'none';
+      document.getElementById('skill-grid').style.display = 'grid';
       document.getElementById('skill-detail').style.display = 'block';
 
       // Add event listeners for quiz options
@@ -1967,7 +1966,7 @@ async function deleteUser(userId, userName) {
           loadAdminList(); // Load admin list when the tab becomes active
         }
       });
-    });
+    })
 
 
     // --- INITIALIZE DROPDOWNS ON LOAD (After Firestore listeners populate ranksData/coursesData) ---
@@ -1982,4 +1981,3 @@ async function deleteUser(userId, userName) {
   </script>
 </body>
 </html>
-
