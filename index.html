@@ -175,12 +175,13 @@
 </div>
 </div>
 <!-- End of Grant Admin Success Notification Modal -->
-<!-- Admin Dashboard -->
+<!-- Admin Dashboard - COMPLETE STRUCTURE -->
 <div class="admin-dashboard" id="adminDashboard">
-<div class="container">
 <div class="admin-header">
-<h1><i class="fas fa-tools"></i> Hand Skills Learning Platform - Admin Panel</h1>
-<button class="logout-btn" onclick="logout()">Logout</button>
+<div class="container">
+<h1><i class="fas fa-cogs"></i> Admin Control Panel</h1>
+<button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+</div>
 </div>
 <div class="admin-content">
 <div class="nav-panel">
@@ -196,23 +197,25 @@
 <h2 class="section-title">Dashboard Overview</h2>
 <p>Welcome to the Hand Skills Learning Platform Admin Panel. From here you can manage skills, content, and user access.</p>
 <div style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
-<div style="background: var(--light); padding: 1.5rem; border-radius: 8px; text-align: center;">
-<i class="fas fa-tools" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem;"></i>
-<h3 id="total-skills">0</h3>
-<p>Total skills in the system</p>
+<div style="background: linear-gradient(135deg, var(--admin-bg), var(--admin-sidebar)); padding: 2rem; border-radius: 16px; text-align: center; border: 1px solid var(--admin-border); box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+<i class="fas fa-tools" style="font-size: 3rem; color: var(--accent); margin-bottom: 1rem; display: block;"></i>
+<h3 id="total-skills" style="font-size: 2.5rem; color: white; margin-bottom: 0.5rem; font-weight: 700;">0</h3>
+<p style="color: var(--admin-text); font-size: 1rem;">Total Skills</p>
 </div>
 </div>
 </div>
+
 <!-- Skills Management Section -->
 <div id="skills-section" class="section" style="display: none;">
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-<h2 class="section-title">Manage Skills</h2>
-<button class="btn" onclick="addNewSkill()">Add New Skill</button>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+<h2 class="section-title" style="margin: 0;">Manage Skills</h2>
+<button class="btn" onclick="addNewSkill()"><i class="fas fa-plus-circle"></i> Add New Skill</button>
 </div>
 <div class="skill-list" id="skillsList">
 <!-- Skills will be loaded here -->
 </div>
 </div>
+
 <!-- Users Management Section -->
 <div id="users-section" class="section users-section">
 <h2 class="section-title">Manage Users</h2>
@@ -220,6 +223,7 @@
 <!-- User groups will be loaded here -->
 </div>
 </div>
+
 <!-- Settings Section -->
 <div id="settings-section" class="section" style="display: none;">
 <h2 class="section-title">System Settings</h2>
@@ -236,7 +240,7 @@
 </div>
 <div class="add-item-input">
 <input type="text" id="newRankInput" placeholder="New rank name">
-<button onclick="addRank()">Add Rank</button>
+<button onclick="addRank()"><i class="fas fa-plus"></i> Add Rank</button>
 </div>
 <div class="operation-message" id="rankMessage"></div>
 </div>
@@ -247,7 +251,7 @@
 </div>
 <div class="add-item-input">
 <input type="text" id="newCourseInput" placeholder="New course name">
-<button onclick="addCourse()">Add Course</button>
+<button onclick="addCourse()"><i class="fas fa-plus"></i> Add Course</button>
 </div>
 <div class="operation-message" id="courseMessage"></div>
 </div>
@@ -260,92 +264,92 @@
 <label for="admin-email">Email Address</label>
 <input type="email" id="admin-email" placeholder="Enter email address">
 </div>
-<button class="btn" onclick="grantAdminAccess()">Grant Admin Access</button>
+<button class="btn" onclick="grantAdminAccess()"><i class="fas fa-user-shield"></i> Grant Admin Access</button>
 </div>
 <div id="adminList">
 <!-- Admin list will be loaded here -->
 </div>
 </div>
 </div>
-</div>
-<!-- Edit Skill Form - REDESIGNED -->
+
+<!-- Edit Skill Form -->
 <div id="edit-skill-form" class="edit-form">
-  <div class="section-title">Edit Skill</div>
+<div class="section-title">Edit Skill</div>
 
-  <!-- Tabs -->
-  <div class="tabs" style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid #e2e8f0;">
-    <button class="tab-btn active" data-tab="info">📌 Skill Info</button>
-    <button class="tab-btn" data-tab="tools">🛠️ Tools</button>
-    <button class="tab-btn" data-tab="steps">📋 Steps</button>
-    <button class="tab-btn" data-tab="quiz">❓ Quiz</button>
-    <button class="tab-btn" data-tab="theory">📖 Theory</button>
-  </div>
+<!-- Tabs -->
+<div class="tabs">
+<button class="tab-btn active" data-tab="info">📌 Skill Info</button>
+<button class="tab-btn" data-tab="tools">🛠️ Tools</button>
+<button class="tab-btn" data-tab="steps">📋 Steps</button>
+<button class="tab-btn" data-tab="quiz">❓ Quiz</button>
+<button class="tab-btn" data-tab="theory">📖 Theory</button>
+</div>
 
-  <!-- Tab Content -->
-  <div id="tab-info" class="tab-content active">
-    <div class="form-row">
-      <div class="form-col">
-        <label for="edit-skill-name">Skill Name *</label>
-        <input type="text" id="edit-skill-name" placeholder="e.g., Soldering Basics" required>
-      </div>
-      <div class="form-col">
-        <label for="edit-skill-image">Skill Image *</label>
-        <input type="file" id="edit-skill-image" accept="image/*" onchange="previewSkillImage(this)">
-        <div class="image-upload-preview" id="skill-image-preview">
-          <span style="color: #999; font-size: 0.9rem;">No file chosen</span>
-        </div>
-        <input type="hidden" id="edit-skill-image-url">
-      </div>
-    </div>
+<!-- Tab Content -->
+<div id="tab-info" class="tab-content active">
+<div class="form-row">
+<div class="form-col">
+<label for="edit-skill-name">Skill Name *</label>
+<input type="text" id="edit-skill-name" placeholder="e.g., Soldering Basics" required>
+</div>
+<div class="form-col">
+<label for="edit-skill-image">Skill Image *</label>
+<input type="file" id="edit-skill-image" accept="image/*" onchange="previewSkillImage(this)">
+<div class="image-upload-preview" id="skill-image-preview">
+<span style="color: #999; font-size: 0.9rem;">No file chosen</span>
+</div>
+<input type="hidden" id="edit-skill-image-url">
+</div>
+</div>
 
-    <div class="form-group">
-      <label for="edit-skill-description">Description *</label>
-      <textarea id="edit-skill-description" rows="3" placeholder="Brief overview of the skill..."></textarea>
-    </div>
-  </div>
+<div class="form-group">
+<label for="edit-skill-description">Description *</label>
+<textarea id="edit-skill-description" rows="3" placeholder="Brief overview of the skill..."></textarea>
+</div>
+</div>
 
-  <div id="tab-tools" class="tab-content">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-      <h3>🛠️ Tools Required</h3>
-      <button class="btn add-step-btn" onclick="addTool()">+ Add Tool</button>
-    </div>
-    <div id="tools-container">
-      <!-- Tools will be added here dynamically -->
-    </div>
-  </div>
+<div id="tab-tools" class="tab-content">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+<h3 style="color: white;">🛠️ Tools Required</h3>
+<button class="btn add-step-btn" onclick="addTool()">+ Add Tool</button>
+</div>
+<div id="tools-container">
+<!-- Tools will be added here dynamically -->
+</div>
+</div>
 
-  <div id="tab-steps" class="tab-content">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-      <h3>📋 Step-by-Step Guide</h3>
-      <button class="btn add-step-btn" onclick="addStep()">+ Add Step</button>
-    </div>
-    <div id="steps-container">
-      <!-- Steps will be added here dynamically -->
-    </div>
-  </div>
+<div id="tab-steps" class="tab-content">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+<h3 style="color: white;">📋 Step-by-Step Guide</h3>
+<button class="btn add-step-btn" onclick="addStep()">+ Add Step</button>
+</div>
+<div id="steps-container">
+<!-- Steps will be added here dynamically -->
+</div>
+</div>
 
-  <div id="tab-quiz" class="tab-content">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-      <h3>❓ Knowledge Check (Quiz)</h3>
-      <button class="btn add-quiz-btn" onclick="addQuizQuestion()">+ Add Question</button>
-    </div>
-    <div id="quiz-container">
-      <!-- Quiz questions will be added here dynamically -->
-    </div>
-  </div>
+<div id="tab-quiz" class="tab-content">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+<h3 style="color: white;">❓ Knowledge Check (Quiz)</h3>
+<button class="btn add-quiz-btn" onclick="addQuizQuestion()">+ Add Question</button>
+</div>
+<div id="quiz-container">
+<!-- Quiz questions will be added here dynamically -->
+</div>
+</div>
 
-  <div id="tab-theory" class="tab-content">
-    <div class="form-group">
-      <label for="edit-theory">Theory & Principles</label>
-      <textarea id="edit-theory" rows="6" placeholder="Explain key concepts, safety, best practices..."></textarea>
-    </div>
-  </div>
+<div id="tab-theory" class="tab-content">
+<div class="form-group">
+<label for="edit-theory">Theory & Principles</label>
+<textarea id="edit-theory" rows="6" placeholder="Explain key concepts, safety, best practices..."></textarea>
+</div>
+</div>
 
-  <!-- Action Buttons -->
-  <div class="form-actions" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #eee;">
-    <button class="btn btn-secondary" onclick="cancelEdit()">Cancel</button>
-    <button class="btn" onclick="saveSkill()">Save Changes</button>
-  </div>
+<!-- Action Buttons -->
+<div class="form-actions" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--admin-border); display: flex; gap: 1rem; justify-content: flex-end;">
+<button class="btn btn-secondary" onclick="cancelEdit()">Cancel</button>
+<button class="btn btn-primary" onclick="saveSkill()"><i class="fas fa-save"></i> Save Changes</button>
+</div>
 </div>
 </div>
 </div>
@@ -2260,4 +2264,5 @@ loadAdminList(); // Load admin list specifically when the Admin Access tab is cl
 </script>
 </body>
 </html>
+
 
