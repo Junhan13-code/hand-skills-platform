@@ -29,11 +29,6 @@ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 --danger: #f87171;
 --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 --transition: all 0.3s ease;
---admin-bg: #0f172a;
---admin-card: #1e293b;
---admin-sidebar: #1e293b;
---admin-text: #e2e8f0;
---admin-border: #334155;
 }
 body {
 background-color: #f5f7fb;
@@ -46,7 +41,6 @@ max-width: 1200px;
 margin: 0 auto;
 padding: 0 20px;
 }
-
 /* Login Popup */
 .login-popup {
 position: fixed;
@@ -102,8 +96,9 @@ border: 1px solid #ddd;
 border-radius: 5px;
 font-size: 1rem;
 }
+/* New styles for image upload previews */
 .image-upload-preview {
-width: 100px;
+width: 100px; /* Adjust size as needed */
 height: 100px;
 border: 1px dashed #ccc;
 display: flex;
@@ -117,473 +112,308 @@ width: 100%;
 height: 100%;
 object-fit: cover;
 }
-
-/* ========================================
-   REDESIGNED ADMIN DASHBOARD
-======================================== */
+/* Admin Dashboard */
 .admin-dashboard {
 display: none;
-min-height: 100vh;
-background: linear-gradient(135deg, var(--admin-bg) 0%, #1e3a5f 100%);
-padding: 0;
+padding: 2rem 0;
+background-color: #f0f4f8; /* Light background for admin panel */
 }
-
-/* Admin Header - Modern Top Bar */
 .admin-header {
-background: var(--admin-card);
-border-bottom: 1px solid var(--admin-border);
-padding: 1rem 2rem;
-position: sticky;
-top: 0;
-z-index: 100;
-box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-margin: 0;
-}
-
-.admin-header .container {
 display: flex;
 justify-content: space-between;
 align-items: center;
-max-width: 100%;
-}
-
-.admin-header h1 {
-color: white;
-font-size: 1.5rem;
-font-weight: 600;
-display: flex;
-align-items: center;
-gap: 0.75rem;
-margin: 0;
-}
-
-.admin-header h1 i {
-color: var(--accent);
-font-size: 1.75rem;
-}
-
-.logout-btn {
-background: linear-gradient(135deg, var(--danger), #dc2626);
-color: white;
-border: none;
-padding: 0.6rem 1.5rem;
-border-radius: 8px;
-cursor: pointer;
-font-weight: 600;
-transition: var(--transition);
-box-shadow: 0 2px 8px rgba(248, 113, 113, 0.3);
-}
-
-.logout-btn:hover {
-transform: translateY(-2px);
-box-shadow: 0 4px 12px rgba(248, 113, 113, 0.4);
-}
-
-/* Admin Content Layout */
-.admin-content {
-display: grid;
-grid-template-columns: 280px 1fr;
-gap: 2rem;
-padding: 2rem;
-max-width: 1600px;
-margin: 0 auto;
-}
-
-/* Navigation Panel - Sleek Sidebar */
-.nav-panel {
-background: var(--admin-card);
-border-radius: 16px;
-padding: 1.5rem;
-box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-height: fit-content;
-position: sticky;
-top: 100px;
-border: 1px solid var(--admin-border);
-}
-
-.nav-panel h3 {
-margin-bottom: 1.5rem;
-padding-bottom: 1rem;
-border-bottom: 2px solid var(--admin-border);
-color: white;
-font-size: 1rem;
-text-transform: uppercase;
-letter-spacing: 1px;
-font-weight: 700;
-}
-
-.nav-item {
-padding: 1rem 1.25rem;
-margin-bottom: 0.5rem;
-border-radius: 12px;
-cursor: pointer;
-transition: var(--transition);
-display: flex;
-align-items: center;
-font-weight: 500;
-color: var(--admin-text);
-background: transparent;
-border: 1px solid transparent;
-}
-
-.nav-item i {
-margin-right: 1rem;
-width: 24px;
-text-align: center;
-font-size: 1.1rem;
-color: var(--accent);
-}
-
-.nav-item:hover {
-background: rgba(67, 97, 238, 0.1);
-border-color: var(--primary);
-transform: translateX(5px);
-}
-
-.nav-item.active {
-background: linear-gradient(135deg, var(--primary), var(--secondary));
-color: white;
-box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
-}
-
-.nav-item.active i {
-color: white;
-}
-
-/* Main Content Area - Enhanced Cards */
-.main-content-area {
-background: var(--admin-card);
-border-radius: 16px;
-padding: 2.5rem;
-box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-border: 1px solid var(--admin-border);
-min-height: 600px;
-}
-
-.section-title {
-font-size: 1.75rem;
-color: white;
 margin-bottom: 2rem;
 padding-bottom: 1rem;
-border-bottom: 2px solid var(--admin-border);
-font-weight: 700;
-display: flex;
-align-items: center;
-gap: 0.75rem;
+border-bottom: 1px solid var(--light);
+background: white;
+border-radius: 10px;
+padding: 1rem 2rem;
+box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
-
-.section-title::before {
-content: '';
-width: 4px;
-height: 32px;
-background: linear-gradient(180deg, var(--primary), var(--accent));
-border-radius: 4px;
+.admin-header h1 {
+color: var(--primary);
+font-size: 1.8rem; /* Slightly larger font */
 }
-
-.skill-list {
+.logout-btn {
+background: var(--danger);
+color: white;
+border: none;
+padding: 0.5rem 1rem;
+border-radius: 5px;
+cursor: pointer;
+}
+.admin-content {
 display: grid;
-grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-gap: 1.5rem;
+grid-template-columns: 250px 1fr; /* Sidebar + Main Content */
+gap: 2rem;
 }
-
-.skill-card {
-border: 1px solid var(--admin-border);
-border-radius: 12px;
-padding: 0;
+/* Navigation Panel */
+.nav-panel {
+background: white;
+border-radius: 10px;
+padding: 1.5rem;
+box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+height: fit-content; /* Keeps it sticky */
+position: sticky;
+top: 2rem;
+}
+.nav-panel h3 {
+margin-bottom: 1.2rem;
+padding-bottom: 0.5rem;
+border-bottom: 1px solid #e2e8f0;
+color: var(--primary);
+font-size: 1.2rem;
+}
+.nav-item {
+padding: 0.8rem;
+margin-bottom: 0.5rem;
+border-radius: 8px; /* Rounded corners */
 cursor: pointer;
 transition: var(--transition);
-background: var(--admin-bg);
-overflow: hidden;
+display: flex;
+align-items: center; /* Align icon and text */
+font-weight: 500;
 }
-
-.skill-card:hover {
-border-color: var(--primary);
-transform: translateY(-5px);
-box-shadow: 0 8px 24px rgba(67, 97, 238, 0.3);
+.nav-item i {
+margin-right: 0.75rem; /* Space between icon and text */
+width: 20px; /* Fixed width for alignment */
+text-align: center;
 }
-
-.skill-card h4 {
-margin-bottom: 0.5rem;
+.nav-item:hover, .nav-item.active {
+background: var(--primary);
 color: white;
 }
-
+/* Main Content Area */
+.main-content-area {
+background: white;
+border-radius: 10px;
+padding: 2rem;
+box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+.section-title {
+font-size: 1.5rem;
+color: var(--primary);
+margin-bottom: 1.5rem;
+padding-bottom: 0.5rem;
+border-bottom: 1px solid var(--light);
+}
+.skill-list {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+gap: 1.5rem;
+}
+.skill-card {
+border: 1px solid var(--light);
+border-radius: 8px;
+padding: 1.2rem;
+cursor: pointer;
+transition: var(--transition);
+background: #f8fafc; /* Lighter background */
+}
+.skill-card:hover {
+border-color: var(--primary);
+transform: translateY(-3px);
+box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+.skill-card h4 {
+margin-bottom: 0.5rem;
+color: var(--primary);
+}
 .skill-actions {
 margin-top: 1rem;
 display: flex;
 gap: 0.5rem;
 }
-
-/* Buttons */
+/* CORRECTED SELECTORS: Define specific styles for buttons in different contexts */
+/* Buttons inside the Edit Skill Form */
 #edit-skill-form .btn,
-#edit-skill-form .action-btn {
-padding: 0.5rem 1rem;
-border-radius: 8px;
+#edit-skill-form .action-btn { /* Include action buttons inside steps/quiz editors */
+padding: 0.4rem 0.8rem;
+border-radius: 4px;
 border: none;
 cursor: pointer;
 font-size: 0.9rem;
-font-weight: 600;
-transition: var(--transition);
 }
-
+/* Specific background colors for edit form buttons (can be inline) */
 #edit-skill-form .btn.add-step-btn,
 #edit-skill-form .btn.add-quiz-btn {
-background: linear-gradient(135deg, var(--success), #22c55e);
+background: var(--success);
 color: white;
-box-shadow: 0 2px 8px rgba(74, 222, 128, 0.3);
 }
-
-#edit-skill-form .btn.add-step-btn:hover,
-#edit-skill-form .btn.add-quiz-btn:hover {
-transform: translateY(-2px);
-box-shadow: 0 4px 12px rgba(74, 222, 128, 0.4);
-}
-
 #edit-skill-form .btn.btn-secondary {
 background: var(--gray);
 color: white;
 }
-
-#edit-skill-form .btn.btn-secondary:hover {
-background: #5a6268;
-}
-
 #edit-skill-form .btn.btn-primary {
-background: linear-gradient(135deg, var(--primary), var(--secondary));
+background: var(--primary);
 color: white;
-box-shadow: 0 2px 8px rgba(67, 97, 238, 0.3);
 }
-
-#edit-skill-form .btn.btn-primary:hover {
-transform: translateY(-2px);
-box-shadow: 0 4px 12px rgba(67, 97, 238, 0.4);
-}
-
+/* Buttons inside the Profile Popup */
 .profile-content .update-rank-btn,
 .profile-content .close-profile-btn,
 .profile-content .logout-btn-popup {
+padding: 0.5rem 1rem; /* Example padding */
+border-radius: 5px;   /* Example radius */
+border: none;         /* Example border */
+cursor: pointer;      /* Example cursor */
+font-size: 1rem;      /* Example size */
+width: 100%;          /* Full width for consistency */
+margin-bottom: 0.5rem; /* Space between buttons */
+color: white;         /* Ensure text contrast */
+}
+.profile-content .update-rank-btn {
+background: var(--primary); /* Example color */
+}
+.profile-content .close-profile-btn {
+background: var(--gray); /* Example color */
+}
+.profile-content .close-profile-btn:hover {
+background: #5a6268;
+}
+.profile-content .logout-btn-popup {
+background: var(--danger); /* Example color */
+}
+.profile-content .logout-btn-popup:hover {
+background: #e53e3e;
+}
+/* Buttons in the Admin Skills List Header and Skill Cards */
+#skills-section .section-title ~ div button.btn, /* Target the "Add New Skill" button */
+.skill-card-ui .skill-content .skill-btn { /* Target buttons in skill cards (Edit, Delete, Move Up/Down) */
+padding: 0.4rem 0.8rem;
+border-radius: 4px;
+border: none;
+cursor: pointer;
+font-size: 0.9rem;
+color: white; /* Ensure text contrast */
+}
+/* Specific colors for skill card buttons (inline styles in HTML take precedence) */
+.skill-card-ui .skill-content .skill-btn[style*="var(--warning)"] { /* Example: Edit button */
+background: var(--warning);
+}
+.skill-card-ui .skill-content .skill-btn[style*="var(--danger)"] { /* Example: Delete button */
+background: var(--danger);
+}
+.skill-card-ui .skill-content .skill-btn[style*="var(--primary)"] { /* Example: Move Up/Down buttons */
+background: var(--primary);
+}
+/* Buttons in the User Management Section (User Cards) */
+.user-card .edit-user-btn,
+.user-card .action-btn.delete-btn { /* Target the Edit and Delete buttons in user cards */
+padding: 0.5rem 1rem;
+border-radius: 4px;
+border: none;
+cursor: pointer;
+font-size: 0.9rem;
+color: white; /* Ensure text contrast */
+}
+.user-card .edit-user-btn {
+background: var(--warning);
+}
+.user-card .edit-user-btn:hover {
+background: #e4bb0b;
+}
+.user-card .action-btn.delete-btn {
+background: var(--danger);
+}
+/* Buttons in the Settings Section (Signup Settings) */
+.setting-actions .delete-btn-setting,
+.setting-actions .move-up-btn,
+.setting-actions .move-down-btn {
+padding: 0.25rem 0.5rem; /* Smaller padding for inline actions */
+border-radius: 4px;
+border: none;
+cursor: pointer;
+font-size: 0.8rem; /* Smaller font */
+color: white; /* Ensure text contrast */
+}
+.setting-actions .delete-btn-setting {
+background: var(--danger);
+}
+.setting-actions .move-up-btn,
+.setting-actions .move-down-btn {
+background: var(--primary);
+}
+/* Buttons in the Settings Section (Admin Access) */
+.admin-access-form button.btn,
+#adminList button.btn { /* Target buttons in admin access section */
 padding: 0.5rem 1rem;
 border-radius: 5px;
 border: none;
 cursor: pointer;
 font-size: 1rem;
-width: 100%;
-margin-bottom: 0.5rem;
-color: white;
-}
-
-.profile-content .update-rank-btn {
+color: white; /* Ensure text contrast */
 background: var(--primary);
 }
-
-.profile-content .close-profile-btn {
-background: var(--gray);
-}
-
-.profile-content .close-profile-btn:hover {
-background: #5a6268;
-}
-
-.profile-content .logout-btn-popup {
+#adminList button.btn { /* Revoke button */
 background: var(--danger);
 }
-
-.profile-content .logout-btn-popup:hover {
-background: #e53e3e;
-}
-
-#skills-section .section-title ~ div button.btn,
-.skill-card-ui .skill-content .skill-btn {
-padding: 0.5rem 1rem;
-border-radius: 8px;
-border: none;
-cursor: pointer;
-font-size: 0.9rem;
-color: white;
-font-weight: 600;
-transition: var(--transition);
-}
-
-.user-card .edit-user-btn,
-.user-card .action-btn.delete-btn {
-padding: 0.5rem 1rem;
-border-radius: 8px;
-border: none;
-cursor: pointer;
-font-size: 0.9rem;
-color: white;
-font-weight: 600;
-transition: var(--transition);
-}
-
-.user-card .edit-user-btn {
-background: linear-gradient(135deg, var(--warning), #eab308);
-box-shadow: 0 2px 8px rgba(250, 204, 21, 0.3);
-}
-
-.user-card .edit-user-btn:hover {
-transform: translateY(-2px);
-box-shadow: 0 4px 12px rgba(250, 204, 21, 0.4);
-}
-
-.user-card .action-btn.delete-btn {
-background: linear-gradient(135deg, var(--danger), #dc2626);
-box-shadow: 0 2px 8px rgba(248, 113, 113, 0.3);
-}
-
-.user-card .action-btn.delete-btn:hover {
-transform: translateY(-2px);
-box-shadow: 0 4px 12px rgba(248, 113, 113, 0.4);
-}
-
-.setting-actions .delete-btn-setting,
-.setting-actions .move-up-btn,
-.setting-actions .move-down-btn {
-padding: 0.4rem 0.8rem;
-border-radius: 6px;
-border: none;
-cursor: pointer;
-font-size: 0.85rem;
-color: white;
-font-weight: 600;
-transition: var(--transition);
-}
-
-.setting-actions .delete-btn-setting {
-background: linear-gradient(135deg, var(--danger), #dc2626);
-}
-
-.setting-actions .delete-btn-setting:hover {
-transform: translateY(-1px);
-}
-
-.setting-actions .move-up-btn,
-.setting-actions .move-down-btn {
-background: linear-gradient(135deg, var(--primary), var(--secondary));
-}
-
-.setting-actions .move-up-btn:hover,
-.setting-actions .move-down-btn:hover {
-transform: translateY(-1px);
-}
-
-.admin-access-form button.btn,
-#adminList button.btn {
-padding: 0.6rem 1.5rem;
-border-radius: 8px;
-border: none;
-cursor: pointer;
-font-size: 1rem;
-color: white;
-font-weight: 600;
-background: linear-gradient(135deg, var(--primary), var(--secondary));
-box-shadow: 0 2px 8px rgba(67, 97, 238, 0.3);
-transition: var(--transition);
-}
-
-.admin-access-form button.btn:hover,
-#adminList button.btn:hover {
-transform: translateY(-2px);
-box-shadow: 0 4px 12px rgba(67, 97, 238, 0.4);
-}
-
-#adminList button.btn {
-background: linear-gradient(135deg, var(--danger), #dc2626);
-box-shadow: 0 2px 8px rgba(248, 113, 113, 0.3);
-}
-
-#adminList button.btn:hover {
-box-shadow: 0 4px 12px rgba(248, 113, 113, 0.4);
-}
-
-/* Edit Form */
+/* Edit Form - NEW STYLES FOR TABS AND STRUCTURE */
 .edit-form {
 display: none;
 }
-
+/* --- TABS STYLING --- */
 .tabs {
 display: flex;
 gap: 0.5rem;
-margin-bottom: 2rem;
-border-bottom: 2px solid var(--admin-border);
-padding-bottom: 0;
+margin-bottom: 1.5rem;
+border-bottom: 1px solid #e2e8f0;
 }
-
 .tab-btn {
-background: transparent;
+background: none;
 border: none;
-padding: 1rem 1.5rem;
+padding: 0.75rem 1.25rem;
 font-weight: 600;
-color: var(--admin-text);
+color: var(--gray);
 cursor: pointer;
-border-radius: 12px 12px 0 0;
+border-radius: 6px 6px 0 0;
 transition: var(--transition);
-border: 1px solid transparent;
-position: relative;
 }
-
 .tab-btn:hover {
-color: var(--accent);
-background: rgba(67, 97, 238, 0.1);
+color: var(--primary);
 }
-
 .tab-btn.active {
-color: white;
-background: linear-gradient(135deg, var(--primary), var(--secondary));
-border-color: var(--primary);
-}
-
-.tab-btn.active::after {
-content: '';
-position: absolute;
-bottom: -2px;
-left: 0;
-right: 0;
-height: 2px;
-background: var(--accent);
+color: var(--primary);
+background: #f0f4ff;
+border-bottom: 3px solid var(--primary);
 }
 
 .tab-content {
 display: none;
-padding: 1.5rem 0;
+padding: 1rem 0; /* Add some internal padding */
 }
-
 .tab-content.active {
 display: block;
 }
 
+/* Better spacing for form groups in tabs */
 .form-row {
 display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 1.5rem;
+grid-template-columns: 1fr 1fr; /* Two equal columns */
+gap: 1rem;
 margin-bottom: 1.5rem;
 }
-
 .form-col {
 flex: 1;
 }
-
 .form-group {
 margin-bottom: 1.5rem;
 }
-
 .form-group label {
 display: block;
 margin-bottom: 0.5rem;
 font-weight: 600;
 color: var(--dark);
 }
-
 .form-group input,
 .form-group textarea,
 .form-group select {
 width: 100%;
 padding: 0.75rem;
 border: 1px solid #ddd;
-border-radius: 8px;
+border-radius: 6px;
 font-size: 1rem;
 transition: border-color 0.2s;
 }
-
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
@@ -591,29 +421,11 @@ outline: none;
 border-color: var(--primary);
 }
 
-.admin-dashboard .form-group label {
-color: var(--admin-text);
-}
-
-.admin-dashboard .form-group input,
-.admin-dashboard .form-group textarea,
-.admin-dashboard .form-group select {
-background: var(--admin-bg);
-color: white;
-border: 1px solid var(--admin-border);
-}
-
-.admin-dashboard .form-group input:focus,
-.admin-dashboard .form-group textarea:focus,
-.admin-dashboard .form-group select:focus {
-border-color: var(--primary);
-box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
-}
-
+/* Image preview styling */
 .image-upload-preview {
 height: 100px;
-border: 2px dashed #ccc;
-border-radius: 8px;
+border: 1px dashed #ccc;
+border-radius: 6px;
 display: flex;
 align-items: center;
 justify-content: center;
@@ -623,429 +435,130 @@ font-size: 0.85rem;
 color: #777;
 overflow: hidden;
 }
-
-.admin-dashboard .image-upload-preview {
-background: var(--admin-bg);
-border: 2px dashed var(--admin-border);
-color: var(--admin-text);
-}
-
 .image-upload-preview img {
 width: 100%;
 height: 100%;
 object-fit: cover;
 }
 
+/* Section title override for edit form */
 .edit-form .section-title {
 font-size: 1.8rem;
-color: white;
+color: var(--primary);
 margin-bottom: 1.5rem;
 padding-bottom: 0.75rem;
-border-bottom: 2px solid var(--admin-border);
+border-bottom: 2px solid var(--light);
 }
 
-/* Steps & Quiz */
-.steps-editor,
+/* Responsive: stack columns on mobile */
+@media (max-width: 768px) {
+.form-row {
+grid-template-columns: 1fr; /* Stack columns on smaller screens */
+}
+}
+
+/* Steps Editor */
+.steps-editor {
+margin-top: 1.5rem;
+}
+.step-item {
+border: 1px solid var(--light);
+border-radius: 8px; /* More rounded */
+padding: 1.2rem; /* Increased padding */
+margin-bottom: 1.2rem; /* Increased margin */
+position: relative;
+background: #f9fafb; /* Light background for steps */
+}
+.step-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 0.8rem;
+padding-bottom: 0.5rem;
+border-bottom: 1px solid #e2e8f0; /* Subtle separator */
+}
+.step-content {
+display: grid;
+grid-template-columns: 1fr 1fr; /* Consistent grid */
+gap: 1rem;
+}
+/* Quiz Editor */
 .quiz-editor {
 margin-top: 1.5rem;
 }
-
-.step-item,
 .quiz-question {
-border: 1px solid #e2e8f0;
-border-radius: 12px;
-padding: 1.5rem;
-margin-bottom: 1.5rem;
+border: 1px solid var(--light);
+border-radius: 8px; /* More rounded */
+padding: 1.2rem; /* Increased padding */
+margin-bottom: 1.2rem; /* Increased margin */
 position: relative;
-background: #f9fafb;
+background: #f9fafb; /* Light background for questions */
 }
-
-.admin-dashboard .step-item,
-.admin-dashboard .quiz-question {
-background: var(--admin-bg);
-border: 1px solid var(--admin-border);
-}
-
-.step-header,
 .quiz-header {
 display: flex;
 justify-content: space-between;
 align-items: center;
-margin-bottom: 1rem;
-padding-bottom: 0.75rem;
-border-bottom: 1px solid #e2e8f0;
+margin-bottom: 0.8rem;
+padding-bottom: 0.5rem;
+border-bottom: 1px solid #e2e8f0; /* Subtle separator */
 }
-
-.admin-dashboard .step-header,
-.admin-dashboard .quiz-header {
-border-bottom: 1px solid var(--admin-border);
-}
-
-.step-header h4,
-.quiz-header h4 {
-color: var(--primary);
-font-size: 1.1rem;
-}
-
-.admin-dashboard .step-header h4,
-.admin-dashboard .quiz-header h4 {
-color: white;
-}
-
-.step-content,
 .quiz-content {
 display: grid;
-grid-template-columns: 1fr 1fr;
+grid-template-columns: 1fr 1fr; /* Consistent grid */
 gap: 1rem;
 }
-
 .quiz-options {
 display: grid;
-grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Responsive grid for options */
 gap: 1rem;
 }
-
-/* Settings */
+/* Settings Tabs */
 .settings-tabs {
 display: flex;
-border-bottom: 2px solid var(--light);
-margin-bottom: 2rem;
-gap: 0.5rem;
+border-bottom: 1px solid var(--light);
+margin-bottom: 1.5rem;
 }
-
-.admin-dashboard .settings-tabs {
-border-bottom: 2px solid var(--admin-border);
-}
-
 .tab-button {
-padding: 1rem 1.5rem;
-background: transparent;
+padding: 0.75rem 1.5rem;
+background: none;
 border: none;
 border-bottom: 3px solid transparent;
 cursor: pointer;
 font-weight: 600;
 color: var(--gray);
-transition: var(--transition);
-border-radius: 8px 8px 0 0;
 }
-
-.admin-dashboard .tab-button {
-color: var(--admin-text);
-}
-
-.tab-button:hover {
-color: var(--primary);
-}
-
-.admin-dashboard .tab-button:hover {
-color: var(--accent);
-background: rgba(67, 97, 238, 0.1);
-}
-
 .tab-button.active {
 border-bottom: 3px solid var(--primary);
 color: var(--primary);
 }
-
-.admin-dashboard .tab-button.active {
-border-bottom-color: var(--accent);
-color: white;
-background: rgba(67, 97, 238, 0.2);
-}
-
-/* User Management */
-.users-section {
+.tab-content {
 display: none;
 }
-
-.course-group {
-margin-bottom: 3rem;
+.tab-content.active {
+display: block;
 }
-
-.course-title {
-font-size: 1.4rem;
-color: var(--secondary);
-margin-bottom: 1.5rem;
-padding-bottom: 0.75rem;
-border-bottom: 2px solid var(--light);
-font-weight: 700;
-}
-
-.admin-dashboard .course-title {
-color: var(--accent);
-border-bottom: 2px solid var(--admin-border);
-}
-
-.user-list {
-display: grid;
-grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-gap: 1rem;
-}
-
-.user-card {
-background: var(--light);
-border-radius: 12px;
-padding: 1.5rem;
-display: flex;
-justify-content: space-between;
-align-items: center;
-transition: var(--transition);
-}
-
-.admin-dashboard .user-card {
-background: var(--admin-bg);
-border: 1px solid var(--admin-border);
-}
-
-.admin-dashboard .user-card:hover {
-border-color: var(--primary);
-box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2);
-}
-
-.user-details {
-flex-grow: 1;
-}
-
-.user-name {
-font-weight: 600;
-margin-bottom: 0.5rem;
-font-size: 1.1rem;
-}
-
-.admin-dashboard .user-name {
-color: white;
-}
-
-.user-rank {
-font-size: 0.9rem;
-color: var(--gray);
-margin-bottom: 0.25rem;
-}
-
-.admin-dashboard .user-rank {
-color: var(--admin-text);
-}
-
-.user-course {
-font-size: 0.9rem;
-color: var(--primary);
-}
-
-.admin-dashboard .user-course {
-color: var(--accent);
-}
-
-.user-email {
-font-size: 0.85rem;
-color: var(--gray);
-margin-top: 0.25rem;
-}
-
-.edit-user-modal {
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-background: rgba(0,0,0,0.7);
-display: flex;
-justify-content: center;
-align-items: center;
-z-index: 3000;
-display: none;
-}
-
-.edit-user-box {
-background: white;
-padding: 2rem;
-border-radius: 10px;
-box-shadow: var(--shadow);
-width: 100%;
-max-width: 500px;
-text-align: center;
-position: relative;
-}
-
-.edit-user-box h3 {
-margin-bottom: 1.5rem;
-color: var(--primary);
-}
-
-/* Settings */
-.signup-settings-section {
-display: none;
-}
-
-.settings-controls {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 2rem;
-}
-
-.settings-column {
-background: var(--light);
-padding: 2rem;
-border-radius: 12px;
-}
-
-.admin-dashboard .settings-column {
-background: var(--admin-bg);
-border: 1px solid var(--admin-border);
-}
-
-.setting-title {
-font-size: 1.3rem;
-margin-bottom: 1.5rem;
-color: var(--primary);
-font-weight: 700;
-display: flex;
-align-items: center;
-gap: 0.5rem;
-}
-
-.admin-dashboard .setting-title {
-color: white;
-}
-
-.admin-dashboard .setting-title::before {
-content: '';
-width: 4px;
-height: 24px;
-background: var(--accent);
-border-radius: 2px;
-}
-
-.setting-item {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 0.75rem;
-padding: 1rem;
-border-bottom: 1px solid rgba(0,0,0,0.1);
-border-radius: 8px;
-}
-
-.admin-dashboard .setting-item {
-background: rgba(67, 97, 238, 0.05);
-border-bottom: 1px solid var(--admin-border);
-color: white;
-}
-
-.setting-actions {
-display: flex;
-gap: 0.5rem;
-}
-
-.add-item-input {
-display: flex;
-margin-top: 1.5rem;
-gap: 0.5rem;
-}
-
-.add-item-input input {
-flex: 1;
-padding: 0.75rem;
-border: 1px solid #ddd;
-border-radius: 8px;
-}
-
-.admin-dashboard .add-item-input input {
-background: var(--admin-bg);
-color: white;
-border: 1px solid var(--admin-border);
-}
-
-.add-item-input button {
-background: var(--success);
-color: white;
-border: none;
-padding: 0.75rem 1.5rem;
-border-radius: 8px;
-cursor: pointer;
-font-weight: 600;
-transition: var(--transition);
-}
-
-.admin-dashboard .add-item-input button {
-background: linear-gradient(135deg, var(--success), #22c55e);
-box-shadow: 0 2px 8px rgba(74, 222, 128, 0.3);
-}
-
-.admin-dashboard .add-item-input button:hover {
-transform: translateY(-2px);
-box-shadow: 0 4px 12px rgba(74, 222, 128, 0.4);
-}
-
-.operation-message {
-margin-top: 1rem;
-padding: 0.75rem;
-border-radius: 8px;
-text-align: center;
-font-weight: 600;
-}
-
-.admin-dashboard .operation-message {
-color: white;
-}
-
-/* Primary Buttons */
-#skills-section .btn,
-#users-section .btn,
-#settings-section .btn {
-background: var(--success);
-color: white;
-border: none;
-border-radius: 8px;
-padding: 0.75rem 1.5rem;
-font-weight: 600;
-cursor: pointer;
-transition: var(--transition);
-}
-
-.admin-dashboard #skills-section .btn,
-.admin-dashboard #users-section .btn,
-.admin-dashboard #settings-section .btn {
-background: linear-gradient(135deg, var(--success), #22c55e);
-box-shadow: 0 2px 8px rgba(74, 222, 128, 0.3);
-}
-
-.admin-dashboard #skills-section .btn:hover,
-.admin-dashboard #users-section .btn:hover,
-.admin-dashboard #settings-section .btn:hover {
-transform: translateY(-2px);
-box-shadow: 0 4px 12px rgba(74, 222, 128, 0.4);
-}
-
-/* Dashboard Stats */
-.admin-dashboard #dashboard-section p {
-color: var(--admin-text);
-}
-
-/* USER INTERFACE (Unchanged) */
+/* User Interface */
 .user-interface {
 display: none;
 padding: 2rem 0;
 }
-
+/* Header Styles */
 header {
 background: linear-gradient(135deg, var(--primary), var(--secondary));
 color: white;
 padding: 2rem 0;
 text-align: center;
 margin-bottom: 2rem;
-position: relative;
 }
-
 header h1 {
 font-size: 2.5rem;
 margin-bottom: 0.5rem;
 }
-
 header p {
 font-size: 1.1rem;
 opacity: 0.9;
 }
-
+/* Profile Button */
 .profile-btn {
 position: absolute;
 top: 20px;
@@ -1059,18 +572,16 @@ cursor: pointer;
 font-weight: 600;
 transition: var(--transition);
 }
-
 .profile-btn:hover {
 background: rgba(0,0,0,0.5);
 }
-
+/* Admin Switch Button */
 .admin-switch {
 position: absolute;
 top: 20px;
 right: 20px;
 z-index: 100;
 }
-
 .admin-switch-btn {
 background: rgba(0,0,0,0.3);
 color: white;
@@ -1081,11 +592,10 @@ cursor: pointer;
 font-weight: 600;
 transition: var(--transition);
 }
-
 .admin-switch-btn:hover {
 background: rgba(0,0,0,0.5);
 }
-
+/* Profile Popup */
 .profile-popup {
 position: fixed;
 top: 70px;
@@ -1097,47 +607,38 @@ box-shadow: var(--shadow);
 z-index: 1000;
 display: none;
 }
-
 .profile-header {
 display: flex;
 align-items: center;
 padding: 1rem;
 border-bottom: 1px solid var(--light);
 }
-
 .profile-header i {
 font-size: 1.5rem;
 margin-right: 0.5rem;
 color: var(--primary);
 }
-
 .profile-header h3 {
 font-size: 1.2rem;
 margin: 0;
 }
-
 .profile-content {
 padding: 1rem;
 }
-
 .profile-info {
 margin-bottom: 1rem;
 }
-
 .info-item {
 margin-bottom: 0.5rem;
 }
-
 .info-label {
 font-weight: 600;
 color: var(--gray);
 font-size: 0.9rem;
 }
-
 .info-value {
 font-size: 1rem;
 }
-
 .change-rank-select {
 width: 100%;
 margin-bottom: 1rem;
@@ -1145,14 +646,130 @@ padding: 0.5rem;
 border: 1px solid #ddd;
 border-radius: 5px;
 }
-
+/* User Management Section */
+.users-section {
+display: none;
+}
+.course-group {
+margin-bottom: 2rem;
+}
+.course-title {
+font-size: 1.3rem;
+color: var(--secondary);
+margin-bottom: 1rem;
+padding-bottom: 0.5rem;
+border-bottom: 1px solid var(--light);
+}
+.user-list {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+gap: 1rem;
+}
+.user-card {
+background: var(--light);
+border-radius: 8px;
+padding: 1rem;
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+.user-details {
+flex-grow: 1;
+}
+.user-name {
+font-weight: 600;
+margin-bottom: 0.25rem;
+}
+.user-rank {
+font-size: 0.9rem;
+color: var(--gray);
+}
+.user-course {
+font-size: 0.9rem;
+color: var(--primary);
+}
+/* Edit User Modal */
+.edit-user-modal {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0,0,0,0.7);
+display: flex;
+justify-content: center;
+align-items: center;
+z-index: 3000;
+display: none;
+}
+.edit-user-box {
+background: white;
+padding: 2rem;
+border-radius: 10px;
+box-shadow: var(--shadow);
+width: 100%;
+max-width: 500px;
+text-align: center;
+position: relative;
+}
+.edit-user-box h3 {
+margin-bottom: 1.5rem;
+color: var(--primary);
+}
+/* Settings Sections */
+.signup-settings-section {
+display: none;
+}
+.settings-controls {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 2rem;
+}
+.settings-column {
+background: var(--light);
+padding: 1.5rem;
+border-radius: 8px;
+}
+.setting-title {
+font-size: 1.2rem;
+margin-bottom: 1rem;
+color: var(--primary);
+}
+.setting-item {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 0.5rem;
+padding: 0.5rem 0;
+border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+.setting-actions {
+display: flex;
+gap: 0.5rem;
+}
+.add-item-input {
+display: flex;
+margin-top: 1rem;
+}
+.add-item-input input {
+flex: 1;
+margin-right: 0.5rem;
+}
+.add-item-input button {
+background: var(--success);
+color: white;
+border: none;
+padding: 0.5rem;
+border-radius: 4px;
+cursor: pointer;
+}
+/* Skill Grid */
 .skill-grid {
 display: grid;
 grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 gap: 1.5rem;
 margin-top: 2rem;
 }
-
 .skill-card-ui {
 background: white;
 border-radius: 10px;
@@ -1164,45 +781,40 @@ height: 100%;
 display: flex;
 flex-direction: column;
 }
-
 .skill-card-ui:hover {
 transform: translateY(-5px);
 box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 }
-
 .skill-icon {
+/* background: linear-gradient(135deg, var(--primary), var(--accent)); */
+/* color: white; */
 font-size: 3rem;
 height: 150px;
 display: flex;
 align-items: center;
 justify-content: center;
 }
-
 .skill-icon img {
 width: 100%;
 height: 100%;
 object-fit: cover;
 }
-
 .skill-content {
 padding: 1.5rem;
 flex-grow: 1;
 display: flex;
 flex-direction: column;
 }
-
 .skill-name {
 font-size: 1.5rem;
 margin-bottom: 0.75rem;
 color: var(--primary);
 }
-
 .skill-desc {
 color: var(--gray);
 flex-grow: 1;
 }
-
-.skill-btn {
+.skill-btn { /* This is the original class for buttons inside skill cards in the grid */
 background: var(--primary);
 color: white;
 border: none;
@@ -1213,11 +825,10 @@ font-weight: 600;
 margin-top: 1rem;
 transition: var(--transition);
 }
-
 .skill-btn:hover {
 background: var(--secondary);
 }
-
+/* Skill Detail */
 .skill-detail {
 background: white;
 border-radius: 10px;
@@ -1226,7 +837,6 @@ box-shadow: var(--shadow);
 margin-top: 1.5rem;
 display: none;
 }
-
 .skill-header {
 display: flex;
 align-items: center;
@@ -1234,23 +844,19 @@ margin-bottom: 2rem;
 padding-bottom: 1rem;
 border-bottom: 2px solid var(--light);
 }
-
-.skill-header img {
-width: 50px;
+.skill-header img { /* Changed selector for skill detail header */
+width: 50px; /* Adjust size as needed */
 height: 50px;
 margin-right: 1rem;
 object-fit: cover;
 }
-
 .skill-header h2 {
 font-size: 2rem;
 color: var(--dark);
 }
-
 .skill-section {
 margin-bottom: 2.5rem;
 }
-
 .section-title-ui {
 font-size: 1.5rem;
 color: var(--primary);
@@ -1258,13 +864,12 @@ margin-bottom: 1rem;
 padding-bottom: 0.5rem;
 border-bottom: 1px solid var(--light);
 }
-
+/* Tools Section */
 .tools-grid {
 display: grid;
 grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 gap: 1rem;
 }
-
 .tool-item {
 background: var(--light);
 border-radius: 8px;
@@ -1272,33 +877,28 @@ padding: 1rem;
 text-align: center;
 transition: var(--transition);
 }
-
 .tool-item:hover {
 background: var(--primary);
 color: white;
 }
-
-.tool-item img {
-width: 50px;
+.tool-item img { /* New selector for tool image in detail view */
+width: 50px; /* Adjust size as needed */
 height: 50px;
 object-fit: cover;
 margin-bottom: 0.5rem;
 }
-
-.tool-item:hover img {
-opacity: 0.8;
+.tool-item:hover img { /* Adjust hover color if needed */
+opacity: 0.8; /* Example hover effect */
 }
-
 .tool-item span {
 display: block;
 }
-
+/* Steps Section */
 .steps-container {
 display: flex;
 flex-direction: column;
 gap: 1.5rem;
 }
-
 .step-card {
 display: flex;
 gap: 1.5rem;
@@ -1306,52 +906,45 @@ background: var(--light);
 border-radius: 8px;
 overflow: hidden;
 }
-
 .step-image {
 width: 200px;
 height: 150px;
 object-fit: cover;
 }
-
 .step-content {
 padding: 1.2rem;
 flex-grow: 1;
 }
-
 .step-title {
 font-size: 1.2rem;
 margin-bottom: 0.5rem;
 color: var(--primary);
 }
-
+/* Theory Section */
 .theory-content {
 background: var(--light);
 padding: 1.5rem;
 border-radius: 8px;
 line-height: 1.8;
 }
-
+/* Quiz Section */
 .quiz-container {
 background: var(--light);
 padding: 1.5rem;
 border-radius: 8px;
 }
-
 .question {
 margin-bottom: 1.5rem;
 }
-
 .question-text {
 font-weight: 600;
 margin-bottom: 0.75rem;
 }
-
 .options {
 display: flex;
 flex-direction: column;
 gap: 0.5rem;
 }
-
 .option {
 display: flex;
 align-items: center;
@@ -1361,16 +954,13 @@ border-radius: 5px;
 cursor: pointer;
 transition: var(--transition);
 }
-
 .option:hover {
 background: #e9ecef;
 }
-
 .option.selected {
 background: var(--primary);
 color: white;
 }
-
 .quiz-result {
 margin-top: 1.5rem;
 padding: 1rem;
@@ -1378,23 +968,19 @@ border-radius: 5px;
 text-align: center;
 font-weight: 600;
 }
-
 .quiz-result.correct {
 background: var(--success);
 color: white;
 }
-
 .quiz-result.incorrect {
 background: var(--danger);
 color: white;
 }
-
 .quiz-nav {
 display: flex;
 justify-content: space-between;
 margin-top: 1.5rem;
 }
-
 .back-btn {
 background: var(--gray);
 color: white;
@@ -1404,7 +990,7 @@ border-radius: 5px;
 cursor: pointer;
 font-weight: 600;
 }
-
+/* Footer */
 footer {
 background: var(--dark);
 color: white;
@@ -1412,19 +998,13 @@ text-align: center;
 padding: 1.5rem 0;
 margin-top: 3rem;
 }
-
-.login-popup.confirmation-modal {
-z-index: 3001;
-}
-
-/* Responsive */
+/* Responsive Design */
 @media (max-width: 992px) {
 .admin-content {
-grid-template-columns: 1fr;
+grid-template-columns: 1fr; /* Stack sidebar and main content on medium screens */
 }
 .nav-panel {
 margin-bottom: 2rem;
-position: static;
 }
 .settings-controls {
 grid-template-columns: 1fr;
@@ -1436,7 +1016,6 @@ flex-wrap: wrap;
 padding: 0.5rem;
 }
 }
-
 @media (max-width: 768px) {
 .step-card {
 flex-direction: column;
@@ -1449,12 +1028,13 @@ height: 200px;
 flex-direction: column;
 text-align: center;
 }
-.skill-header img {
+.skill-header img { /* Adjust selector for mobile */
 margin-right: 0;
 margin-bottom: 1rem;
 }
 .form-row {
-grid-template-columns: 1fr;
+flex-direction: column;
+gap: 0;
 }
 .profile-btn, .admin-switch {
 position: static;
@@ -1470,6 +1050,28 @@ top: 50px;
 right: 10px;
 }
 }
+/* Confirmation Modal */
+.login-popup.confirmation-modal {
+/* Inherits basic styles from .login-popup */
+z-index: 3001; /* Ensure it's above other modals */
+}
+/* Primary action buttons in admin sections */
+#skills-section .btn,
+#users-section .btn,
+#settings-section .btn {
+background: var(--success);
+color: white;
+border: none;
+border-radius: 5px;
+padding: 0.5rem 1rem;
+font-weight: 600;
+cursor: pointer;
+transition: var(--transition);
+}
+#skills-section .btn:hover {
+background: #38c172; /* Slightly darker green on hover */
+}
+/* No specific additional styling needed unless customization is desired */
 </style>
 </head>
 <body>
@@ -1636,13 +1238,11 @@ right: 10px;
 </div>
 <!-- End of Grant Admin Success Notification Modal -->
 <!-- Admin Dashboard -->
-<!-- Admin Dashboard - COMPLETE STRUCTURE -->
 <div class="admin-dashboard" id="adminDashboard">
-<div class="admin-header">
 <div class="container">
-<h1><i class="fas fa-cogs"></i> Admin Control Panel</h1>
-<button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
-</div>
+<div class="admin-header">
+<h1><i class="fas fa-tools"></i> Hand Skills Learning Platform - Admin Panel</h1>
+<button class="logout-btn" onclick="logout()">Logout</button>
 </div>
 <div class="admin-content">
 <div class="nav-panel">
@@ -1658,25 +1258,23 @@ right: 10px;
 <h2 class="section-title">Dashboard Overview</h2>
 <p>Welcome to the Hand Skills Learning Platform Admin Panel. From here you can manage skills, content, and user access.</p>
 <div style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
-<div style="background: linear-gradient(135deg, var(--admin-bg), var(--admin-sidebar)); padding: 2rem; border-radius: 16px; text-align: center; border: 1px solid var(--admin-border); box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
-<i class="fas fa-tools" style="font-size: 3rem; color: var(--accent); margin-bottom: 1rem; display: block;"></i>
-<h3 id="total-skills" style="font-size: 2.5rem; color: white; margin-bottom: 0.5rem; font-weight: 700;">0</h3>
-<p style="color: var(--admin-text); font-size: 1rem;">Total Skills</p>
+<div style="background: var(--light); padding: 1.5rem; border-radius: 8px; text-align: center;">
+<i class="fas fa-tools" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem;"></i>
+<h3 id="total-skills">0</h3>
+<p>Total skills in the system</p>
 </div>
 </div>
 </div>
-
 <!-- Skills Management Section -->
 <div id="skills-section" class="section" style="display: none;">
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-<h2 class="section-title" style="margin: 0;">Manage Skills</h2>
-<button class="btn" onclick="addNewSkill()"><i class="fas fa-plus-circle"></i> Add New Skill</button>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+<h2 class="section-title">Manage Skills</h2>
+<button class="btn" onclick="addNewSkill()">Add New Skill</button>
 </div>
 <div class="skill-list" id="skillsList">
 <!-- Skills will be loaded here -->
 </div>
 </div>
-
 <!-- Users Management Section -->
 <div id="users-section" class="section users-section">
 <h2 class="section-title">Manage Users</h2>
@@ -1684,7 +1282,6 @@ right: 10px;
 <!-- User groups will be loaded here -->
 </div>
 </div>
-
 <!-- Settings Section -->
 <div id="settings-section" class="section" style="display: none;">
 <h2 class="section-title">System Settings</h2>
@@ -1701,7 +1298,7 @@ right: 10px;
 </div>
 <div class="add-item-input">
 <input type="text" id="newRankInput" placeholder="New rank name">
-<button onclick="addRank()"><i class="fas fa-plus"></i> Add Rank</button>
+<button onclick="addRank()">Add Rank</button>
 </div>
 <div class="operation-message" id="rankMessage"></div>
 </div>
@@ -1712,7 +1309,7 @@ right: 10px;
 </div>
 <div class="add-item-input">
 <input type="text" id="newCourseInput" placeholder="New course name">
-<button onclick="addCourse()"><i class="fas fa-plus"></i> Add Course</button>
+<button onclick="addCourse()">Add Course</button>
 </div>
 <div class="operation-message" id="courseMessage"></div>
 </div>
@@ -1725,92 +1322,92 @@ right: 10px;
 <label for="admin-email">Email Address</label>
 <input type="email" id="admin-email" placeholder="Enter email address">
 </div>
-<button class="btn" onclick="grantAdminAccess()"><i class="fas fa-user-shield"></i> Grant Admin Access</button>
+<button class="btn" onclick="grantAdminAccess()">Grant Admin Access</button>
 </div>
 <div id="adminList">
 <!-- Admin list will be loaded here -->
 </div>
 </div>
 </div>
-
-<!-- Edit Skill Form -->
+</div>
+<!-- Edit Skill Form - REDESIGNED -->
 <div id="edit-skill-form" class="edit-form">
-<div class="section-title">Edit Skill</div>
+  <div class="section-title">Edit Skill</div>
 
-<!-- Tabs -->
-<div class="tabs">
-<button class="tab-btn active" data-tab="info">📌 Skill Info</button>
-<button class="tab-btn" data-tab="tools">🛠️ Tools</button>
-<button class="tab-btn" data-tab="steps">📋 Steps</button>
-<button class="tab-btn" data-tab="quiz">❓ Quiz</button>
-<button class="tab-btn" data-tab="theory">📖 Theory</button>
-</div>
+  <!-- Tabs -->
+  <div class="tabs" style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid #e2e8f0;">
+    <button class="tab-btn active" data-tab="info">📌 Skill Info</button>
+    <button class="tab-btn" data-tab="tools">🛠️ Tools</button>
+    <button class="tab-btn" data-tab="steps">📋 Steps</button>
+    <button class="tab-btn" data-tab="quiz">❓ Quiz</button>
+    <button class="tab-btn" data-tab="theory">📖 Theory</button>
+  </div>
 
-<!-- Tab Content -->
-<div id="tab-info" class="tab-content active">
-<div class="form-row">
-<div class="form-col">
-<label for="edit-skill-name">Skill Name *</label>
-<input type="text" id="edit-skill-name" placeholder="e.g., Soldering Basics" required>
-</div>
-<div class="form-col">
-<label for="edit-skill-image">Skill Image *</label>
-<input type="file" id="edit-skill-image" accept="image/*" onchange="previewSkillImage(this)">
-<div class="image-upload-preview" id="skill-image-preview">
-<span style="color: #999; font-size: 0.9rem;">No file chosen</span>
-</div>
-<input type="hidden" id="edit-skill-image-url">
-</div>
-</div>
+  <!-- Tab Content -->
+  <div id="tab-info" class="tab-content active">
+    <div class="form-row">
+      <div class="form-col">
+        <label for="edit-skill-name">Skill Name *</label>
+        <input type="text" id="edit-skill-name" placeholder="e.g., Soldering Basics" required>
+      </div>
+      <div class="form-col">
+        <label for="edit-skill-image">Skill Image *</label>
+        <input type="file" id="edit-skill-image" accept="image/*" onchange="previewSkillImage(this)">
+        <div class="image-upload-preview" id="skill-image-preview">
+          <span style="color: #999; font-size: 0.9rem;">No file chosen</span>
+        </div>
+        <input type="hidden" id="edit-skill-image-url">
+      </div>
+    </div>
 
-<div class="form-group">
-<label for="edit-skill-description">Description *</label>
-<textarea id="edit-skill-description" rows="3" placeholder="Brief overview of the skill..."></textarea>
-</div>
-</div>
+    <div class="form-group">
+      <label for="edit-skill-description">Description *</label>
+      <textarea id="edit-skill-description" rows="3" placeholder="Brief overview of the skill..."></textarea>
+    </div>
+  </div>
 
-<div id="tab-tools" class="tab-content">
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-<h3 style="color: white;">🛠️ Tools Required</h3>
-<button class="btn add-step-btn" onclick="addTool()">+ Add Tool</button>
-</div>
-<div id="tools-container">
-<!-- Tools will be added here dynamically -->
-</div>
-</div>
+  <div id="tab-tools" class="tab-content">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <h3>🛠️ Tools Required</h3>
+      <button class="btn add-step-btn" onclick="addTool()">+ Add Tool</button>
+    </div>
+    <div id="tools-container">
+      <!-- Tools will be added here dynamically -->
+    </div>
+  </div>
 
-<div id="tab-steps" class="tab-content">
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-<h3 style="color: white;">📋 Step-by-Step Guide</h3>
-<button class="btn add-step-btn" onclick="addStep()">+ Add Step</button>
-</div>
-<div id="steps-container">
-<!-- Steps will be added here dynamically -->
-</div>
-</div>
+  <div id="tab-steps" class="tab-content">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <h3>📋 Step-by-Step Guide</h3>
+      <button class="btn add-step-btn" onclick="addStep()">+ Add Step</button>
+    </div>
+    <div id="steps-container">
+      <!-- Steps will be added here dynamically -->
+    </div>
+  </div>
 
-<div id="tab-quiz" class="tab-content">
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-<h3 style="color: white;">❓ Knowledge Check (Quiz)</h3>
-<button class="btn add-quiz-btn" onclick="addQuizQuestion()">+ Add Question</button>
-</div>
-<div id="quiz-container">
-<!-- Quiz questions will be added here dynamically -->
-</div>
-</div>
+  <div id="tab-quiz" class="tab-content">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <h3>❓ Knowledge Check (Quiz)</h3>
+      <button class="btn add-quiz-btn" onclick="addQuizQuestion()">+ Add Question</button>
+    </div>
+    <div id="quiz-container">
+      <!-- Quiz questions will be added here dynamically -->
+    </div>
+  </div>
 
-<div id="tab-theory" class="tab-content">
-<div class="form-group">
-<label for="edit-theory">Theory & Principles</label>
-<textarea id="edit-theory" rows="6" placeholder="Explain key concepts, safety, best practices..."></textarea>
-</div>
-</div>
+  <div id="tab-theory" class="tab-content">
+    <div class="form-group">
+      <label for="edit-theory">Theory & Principles</label>
+      <textarea id="edit-theory" rows="6" placeholder="Explain key concepts, safety, best practices..."></textarea>
+    </div>
+  </div>
 
-<!-- Action Buttons -->
-<div class="form-actions" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--admin-border); display: flex; gap: 1rem; justify-content: flex-end;">
-<button class="btn btn-secondary" onclick="cancelEdit()">Cancel</button>
-<button class="btn btn-primary" onclick="saveSkill()"><i class="fas fa-save"></i> Save Changes</button>
-</div>
+  <!-- Action Buttons -->
+  <div class="form-actions" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #eee;">
+    <button class="btn btn-secondary" onclick="cancelEdit()">Cancel</button>
+    <button class="btn" onclick="saveSkill()">Save Changes</button>
+  </div>
 </div>
 </div>
 </div>
