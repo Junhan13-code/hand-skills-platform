@@ -1,10 +1,11 @@
-<style>
+/* styles.css */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
+
 :root {
   --primary: #4361ee;
   --secondary: #3f37c9;
@@ -17,17 +18,31 @@
   --danger: #f87171;
   --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   --transition: all 0.3s ease;
-  --admin-bg: #0f172a; /* Kept for potential use in specific elements */
-  --admin-card: #1e293b; /* Kept for potential use in specific elements */
-  --admin-sidebar: #1e293b; /* Kept for potential use in specific elements */
-  --admin-text: #e2e8f0; /* Kept for potential use in specific elements */
-  --admin-border: #334155; /* Kept for potential use in specific elements */
+
+  /* NEW DARK THEME COLORS */
+  --bg-dark: #0f172a;
+  --bg-darker: #020814;
+  --bg-card: #1e293b;
+  --bg-sidebar: #1e293b;
+  --bg-input: #334155;
+  --text-light: #f1f5f9;
+  --text-gray: #cbd5e1;
+  --border-dark: #334155;
+  --glass-bg: rgba(30, 41, 59, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --gradient-start: #1e3a8a;
+  --gradient-mid: #1e40af;
+  --gradient-end: #3b82f6;
 }
+
 body {
-  background-color: #f5f7fb;
-  color: var(--dark);
+  background: linear-gradient(135deg, var(--bg-darker), var(--bg-dark));
+  color: var(--text-light);
   line-height: 1.6;
+  min-height: 100vh;
+  backdrop-filter: blur(10px);
 }
+
 .container {
   width: 100%;
   max-width: 1200px;
@@ -35,99 +50,192 @@ body {
   padding: 0 20px;
 }
 
-/* Login Popup */
+/* LOGIN POPUP */
 .login-popup {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.7);
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 2000;
   display: none;
 }
+
 .login-box {
-  background: white;
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
   padding: 2.5rem;
-  border-radius: 10px;
-  box-shadow: var(--shadow);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   width: 100%;
   max-width: 450px;
   text-align: center;
   position: relative;
+  border: 1px solid var(--glass-border);
 }
+
 .login-box h2 {
   margin-bottom: 1.5rem;
-  color: var(--primary);
+  color: var(--text-light);
+  background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
+
 .close-btn {
   position: absolute;
   top: 15px;
   right: 15px;
   font-size: 1.5rem;
   cursor: pointer;
-  color: var(--gray);
+  color: var(--text-gray);
+  transition: var(--transition);
 }
+
 .close-btn:hover {
-  color: var(--dark);
+  color: var(--text-light);
+  transform: scale(1.1);
 }
+
 .form-group {
   margin-bottom: 1.2rem;
   text-align: left;
 }
+
 .form-group label {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
+  color: var(--text-gray);
 }
-.form-group input, .form-group select, .form-group textarea {
+
+.form-group input,
+.form-group select,
+.form-group textarea {
   width: 100%;
   padding: 0.8rem;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  border: 1px solid var(--border-dark);
+  border-radius: 8px;
   font-size: 1rem;
+  background: var(--bg-input);
+  color: var(--text-light);
+  transition: var(--transition);
 }
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(76, 201, 240, 0.2);
+}
+
 .image-upload-preview {
   width: 100px;
   height: 100px;
-  border: 1px dashed #ccc;
+  border: 2px dashed var(--border-dark);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-top: 0.5rem;
   overflow: hidden;
+  border-radius: 8px;
 }
+
 .image-upload-preview img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-/* ========================================
-   REDESIGNED ADMIN DASHBOARD
-======================================== */
+/* BUTTONS */
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: var(--transition);
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn.primary-btn {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+}
+
+.btn.secondary-btn {
+  background: linear-gradient(135deg, var(--gray), #5a6268);
+}
+
+.btn.google-btn {
+  background: linear-gradient(135deg, #4285F4, #34A853);
+}
+
+.btn.success-btn {
+  background: linear-gradient(135deg, var(--success), #22c55e);
+}
+
+.btn.danger-btn {
+  background: linear-gradient(135deg, var(--danger), #dc2626);
+}
+
+.btn.warning-btn {
+  background: linear-gradient(135deg, var(--warning), #eab308);
+}
+
+hr {
+  margin: 1.5rem 0;
+  border: 0;
+  border-top: 1px solid var(--border-dark);
+}
+
+.error-message {
+  color: var(--danger);
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: rgba(248, 113, 113, 0.1);
+  border-radius: 8px;
+  border-left: 4px solid var(--danger);
+}
+
+/* ADMIN DASHBOARD */
 .admin-dashboard {
   display: none;
   min-height: 100vh;
-  /* CHANGED: Removed dark gradient, used light background to match user interface */
-  background-color: #f5f7fb;
+  background: linear-gradient(135deg, var(--bg-darker), var(--bg-dark));
   padding: 0;
 }
 
-/* Admin Header - Updated to match user interface style */
 .admin-header {
-  /* CHANGED: Used gradient matching user interface */
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
   color: white;
-  border-bottom: 1px solid rgba(255,255,255, 0.2); /* Adjusted border color */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding: 1rem 2rem;
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: var(--shadow);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   margin: 0;
 }
 
@@ -139,7 +247,6 @@ body {
 }
 
 .admin-header h1 {
-  /* CHANGED: Matched user interface header style */
   color: white;
   font-size: 1.5rem;
   font-weight: 600;
@@ -147,35 +254,36 @@ body {
   align-items: center;
   gap: 0.75rem;
   margin: 0;
+  background: linear-gradient(to right, var(--text-light), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .admin-header h1 i {
-  /* CHANGED: Matched user interface header icon style */
   color: var(--accent);
   font-size: 1.75rem;
 }
 
 .logout-btn {
-  /* CHANGED: Simplified logout button style to match user interface pattern */
-  background: var(--danger);
+  background: linear-gradient(135deg, var(--danger), #dc2626);
   color: white;
   border: none;
   padding: 0.6rem 1.5rem;
-  border-radius: 5px; /* Changed from 8px to match user interface buttons */
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
   transition: var(--transition);
-  /* Removed gradient and shadow */
+  box-shadow: 0 4px 15px rgba(248, 113, 113, 0.3);
 }
 
 .logout-btn:hover {
-  /* CHANGED: Simplified hover effect */
-  background: #e53e3e; /* Darker shade of danger */
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
   transform: translateY(-2px);
-  /* Removed box shadow */
+  box-shadow: 0 6px 20px rgba(248, 113, 113, 0.4);
 }
 
-/* Admin Content Layout */
+/* ADMIN CONTENT LAYOUT */
 .admin-content {
   display: grid;
   grid-template-columns: 280px 1fr;
@@ -185,40 +293,44 @@ body {
   margin: 0 auto;
 }
 
-/* Navigation Panel - Sleek Sidebar */
+/* NAVIGATION PANEL - MODERN SIDEBAR */
 .nav-panel {
-  /* CHANGED: Made sidebar lighter to match user interface theme */
-  background: white; /* Changed from --admin-card */
-  border-radius: 10px; /* Changed from 16px */
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
   padding: 1.5rem;
-  box-shadow: var(--shadow); /* Changed from heavy shadow */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   height: fit-content;
   position: sticky;
   top: 100px;
-  border: 1px solid var(--light); /* Changed from --admin-border */
+  border: 1px solid var(--glass-border);
 }
 
 .nav-panel h3 {
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid var(--light); /* Changed from 2px --admin-border */
-  color: var(--primary); /* Changed from white */
+  border-bottom: 1px solid var(--border-dark);
+  color: var(--text-light);
   font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: 1px;
   font-weight: 700;
+  background: linear-gradient(to right, var(--text-light), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .nav-item {
   padding: 1rem 1.25rem;
   margin-bottom: 0.5rem;
-  border-radius: 8px; /* Changed from 12px */
+  border-radius: 12px;
   cursor: pointer;
   transition: var(--transition);
   display: flex;
   align-items: center;
   font-weight: 500;
-  color: var(--dark); /* Changed from --admin-text */
+  color: var(--text-gray);
   background: transparent;
   border: 1px solid transparent;
 }
@@ -228,59 +340,96 @@ body {
   width: 24px;
   text-align: center;
   font-size: 1.1rem;
-  color: var(--primary); /* Changed from --accent */
+  color: var(--accent);
 }
 
 .nav-item:hover {
-  background: var(--light); /* Changed from gradient */
-  border-color: var(--primary);
+  background: rgba(76, 201, 240, 0.1);
+  border-color: var(--accent);
   transform: translateX(5px);
+  color: var(--text-light);
 }
 
 .nav-item.active {
-  background: var(--primary); /* Changed from gradient */
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
   color: white;
-  /* Removed box shadow */
+  border-color: var(--primary);
+  box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
 }
 
 .nav-item.active i {
   color: white;
 }
 
-/* Main Content Area - Updated to match user interface theme */
+/* MAIN CONTENT AREA */
 .main-content-area {
-  /* CHANGED: Made main area lighter */
-  background: white; /* Changed from --admin-card */
-  border-radius: 10px; /* Changed from 16px */
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
   padding: 2.5rem;
-  box-shadow: var(--shadow); /* Changed from heavy shadow */
-  border: 1px solid var(--light); /* Changed from --admin-border */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--glass-border);
   min-height: 600px;
 }
 
 .section-title {
-  /* CHANGED: Matched user interface section title style */
   font-size: 1.75rem;
-  color: var(--primary); /* Changed from white */
+  color: var(--text-light);
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid var(--light); /* Changed from --admin-border */
+  border-bottom: 2px solid var(--border-dark);
   font-weight: 700;
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  background: linear-gradient(to right, var(--text-light), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.section-title::before {
-  /* CHANGED: Removed the colored bar before the title */
-  content: none;
-  /* content: '';
-  width: 4px;
-  height: 32px;
-  background: linear-gradient(180deg, var(--primary), var(--accent));
-  border-radius: 4px; */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
 }
 
+.stat-card {
+  background: linear-gradient(135deg, var(--bg-card), var(--bg-input));
+  padding: 2rem;
+  border-radius: 16px;
+  text-align: center;
+  border: 1px solid var(--border-dark);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: var(--transition);
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.stat-card i {
+  font-size: 3rem;
+  color: var(--accent);
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.stat-card h3 {
+  font-size: 2.5rem;
+  color: white;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.stat-card p {
+  color: var(--text-gray);
+  font-size: 1rem;
+}
+
+/* SKILLS MANAGEMENT */
 .skill-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -288,26 +437,25 @@ body {
 }
 
 .skill-card {
-  /* CHANGED: Made skill cards lighter */
-  border: 1px solid var(--light); /* Changed from --admin-border */
-  border-radius: 10px; /* Changed from 12px */
+  border: 1px solid var(--border-dark);
+  border-radius: 12px;
   padding: 0;
   cursor: pointer;
   transition: var(--transition);
-  background: white; /* Changed from --admin-bg */
+  background: var(--bg-card);
   overflow: hidden;
-  box-shadow: var(--shadow); /* Added subtle shadow */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .skill-card:hover {
-  border-color: var(--primary);
+  border-color: var(--accent);
   transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15); /* Added stronger shadow on hover */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 
 .skill-card h4 {
   margin-bottom: 0.5rem;
-  color: var(--dark); /* Changed from white */
+  color: var(--text-light);
 }
 
 .skill-actions {
@@ -316,207 +464,38 @@ body {
   gap: 0.5rem;
 }
 
-/* Buttons - Updated to match user interface theme */
-#edit-skill-form .btn,
-#edit-skill-form .action-btn {
+.action-btn {
   padding: 0.5rem 1rem;
-  border-radius: 5px; /* Changed from 8px */
+  border-radius: 8px;
   border: none;
   cursor: pointer;
   font-size: 0.9rem;
   font-weight: 600;
   transition: var(--transition);
-  color: white; /* Ensure text contrast */
-}
-
-#edit-skill-form .btn.add-step-btn,
-#edit-skill-form .btn.add-quiz-btn {
-  /* CHANGED: Simplified button style */
-  background: var(--success); /* Removed gradient */
+  background: linear-gradient(135deg, var(--gray), #5a6268);
   color: white;
-  /* Removed shadow */
+  box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
 }
 
-#edit-skill-form .btn.add-step-btn:hover,
-#edit-skill-form .btn.add-quiz-btn:hover {
-  background: #22c55e; /* Darker shade of success */
+.action-btn:hover {
+  background: linear-gradient(135deg, #5a6268, #6c757d);
   transform: translateY(-2px);
-  /* Removed shadow */
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
 }
 
-#edit-skill-form .btn.btn-secondary {
-  background: var(--gray);
-  color: white;
+.action-btn i {
+  margin-right: 0.25rem;
 }
 
-#edit-skill-form .btn.btn-secondary:hover {
-  background: #5a6268;
-}
-
-#edit-skill-form .btn.btn-primary {
-  /* CHANGED: Simplified button style */
-  background: var(--primary); /* Removed gradient */
-  color: white;
-  /* Removed shadow */
-}
-
-#edit-skill-form .btn.btn-primary:hover {
-  background: var(--secondary); /* Darker shade of primary */
-  transform: translateY(-2px);
-  /* Removed shadow */
-}
-
-.profile-content .update-rank-btn,
-.profile-content .close-profile-btn,
-.profile-content .logout-btn-popup {
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-  width: 100%;
-  margin-bottom: 0.5rem;
-  color: white;
-}
-
-.profile-content .update-rank-btn {
-  background: var(--primary);
-}
-
-.profile-content .close-profile-btn {
-  background: var(--gray);
-}
-
-.profile-content .close-profile-btn:hover {
-  background: #5a6268;
-}
-
-.profile-content .logout-btn-popup {
-  background: var(--danger);
-}
-
-.profile-content .logout-btn-popup:hover {
-  background: #e53e3e;
-}
-
-#skills-section .section-title ~ div button.btn,
-.skill-card-ui .skill-content .skill-btn {
-  padding: 0.5rem 1rem;
-  border-radius: 5px; /* Changed from 8px */
-  border: none;
-  cursor: pointer;
-  font-size: 0.9rem;
-  color: white;
-  font-weight: 600;
-  transition: var(--transition);
-}
-
-.user-card .edit-user-btn,
-.user-card .action-btn.delete-btn {
-  padding: 0.5rem 1rem;
-  border-radius: 5px; /* Changed from 8px */
-  border: none;
-  cursor: pointer;
-  font-size: 0.9rem;
-  color: white;
-  font-weight: 600;
-  transition: var(--transition);
-}
-
-.user-card .edit-user-btn {
-  /* CHANGED: Simplified button style */
-  background: var(--warning); /* Removed gradient */
-  color: white;
-  /* Removed shadow */
-}
-
-.user-card .edit-user-btn:hover {
-  background: #eab308; /* Darker shade of warning */
-  transform: translateY(-2px);
-  /* Removed shadow */
-}
-
-.user-card .action-btn.delete-btn {
-  /* CHANGED: Simplified button style */
-  background: var(--danger); /* Removed gradient */
-  color: white;
-  /* Removed shadow */
-}
-
-.user-card .action-btn.delete-btn:hover {
-  background: #dc2626; /* Darker shade of danger */
-  transform: translateY(-2px);
-  /* Removed shadow */
-}
-
-.setting-actions .delete-btn-setting,
-.setting-actions .move-up-btn,
-.setting-actions .move-down-btn {
-  padding: 0.4rem 0.8rem;
-  border-radius: 5px; /* Changed from 6px */
-  border: none;
-  cursor: pointer;
-  font-size: 0.85rem;
-  color: white;
-  font-weight: 600;
-  transition: var(--transition);
-}
-
-.setting-actions .delete-btn-setting {
-  background: var(--danger); /* Removed gradient */
-}
-
-.setting-actions .delete-btn-setting:hover {
-  background: #dc2626; /* Darker shade of danger */
-  transform: translateY(-1px);
-}
-
-.setting-actions .move-up-btn,
-.setting-actions .move-down-btn {
-  background: var(--primary); /* Removed gradient */
-}
-
-.setting-actions .move-up-btn:hover,
-.setting-actions .move-down-btn:hover {
-  background: var(--secondary); /* Darker shade of primary */
-  transform: translateY(-1px);
-}
-
-.admin-access-form button.btn,
-#adminList button.btn {
-  padding: 0.6rem 1.5rem;
-  border-radius: 5px; /* Changed from 8px */
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-  color: white;
-  font-weight: 600;
-  /* CHANGED: Simplified button style */
-  background: var(--primary); /* Removed gradient */
-  /* Removed shadow */
-  transition: var(--transition);
-}
-
-.admin-access-form button.btn:hover,
-#adminList button.btn:hover {
-  background: var(--secondary); /* Darker shade of primary */
-  transform: translateY(-2px);
-  /* Removed shadow */
-}
-
-#adminList button.btn {
-  /* CHANGED: Simplified button style */
-  background: var(--danger); /* Removed gradient */
-  /* Removed shadow */
-}
-
-#adminList button.btn:hover {
-  background: #dc2626; /* Darker shade of danger */
-  /* Removed shadow */
-}
-
-/* Edit Form */
+/* EDIT FORM */
 .edit-form {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-top: 2rem;
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   display: none;
 }
 
@@ -524,8 +503,9 @@ body {
   display: flex;
   gap: 0.5rem;
   margin-bottom: 2rem;
-  border-bottom: 1px solid var(--light); /* Changed from --admin-border */
+  border-bottom: 1px solid var(--border-dark);
   padding-bottom: 0;
+  overflow-x: auto;
 }
 
 .tab-btn {
@@ -533,36 +513,25 @@ body {
   border: none;
   padding: 1rem 1.5rem;
   font-weight: 600;
-  color: var(--gray); /* Changed from --admin-text */
+  color: var(--text-gray);
   cursor: pointer;
-  border-radius: 8px 8px 0 0; /* Changed from 12px */
+  border-radius: 12px 12px 0 0;
   transition: var(--transition);
   border: 1px solid transparent;
   position: relative;
+  white-space: nowrap;
 }
 
 .tab-btn:hover {
-  color: var(--primary); /* Changed from --accent */
-  background: var(--light); /* Changed from gradient */
+  color: var(--accent);
+  background: rgba(76, 201, 240, 0.1);
 }
 
 .tab-btn.active {
-  color: var(--primary); /* Changed from white */
-  background: white; /* Changed from gradient */
-  border-color: var(--primary);
-  border-bottom: 3px solid var(--primary); /* Added bottom border indicator */
-}
-
-.tab-btn.active::after {
-  /* CHANGED: Removed ::after pseudo-element, using border-bottom instead */
-  content: none;
-  /* content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--accent); */
+  color: var(--accent);
+  background: var(--bg-card);
+  border-color: var(--accent);
+  border-bottom: 3px solid var(--accent);
 }
 
 .tab-content {
@@ -585,15 +554,11 @@ body {
   flex: 1;
 }
 
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
 .form-group label {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 600;
-  color: var(--dark); /* Changed from --admin-text */
+  color: var(--text-gray);
 }
 
 .form-group input,
@@ -601,63 +566,35 @@ body {
 .form-group select {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd; /* Changed from --admin-border */
+  border: 1px solid var(--border-dark);
   border-radius: 8px;
   font-size: 1rem;
-  transition: border-color 0.2s;
-  background: white; /* Changed from --admin-bg */
-  color: var(--dark); /* Changed from white */
+  transition: var(--transition);
+  background: var(--bg-input);
+  color: var(--text-light);
 }
 
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
   outline: none;
-  border-color: var(--primary);
-  /* CHANGED: Removed custom box shadow */
-  /* box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1); */
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(76, 201, 240, 0.2);
 }
-
-/* Removed specific overrides for admin dashboard inputs */
-/* .admin-dashboard .form-group label {
-  color: var(--admin-text);
-}
-
-.admin-dashboard .form-group input,
-.admin-dashboard .form-group textarea,
-.admin-dashboard .form-group select {
-  background: var(--admin-bg);
-  color: white;
-  border: 1px solid var(--admin-border);
-}
-
-.admin-dashboard .form-group input:focus,
-.admin-dashboard .form-group textarea:focus,
-.admin-dashboard .form-group select:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
-} */
 
 .image-upload-preview {
   height: 100px;
-  border: 2px dashed #ccc;
+  border: 2px dashed var(--border-dark);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-top: 0.5rem;
-  background: #fafafa;
+  background: rgba(51, 65, 85, 0.5);
   font-size: 0.85rem;
-  color: #777;
+  color: var(--text-gray);
   overflow: hidden;
 }
-
-/* Removed specific override for admin dashboard image preview */
-/* .admin-dashboard .image-upload-preview {
-  background: var(--admin-bg);
-  border: 2px dashed var(--admin-border);
-  color: var(--admin-text);
-} */
 
 .image-upload-preview img {
   width: 100%;
@@ -665,38 +602,15 @@ body {
   object-fit: cover;
 }
 
-.edit-form .section-title {
-  /* CHANGED: Matched user interface section title style */
-  font-size: 1.8rem;
-  color: var(--primary); /* Changed from white */
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 2px solid var(--light); /* Changed from --admin-border */
-}
-
-/* Steps & Quiz */
-.steps-editor,
-.quiz-editor {
-  margin-top: 1.5rem;
-}
-
 .step-item,
 .quiz-question {
-  /* CHANGED: Made step/question items lighter */
-  border: 1px solid var(--light); /* Changed from #e2e8f0 */
-  border-radius: 8px; /* Changed from 12px */
+  border: 1px solid var(--border-dark);
+  border-radius: 12px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
   position: relative;
-  background: #f9fafb; /* Changed from #f9fafb */
+  background: var(--bg-card);
 }
-
-/* Removed specific override for admin dashboard step/quiz items */
-/* .admin-dashboard .step-item,
-.admin-dashboard .quiz-question {
-  background: var(--admin-bg);
-  border: 1px solid var(--admin-border);
-} */
 
 .step-header,
 .quiz-header {
@@ -705,26 +619,14 @@ body {
   align-items: center;
   margin-bottom: 1rem;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--light); /* Changed from #e2e8f0 */
+  border-bottom: 1px solid var(--border-dark);
 }
-
-/* Removed specific override for admin dashboard headers */
-/* .admin-dashboard .step-header,
-.admin-dashboard .quiz-header {
-  border-bottom: 1px solid var(--admin-border);
-} */
 
 .step-header h4,
 .quiz-header h4 {
-  color: var(--primary); /* Changed from --primary */
+  color: var(--accent);
   font-size: 1.1rem;
 }
-
-/* Removed specific override for admin dashboard header text */
-/* .admin-dashboard .step-header h4,
-.admin-dashboard .quiz-header h4 {
-  color: white;
-} */
 
 .step-content,
 .quiz-content {
@@ -739,18 +641,14 @@ body {
   gap: 1rem;
 }
 
-/* Settings */
+/* SETTINGS */
 .settings-tabs {
   display: flex;
-  border-bottom: 1px solid var(--light); /* Changed from --light */
+  border-bottom: 1px solid var(--border-dark);
   margin-bottom: 2rem;
   gap: 0.5rem;
+  overflow-x: auto;
 }
-
-/* Removed specific override for admin dashboard settings tabs */
-/* .admin-dashboard .settings-tabs {
-  border-bottom: 2px solid var(--admin-border);
-} */
 
 .tab-button {
   padding: 1rem 1.5rem;
@@ -759,165 +657,29 @@ body {
   border-bottom: 3px solid transparent;
   cursor: pointer;
   font-weight: 600;
-  color: var(--gray); /* Changed from --gray */
+  color: var(--text-gray);
   transition: var(--transition);
   border-radius: 8px 8px 0 0;
+  white-space: nowrap;
 }
-
-/* Removed specific override for admin dashboard tab buttons */
-/* .admin-dashboard .tab-button {
-  color: var(--admin-text);
-} */
 
 .tab-button:hover {
-  color: var(--primary); /* Changed from --primary */
-}
-
-/* Removed specific override for admin dashboard tab button hover */
-/* .admin-dashboard .tab-button:hover {
   color: var(--accent);
-  background: rgba(67, 97, 238, 0.1);
-} */
+  background: rgba(76, 201, 240, 0.1);
+}
 
 .tab-button.active {
-  border-bottom: 3px solid var(--primary);
-  color: var(--primary); /* Changed from --primary */
-}
-
-/* Removed specific override for admin dashboard active tab button */
-/* .admin-dashboard .tab-button.active {
-  border-bottom-color: var(--accent);
-  color: white;
-  background: rgba(67, 97, 238, 0.2);
-} */
-
-/* User Management */
-.users-section {
-  display: none;
-}
-
-.course-group {
-  margin-bottom: 3rem;
-}
-
-.course-title {
-  /* CHANGED: Matched user interface course title style */
-  font-size: 1.4rem;
-  color: var(--primary); /* Changed from --secondary */
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--light); /* Changed from --light */
-  font-weight: 700;
-}
-
-/* Removed specific override for admin dashboard course title */
-/* .admin-dashboard .course-title {
+  border-bottom: 3px solid var(--accent);
   color: var(--accent);
-  border-bottom: 2px solid var(--admin-border);
-} */
-
-.user-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 1rem;
+  background: rgba(76, 201, 240, 0.1);
 }
 
-.user-card {
-  background: var(--light);
-  border-radius: 10px; /* Changed from 12px */
-  padding: 1.5rem; /* Changed from 1.5rem */
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: var(--transition);
-}
-
-/* Removed specific override for admin dashboard user cards */
-/* .admin-dashboard .user-card {
-  background: var(--admin-bg);
-  border: 1px solid var(--admin-border);
-}
-
-.admin-dashboard .user-card:hover {
-  border-color: var(--primary);
-  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2);
-} */
-
-.user-details {
-  flex-grow: 1;
-}
-
-.user-name {
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  font-size: 1.1rem;
-}
-
-/* Removed specific override for admin dashboard user name */
-/* .admin-dashboard .user-name {
-  color: white;
-} */
-
-.user-rank {
-  font-size: 0.9rem;
-  color: var(--gray); /* Changed from --gray */
-  margin-bottom: 0.25rem;
-}
-
-/* Removed specific override for admin dashboard user rank */
-/* .admin-dashboard .user-rank {
-  color: var(--admin-text);
-} */
-
-.user-course {
-  font-size: 0.9rem;
-  color: var(--primary); /* Changed from --primary */
-}
-
-/* Removed specific override for admin dashboard user course */
-/* .admin-dashboard .user-course {
-  color: var(--accent);
-} */
-
-.user-email {
-  font-size: 0.85rem;
-  color: var(--gray); /* Changed from --gray */
-  margin-top: 0.25rem;
-}
-
-.edit-user-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 3000;
+.tab-content {
   display: none;
 }
 
-.edit-user-box {
-  background: white;
-  padding: 2rem;
-  border-radius: 10px;
-  box-shadow: var(--shadow);
-  width: 100%;
-  max-width: 500px;
-  text-align: center;
-  position: relative;
-}
-
-.edit-user-box h3 {
-  margin-bottom: 1.5rem;
-  color: var(--primary); /* Changed from --primary */
-}
-
-/* Settings */
-.signup-settings-section {
-  display: none;
+.tab-content.active {
+  display: block;
 }
 
 .settings-controls {
@@ -927,40 +689,21 @@ body {
 }
 
 .settings-column {
-  background: var(--light); /* Changed from --light */
-  padding: 2rem; /* Changed from 2rem */
-  border-radius: 10px; /* Changed from 12px */
+  background: var(--bg-card);
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-dark);
 }
 
-/* Removed specific override for admin dashboard settings columns */
-/* .admin-dashboard .settings-column {
-  background: var(--admin-bg);
-  border: 1px solid var(--admin-border);
-} */
-
 .setting-title {
-  /* CHANGED: Matched user interface setting title style */
   font-size: 1.3rem;
   margin-bottom: 1.5rem;
-  color: var(--primary); /* Changed from --primary */
+  color: var(--accent);
   font-weight: 700;
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
-
-/* Removed specific override for admin dashboard setting title */
-/* .admin-dashboard .setting-title {
-  color: white;
-}
-
-.admin-dashboard .setting-title::before {
-  content: '';
-  width: 4px;
-  height: 24px;
-  background: var(--accent);
-  border-radius: 2px;
-} */
 
 .setting-item {
   display: flex;
@@ -968,21 +711,53 @@ body {
   align-items: center;
   margin-bottom: 0.75rem;
   padding: 1rem;
-  border-bottom: 1px solid rgba(0,0,0,0.1); /* Changed from rgba(0,0,0,0.1) */
-  border-radius: 8px; /* Added border radius */
-  background: white; /* Added background */
+  border-bottom: 1px solid var(--border-dark);
+  border-radius: 8px;
+  background: var(--bg-input);
+  transition: var(--transition);
 }
 
-/* Removed specific override for admin dashboard setting items */
-/* .admin-dashboard .setting-item {
-  background: rgba(67, 97, 238, 0.05);
-  border-bottom: 1px solid var(--admin-border);
-  color: white;
-} */
+.setting-item:hover {
+  background: var(--bg-card);
+  transform: translateX(3px);
+}
 
 .setting-actions {
   display: flex;
   gap: 0.5rem;
+}
+
+.move-up-btn,
+.move-down-btn,
+.delete-btn-setting {
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: white;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.move-up-btn,
+.move-down-btn {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+}
+
+.delete-btn-setting {
+  background: linear-gradient(135deg, var(--danger), #dc2626);
+}
+
+.move-up-btn:hover,
+.move-down-btn:hover {
+  background: linear-gradient(135deg, var(--secondary), var(--primary));
+  transform: translateY(-1px);
+}
+
+.delete-btn-setting:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-1px);
 }
 
 .add-item-input {
@@ -994,40 +769,29 @@ body {
 .add-item-input input {
   flex: 1;
   padding: 0.75rem;
-  border: 1px solid #ddd; /* Changed from #ddd */
-  border-radius: 8px; /* Changed from 8px */
-  background: white; /* Added background */
-  color: var(--dark); /* Added color */
+  border: 1px solid var(--border-dark);
+  border-radius: 8px;
+  background: var(--bg-input);
+  color: var(--text-light);
 }
 
-/* Removed specific override for admin dashboard add item input */
-/* .admin-dashboard .add-item-input input {
-  background: var(--admin-bg);
-  color: white;
-  border: 1px solid var(--admin-border);
-} */
-
 .add-item-input button {
-  background: var(--success);
+  background: linear-gradient(135deg, var(--success), #22c55e);
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
-  border-radius: 8px; /* Changed from 8px */
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
   transition: var(--transition);
-}
-
-/* Removed specific override for admin dashboard add item button */
-/* .admin-dashboard .add-item-input button {
-  background: linear-gradient(135deg, var(--success), #22c55e);
   box-shadow: 0 2px 8px rgba(74, 222, 128, 0.3);
 }
 
-.admin-dashboard .add-item-input button:hover {
+.add-item-input button:hover {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(74, 222, 128, 0.4);
-} */
+}
 
 .operation-message {
   margin-top: 1rem;
@@ -1035,65 +799,158 @@ body {
   border-radius: 8px;
   text-align: center;
   font-weight: 600;
+  background: rgba(74, 222, 128, 0.1);
+  color: var(--success);
+  border-left: 4px solid var(--success);
 }
 
-/* Removed specific override for admin dashboard operation message */
-/* .admin-dashboard .operation-message {
-  color: white;
-} */
+/* USER MANAGEMENT */
+.course-group {
+  margin-bottom: 3rem;
+}
 
-/* Primary Buttons */
-#skills-section .btn,
-#users-section .btn,
-#settings-section .btn {
-  background: var(--success); /* Changed from --success */
+.course-title {
+  font-size: 1.4rem;
+  color: var(--accent);
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-dark);
+  font-weight: 700;
+}
+
+.user-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
+.user-card {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: var(--transition);
+  border: 1px solid var(--border-dark);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.user-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 12px rgba(76, 201, 240, 0.2);
+}
+
+.user-details {
+  flex-grow: 1;
+}
+
+.user-name {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  color: var(--text-light);
+}
+
+.user-rank {
+  font-size: 0.9rem;
+  color: var(--text-gray);
+  margin-bottom: 0.25rem;
+}
+
+.user-course {
+  font-size: 0.9rem;
+  color: var(--accent);
+}
+
+.user-email {
+  font-size: 0.85rem;
+  color: var(--text-gray);
+  margin-top: 0.25rem;
+}
+
+.edit-user-btn {
+  background: linear-gradient(135deg, var(--warning), #eab308);
   color: white;
   border: none;
-  border-radius: 5px; /* Changed from 8px */
-  padding: 0.75rem 1.5rem;
-  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
   cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
   transition: var(--transition);
+  box-shadow: 0 2px 8px rgba(250, 204, 21, 0.3);
 }
 
-/* Removed specific override for admin dashboard buttons */
-/* .admin-dashboard #skills-section .btn,
-.admin-dashboard #users-section .btn,
-.admin-dashboard #settings-section .btn {
-  background: linear-gradient(135deg, var(--success), #22c55e);
-  box-shadow: 0 2px 8px rgba(74, 222, 128, 0.3);
-}
-
-.admin-dashboard #skills-section .btn:hover,
-.admin-dashboard #users-section .btn:hover,
-.admin-dashboard #settings-section .btn:hover {
+.edit-user-btn:hover {
+  background: linear-gradient(135deg, #eab308, #ca8a04);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(74, 222, 128, 0.4);
-} */
-
-/* Dashboard Stats - Updated to match user interface theme */
-.admin-dashboard #dashboard-section p {
-  color: var(--dark); /* Changed from --admin-text */
+  box-shadow: 0 4px 12px rgba(250, 204, 21, 0.4);
 }
 
-/* USER INTERFACE (Unchanged) */
+/* EDIT USER MODAL */
+.edit-user-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+  display: none;
+}
+
+.edit-user-box {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+  position: relative;
+  border: 1px solid var(--glass-border);
+}
+
+.edit-user-box h3 {
+  margin-bottom: 1.5rem;
+  color: var(--text-light);
+  background: linear-gradient(to right, var(--text-light), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* USER INTERFACE */
 .user-interface {
   display: none;
   padding: 2rem 0;
+  background: linear-gradient(135deg, var(--bg-darker), var(--bg-dark));
+  min-height: 100vh;
 }
 
 header {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
   color: white;
   padding: 2rem 0;
   text-align: center;
   margin-bottom: 2rem;
   position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 header h1 {
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
+  background: linear-gradient(to right, white, var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 header p {
@@ -1105,18 +962,20 @@ header p {
   position: absolute;
   top: 20px;
   right: 120px;
-  background: rgba(0,0,0,0.3);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
   color: white;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   padding: 0.75rem 1.5rem;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
   transition: var(--transition);
 }
 
 .profile-btn:hover {
-  background: rgba(0,0,0,0.5);
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
 }
 
 .admin-switch {
@@ -1127,18 +986,20 @@ header p {
 }
 
 .admin-switch-btn {
-  background: rgba(0,0,0,0.3);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
   color: white;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   padding: 0.75rem 1.5rem;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
   transition: var(--transition);
 }
 
 .admin-switch-btn:hover {
-  background: rgba(0,0,0,0.5);
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
 }
 
 .profile-popup {
@@ -1146,29 +1007,32 @@ header p {
   top: 70px;
   right: 20px;
   width: 300px;
-  background: white;
-  border-radius: 10px;
-  box-shadow: var(--shadow);
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   z-index: 1000;
   display: none;
+  border: 1px solid var(--glass-border);
 }
 
 .profile-header {
   display: flex;
   align-items: center;
   padding: 1rem;
-  border-bottom: 1px solid var(--light);
+  border-bottom: 1px solid var(--border-dark);
 }
 
 .profile-header i {
   font-size: 1.5rem;
   margin-right: 0.5rem;
-  color: var(--primary);
+  color: var(--accent);
 }
 
 .profile-header h3 {
   font-size: 1.2rem;
   margin: 0;
+  color: var(--text-light);
 }
 
 .profile-content {
@@ -1181,24 +1045,38 @@ header p {
 
 .info-item {
   margin-bottom: 0.5rem;
+  padding: 0.25rem 0;
 }
 
 .info-label {
   font-weight: 600;
-  color: var(--gray);
+  color: var(--text-gray);
   font-size: 0.9rem;
 }
 
 .info-value {
   font-size: 1rem;
+  color: var(--text-light);
 }
 
-.change-rank-select {
+.logout-btn-popup {
+  background: linear-gradient(135deg, var(--danger), #dc2626);
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
   width: 100%;
-  margin-bottom: 1rem;
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  margin-top: 1rem;
+  transition: var(--transition);
+  box-shadow: 0 4px 15px rgba(248, 113, 113, 0.3);
+}
+
+.logout-btn-popup:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(248, 113, 113, 0.4);
 }
 
 .skill-grid {
@@ -1209,20 +1087,23 @@ header p {
 }
 
 .skill-card-ui {
-  background: white;
-  border-radius: 10px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: var(--shadow);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   transition: var(--transition);
   cursor: pointer;
   height: 100%;
   display: flex;
   flex-direction: column;
+  border: 1px solid var(--glass-border);
 }
 
 .skill-card-ui:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+  border-color: var(--accent);
 }
 
 .skill-icon {
@@ -1231,6 +1112,7 @@ header p {
   display: flex;
   align-items: center;
   justify-content: center;
+  background: linear-gradient(135deg, var(--bg-card), var(--bg-input));
 }
 
 .skill-icon img {
@@ -1249,37 +1131,42 @@ header p {
 .skill-name {
   font-size: 1.5rem;
   margin-bottom: 0.75rem;
-  color: var(--primary);
+  color: var(--text-light);
 }
 
 .skill-desc {
-  color: var(--gray);
+  color: var(--text-gray);
   flex-grow: 1;
 }
 
 .skill-btn {
-  background: var(--primary);
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
   color: white;
   border: none;
   padding: 0.75rem;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
   margin-top: 1rem;
   transition: var(--transition);
+  box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
 }
 
 .skill-btn:hover {
-  background: var(--secondary);
+  background: linear-gradient(135deg, var(--secondary), var(--primary));
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
 }
 
 .skill-detail {
-  background: white;
-  border-radius: 10px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
   padding: 2rem;
-  box-shadow: var(--shadow);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   margin-top: 1.5rem;
   display: none;
+  border: 1px solid var(--glass-border);
 }
 
 .skill-header {
@@ -1287,7 +1174,7 @@ header p {
   align-items: center;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid var(--light);
+  border-bottom: 2px solid var(--border-dark);
 }
 
 .skill-header img {
@@ -1295,11 +1182,12 @@ header p {
   height: 50px;
   margin-right: 1rem;
   object-fit: cover;
+  border-radius: 8px;
 }
 
 .skill-header h2 {
   font-size: 2rem;
-  color: var(--dark);
+  color: var(--text-light);
 }
 
 .skill-section {
@@ -1308,10 +1196,10 @@ header p {
 
 .section-title-ui {
   font-size: 1.5rem;
-  color: var(--primary);
+  color: var(--accent);
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--light);
+  border-bottom: 1px solid var(--border-dark);
 }
 
 .tools-grid {
@@ -1321,16 +1209,18 @@ header p {
 }
 
 .tool-item {
-  background: var(--light);
+  background: var(--bg-card);
   border-radius: 8px;
   padding: 1rem;
   text-align: center;
   transition: var(--transition);
+  border: 1px solid var(--border-dark);
 }
 
 .tool-item:hover {
-  background: var(--primary);
-  color: white;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
 }
 
 .tool-item img {
@@ -1338,6 +1228,7 @@ header p {
   height: 50px;
   object-fit: cover;
   margin-bottom: 0.5rem;
+  border-radius: 4px;
 }
 
 .tool-item:hover img {
@@ -1346,6 +1237,11 @@ header p {
 
 .tool-item span {
   display: block;
+  color: var(--text-gray);
+}
+
+.tool-item:hover span {
+  color: white;
 }
 
 .steps-container {
@@ -1357,14 +1253,21 @@ header p {
 .step-card {
   display: flex;
   gap: 1.5rem;
-  background: var(--light);
+  background: var(--bg-card);
   border-radius: 8px;
   overflow: hidden;
+  transition: var(--transition);
+  border: 1px solid var(--border-dark);
+}
+
+.step-card:hover {
+  transform: translateX(5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .step-image {
   width: 200px;
-  height: 150px; /* Changed from 150px */
+  height: 150px;
   object-fit: cover;
 }
 
@@ -1376,29 +1279,35 @@ header p {
 .step-title {
   font-size: 1.2rem;
   margin-bottom: 0.5rem;
-  color: var(--primary);
+  color: var(--accent);
 }
 
 .theory-content {
-  background: var(--light);
+  background: var(--bg-card);
   padding: 1.5rem;
   border-radius: 8px;
   line-height: 1.8;
+  border: 1px solid var(--border-dark);
 }
 
 .quiz-container {
-  background: var(--light);
+  background: var(--bg-card);
   padding: 1.5rem;
   border-radius: 8px;
+  border: 1px solid var(--border-dark);
 }
 
 .question {
   margin-bottom: 1.5rem;
+  padding: 1rem;
+  border-radius: 8px;
+  background: var(--bg-input);
 }
 
 .question-text {
   font-weight: 600;
   margin-bottom: 0.75rem;
+  color: var(--text-light);
 }
 
 .options {
@@ -1411,36 +1320,39 @@ header p {
   display: flex;
   align-items: center;
   padding: 0.75rem;
-  background: white;
+  background: var(--bg-card);
   border-radius: 5px;
   cursor: pointer;
   transition: var(--transition);
+  border: 1px solid var(--border-dark);
 }
 
 .option:hover {
-  background: #e9ecef;
+  background: var(--bg-input);
+  border-color: var(--accent);
 }
 
 .option.selected {
-  background: var(--primary);
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
   color: white;
+  border-color: var(--primary);
 }
 
 .quiz-result {
   margin-top: 1.5rem;
   padding: 1rem;
-  border-radius: 5px;
+  border-radius: 8px;
   text-align: center;
   font-weight: 600;
 }
 
 .quiz-result.correct {
-  background: var(--success);
+  background: linear-gradient(135deg, var(--success), #22c55e);
   color: white;
 }
 
 .quiz-result.incorrect {
-  background: var(--danger);
+  background: linear-gradient(135deg, var(--danger), #dc2626);
   color: white;
 }
 
@@ -1451,78 +1363,99 @@ header p {
 }
 
 .back-btn {
-  background: var(--gray);
+  background: linear-gradient(135deg, var(--gray), #5a6268);
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
+  transition: var(--transition);
+  box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+}
+
+.back-btn:hover {
+  background: linear-gradient(135deg, #5a6268, #6c757d);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
 }
 
 footer {
-  background: var(--dark);
-  color: white;
+  background: linear-gradient(135deg, var(--bg-darker), var(--bg-dark));
+  color: var(--text-gray);
   text-align: center;
   padding: 1.5rem 0;
   margin-top: 3rem;
+  border-top: 1px solid var(--border-dark);
 }
 
-.login-popup.confirmation-modal {
-  z-index: 3001;
-}
-
-/* Responsive */
+/* RESPONSIVE */
 @media (max-width: 992px) {
   .admin-content {
     grid-template-columns: 1fr;
   }
+  
   .nav-panel {
     margin-bottom: 2rem;
     position: static;
   }
+  
   .settings-controls {
     grid-template-columns: 1fr;
   }
-  .settings-tabs {
-    flex-wrap: wrap;
+  
+  .form-row {
+    grid-template-columns: 1fr;
   }
-  .tab-button {
-    padding: 0.5rem;
-  }
-}
-
-@media (max-width: 768px) {
+  
   .step-card {
     flex-direction: column;
   }
+  
   .step-image {
     width: 100%;
     height: 200px;
   }
+  
   .skill-header {
     flex-direction: column;
     text-align: center;
   }
+  
   .skill-header img {
     margin-right: 0;
     margin-bottom: 1rem;
   }
-  .form-row {
-    grid-template-columns: 1fr;
-  }
-  .profile-btn, .admin-switch {
+}
+
+@media (max-width: 768px) {
+  .profile-btn, 
+  .admin-switch {
     position: static;
     text-align: center;
     margin-top: 1rem;
+    margin-right: 0;
   }
-  .profile-btn {
-    margin-right: 1rem;
-  }
+  
   .profile-popup {
     position: absolute;
     top: 50px;
     right: 10px;
+    width: 280px;
+  }
+  
+  .skill-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .tabs,
+  .settings-tabs {
+    flex-wrap: wrap;
+  }
+  
+  .tab-btn,
+  .tab-button {
+    padding: 0.75rem;
+    font-size: 0.9rem;
   }
 }
-</style>
