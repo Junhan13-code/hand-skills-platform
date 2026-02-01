@@ -322,6 +322,7 @@
     let editingSkillId = null; // Track the ID of the skill being edited
     let wasInAdminView = false; // Track previous view state
     let firestoreListenersSetup = false; // Guard to prevent duplicate listeners
+    let usersData = []; 
 
     // Function to update dashboard counters
     function updateCounters() {
@@ -1256,76 +1257,86 @@
 
     // --- USERS MANAGEMENT (ADMIN) ---
     async function loadUsersManagement() {
-      try {
-        const usersSnapshot = await db.collection("users").get();
-        const users = [];
-        usersSnapshot.forEach(doc => {
-          users.push({ id: doc.id, ...doc.data() });
-        });
+  try {
+    const usersSnapshot = await db.collection("users").get();
+    usersData = []; // Reset the global array
+    usersSnapshot.forEach(doc => {
+      usersData.push({ id: doc.id, ...doc.data() });
+    });
 
-        // Group users by course
-        const groupedUsers = {};
-        users.forEach(user => {
-          if (!groupedUsers[user.course]) {
-            groupedUsers[user.course] = [];
-          }
-          groupedUsers[user.course].push(user);
-        });
-
-        const usersContent = document.getElementById('usersContent');
-        usersContent.innerHTML = '';
-
-        // Sort courses alphabetically
-        const sortedCourses = Object.keys(groupedUsers).sort();
-
-        sortedCourses.forEach(course => {
-          const courseGroup = document.createElement('div');
-          courseGroup.className = 'course-group';
-          courseGroup.innerHTML = `<h3 class="course-title">${course}</h3>`;
-          const userList = document.createElement('div');
-          userList.className = 'user-list';
-
-          // Sort users within each course by name
-          groupedUsers[course].sort((a, b) => a.name.localeCompare(b.name)).forEach(user => {
-            const userCard = document.createElement('div');
-            userCard.className = 'user-card';
-            userCard.innerHTML = `
-              <div class="user-details">
-                <div class="user-name">${user.name || user.email}</div>
-                <div class="user-rank">${user.rank}</div>
-                <div class="user-course">${user.course}</div>
-                <div class="user-email">${user.email}</div>
-              </div>
-              <div>
-                <button class="edit-user-btn" onclick="openEditUserModal('${user.id}')">Edit</button>
-                <button class="action-btn delete-btn" onclick="deleteUser('${user.id}', '${user.name || user.email}')">Delete</button>
-              </div>
-            `;
-            userList.appendChild(userCard);
-          });
-
-          courseGroup.appendChild(userList);
-          usersContent.appendChild(courseGroup);
-        });
-
-      } catch (error) {
-        console.error("Error loading users: ", error);
+    // Group users by course
+    const groupedUsers = {};
+    usersData.forEach(user => { // Use the global usersData array
+      if (!groupedUsers[user.course]) {
+        groupedUsers[user.course] = [];
       }
-    }
+      groupedUsers[user.course].push(user);
+    });
 
-    function openEditUserModal(userId) {
-      const user = usersData.find(u => u.id === userId); // Note: usersData needs to be populated, see loadUsersManagement
-      if (!user) {
-          console.error("User not found for editing:", userId);
-          return;
-      }
-      document.getElementById('edit-user-name').value = user.name;
-      document.getElementById('edit-user-rank').value = user.rank;
-      document.getElementById('edit-user-course').value = user.course;
-      document.getElementById('editUserModal').style.display = 'flex';
-      // Store the ID of the user being edited
-      document.getElementById('editUserModal').setAttribute('data-editing-id', userId);
-    }
+    const usersContent = document.getElementById('usersContent');
+    usersContent.innerHTML = '';
+
+    // Sort courses alphabetically
+    const sortedCourses = Object.keys(groupedUsers).sort();
+
+    sortedCourses.forEach(course => {
+      const courseGroup = document.createElement('div');
+      courseGroup.className = 'course-group';
+      courseGroup.innerHTML = `<h3 class="course-title">${course}</h3>`;
+      const userList = document.createElement('div');
+      userList.className = 'user-list';
+
+      // Sort users within each course by name
+      groupedUsers[course].sort((a, b) => a.name.localeCompare(b.name)).forEach(user => {
+        const userCard = document.createElement('div');
+        userCard.className = 'user-card';
+        userCard.innerHTML = `
+          <div class="user-details">
+            <div class="user-name">${user.name || user.email}</div>
+            <div class="user-rank">${user.rank}</div>
+            <div class="user-course">${user.course}</div>
+            <div class="user-email">${user.email}</div>
+          </div>
+          <div>
+            <button class="edit-user-btn" onclick="openEditUserModal('${user.id}')">Edit</button>
+            <button class="action-btn delete-btn" onclick="deleteUser('${user.id}', '${user.name || user.email}')">Delete</button>
+          </div>
+        `;
+        userList.appendChild(userCard);
+      });
+
+      courseGroup.appendChild(userList);
+      usersContent.appendChild(courseGroup);
+    });
+
+  } catch (error) {
+    console.error("Error loading users: ", error);
+  }
+}
+
+function openEditUserModal(userId) {
+  // Add a check for userId validity
+  if (!userId) {
+      console.error("Invalid user ID provided to openEditUserModal:", userId);
+      alert("Cannot edit user: Invalid user ID.");
+      return;
+  }
+  // Find user by the passed ID, not relying on potentially stale usersData lookup
+  // Although usersData should be fresh if loadUsersManagement ran recently
+  const user = usersData.find(u => u.id === userId);
+  if (!user) {
+      console.error("User not found for editing:", userId);
+      alert("User not found.");
+      return; // Exit if user not found
+  }
+  document.getElementById('edit-user-name').value = user.name;
+  document.getElementById('edit-user-rank').value = user.rank;
+  document.getElementById('edit-user-course').value = user.course;
+  document.getElementById('editUserModal').style.display = 'flex';
+  // Store the ID of the user being edited
+  document.getElementById('editUserModal').setAttribute('data-editing-id', userId);
+}
+
 
     function closeEditUserModal() {
       document.getElementById('editUserModal').style.display = 'none';
@@ -1362,32 +1373,38 @@
     }
 
     // Delete User (Admin) - NEW FUNCTION ADDED
-    async function deleteUser(userId, userName) {
-        if (!confirm(`Are you sure you want to delete the user "${userName}"? This action cannot be undone.`)) {
-            return;
-        }
-        try {
-            // First, attempt to remove the user from the admins collection if they are an admin
-            await db.collection("admins").doc(userId).delete().catch(error => {
-                // It's okay if the user wasn't an admin, just log the specific error
-                if (error.code !== 'not-found') {
-                    console.error("Error removing user from admins during deletion: ", error);
-                }
-            });
-
-            // Then, delete the user document from the users collection
-            await db.collection("users").doc(userId).delete();
-
-            alert(`User "${userName}" has been deleted successfully.`);
-            // Optionally, refresh the user list to reflect the deletion
-            if (document.getElementById('users-section').style.display === 'block') {
-                loadUsersManagement(); // Reload the user list if currently viewing
-            }
-        } catch (error) {
-            console.error("Error deleting user: ", error);
-            alert('Error deleting user: ' + error.message);
-        }
+async function deleteUser(userId, userName) {
+    // Add validation for userId here too
+    if (!userId) {
+        console.error("Invalid user ID provided to deleteUser:", userId);
+        alert("Cannot delete user: Invalid user ID.");
+        return;
     }
+    if (!confirm(`Are you sure you want to delete the user "${userName}"? This action cannot be undone.`)) {
+        return;
+    }
+    try {
+        // First, attempt to remove the user from the admins collection if they are an admin
+        await db.collection("admins").doc(userId).delete().catch(error => {
+            // It's okay if the user wasn't an admin, just log the specific error
+            if (error.code !== 'not-found') {
+                console.error("Error removing user from admins during deletion: ", error);
+            }
+        });
+
+        // Then, delete the user document from the users collection
+        await db.collection("users").doc(userId).delete(); // userId is now validated
+
+        alert(`User "${userName}" has been deleted successfully.`);
+        // Optionally, refresh the user list to reflect the deletion
+        if (document.getElementById('users-section').style.display === 'block') {
+            loadUsersManagement(); // Reload the user list if currently viewing
+        }
+    } catch (error) {
+        console.error("Error deleting user: ", error);
+        alert('Error deleting user: ' + error.message);
+    }
+}
 
 
     // --- SETTINGS (ADMIN) ---
@@ -1965,3 +1982,4 @@
   </script>
 </body>
 </html>
+
