@@ -15,329 +15,501 @@
 </head>
 <body>
 
-  <!-- Login Popup -->
-  <div class="login-popup" id="loginPopup">
-    <div class="login-box">
-      <span class="close-btn" onclick="closeLoginPopup()">&times;</span>
-      <h2>Login</h2>
-      <div id="auth-container">
-        <div id="loginForm">
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" required>
-          </div>
-          <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" required>
-          </div>
-          <button class="btn primary-btn" onclick="login()">Login</button> <!-- Added class -->
-          <button class="btn secondary-btn" onclick="showForgotPassword()">Forgot Password?</button> <!-- Added class -->
-          <button class="btn secondary-btn" onclick="showSignupForm()">Sign Up</button> <!-- Added class -->
-          <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid #eee;"> <!-- Visual separator -->
-          <button class="btn google-btn" onclick="googleLogin()"> <!-- Added class -->
-            <i class="fab fa-google"></i> Sign in with Google
-          </button>
-        </div>
-        <div id="signupForm" style="display: none;">
-          <div class="form-group">
-            <label for="signup-email">Email</label>
-            <input type="email" id="signup-email" required>
-          </div>
-          <div class="form-group">
-            <label for="signup-password">Password (min 6 characters)</label>
-            <input type="password" id="signup-password" required>
-          </div>
-          <div class="form-group">
-            <label for="signup-confirm-password">Confirm Password</label>
-            <input type="password" id="signup-confirm-password" required>
-          </div>
-          <button class="btn primary-btn" onclick="signup()">Sign Up</button> <!-- Added class -->
-          <button class="btn secondary-btn" onclick="showLoginForm()">Back to Login</button> <!-- Added class -->
-        </div>
-        <div id="forgotPasswordForm" style="display: none;">
-          <div class="form-group">
-            <label for="forgot-email">Enter your Email</label>
-            <input type="email" id="forgot-email" required>
-          </div>
-          <button class="btn primary-btn" onclick="sendPasswordReset()">Send Reset Email</button> <!-- Added class -->
-          <button class="btn secondary-btn" onclick="showLoginForm()">Back to Login</button> <!-- Added class -->
-        </div>
-        <div id="profileForm" style="display: none;">
-          <h3>Complete Your Profile</h3>
-          <div class="form-group">
-            <label for="profile-rank">Rank</label>
-            <select id="profile-rank"><!-- Options will be loaded dynamically --></select>
-          </div>
-          <div class="form-group">
-            <label for="profile-course">Course</label>
-            <select id="profile-course"><!-- Options will be loaded dynamically --></select>
-          </div>
-          <div class="form-group">
-            <label for="profile-name">Full Name</label>
-            <input type="text" id="profile-name" placeholder="Enter your full name">
-          </div>
-          <button class="btn primary-btn" onclick="completeProfile()">Save Profile</button> <!-- Added class -->
-        </div>
-        <div class="error-message" id="auth-error"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Admin Dashboard -->
-  <div class="admin-dashboard" id="adminDashboard">
-    <div class="admin-header">
-      <div class="container">
-        <h1><i class="fas fa-cogs"></i> Admin Control Panel</h1>
-        <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
-      </div>
-    </div>
-    <div class="admin-content">
-      <div class="nav-panel">
-        <h3>Navigation</h3>
-        <div class="nav-item active" onclick="showSection('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</div>
-        <div class="nav-item" onclick="showSection('skills')"><i class="fas fa-tools"></i> Manage Skills</div>
-        <div class="nav-item" onclick="showSection('users')"><i class="fas fa-users"></i> Manage Users</div>
-        <div class="nav-item" onclick="showSection('settings')"><i class="fas fa-cog"></i> Settings</div>
-      </div>
-      <div class="main-content-area">
-        <!-- Dashboard Section -->
-        <div id="dashboard-section" class="section">
-          <h2 class="section-title">Dashboard Overview</h2>
-          <div class="stats-grid">
-            <div style="background: linear-gradient(135deg, var(--admin-bg), var(--admin-sidebar)); padding: 2rem; border-radius: 16px; text-align: center; border: 1px solid var(--admin-border); box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
-              <i class="fas fa-tools" style="font-size: 3rem; color: var(--accent); margin-bottom: 1rem; display: block;"></i>
-              <h3 id="total-skills" style="font-size: 2.5rem; color: white; margin-bottom: 0.5rem; font-weight: 700;">0</h3>
-              <p style="color: var(--admin-text); font-size: 1rem;">Total Skills</p>
-            </div>
-            <div style="background: linear-gradient(135deg, var(--admin-bg), var(--admin-sidebar)); padding: 2rem; border-radius: 16px; text-align: center; border: 1px solid var(--admin-border); box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
-              <i class="fas fa-users" style="font-size: 3rem; color: var(--accent); margin-bottom: 1rem; display: block;"></i>
-              <h3 id="total-users" style="font-size: 2.5rem; color: white; margin-bottom: 0.5rem; font-weight: 700;">0</h3>
-              <p style="color: var(--admin-text); font-size: 1rem;">Total Users</p>
-            </div>
-            <div style="background: linear-gradient(135deg, var(--admin-bg), var(--admin-sidebar)); padding: 2rem; border-radius: 16px; text-align: center; border: 1px solid var(--admin-border); box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
-              <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--accent); margin-bottom: 1rem; display: block;"></i>
-              <h3 id="completed-skills" style="font-size: 2.5rem; color: white; margin-bottom: 0.5rem; font-weight: 700;">0</h3>
-              <p style="color: var(--admin-text); font-size: 1rem;">Completed Skills</p>
-            </div>
-            <div style="background: linear-gradient(135deg, var(--admin-bg), var(--admin-sidebar)); padding: 2rem; border-radius: 16px; text-align: center; border: 1px solid var(--admin-border); box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
-              <i class="fas fa-user-shield" style="font-size: 3rem; color: var(--accent); margin-bottom: 1rem; display: block;"></i>
-              <h3 id="admin-count" style="font-size: 2.5rem; color: white; margin-bottom: 0.5rem; font-weight: 700;">0</h3>
-              <p style="color: var(--admin-text); font-size: 1rem;">Admin Count</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Skills Management Section -->
-        <div id="skills-section" class="section" style="display: none;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-            <h2 class="section-title">Manage Skills</h2>
-            <button class="btn" onclick="addNewSkill()">Add New Skill</button>
-          </div>
-          <div class="skill-list" id="skillsList"><!-- Skills will be loaded here --></div>
-        </div>
-
-        <!-- Users Management Section -->
-        <div id="users-section" class="section users-section" style="display: none;">
-          <h2 class="section-title">Manage Users</h2>
-          <div id="usersContent"><!-- User groups will be loaded here --></div>
-        </div>
-
-        <!-- Settings Section -->
-        <div id="settings-section" class="section" style="display: none;">
-          <h2 class="section-title">System Settings</h2>
-          <div class="settings-tabs">
-            <button class="tab-button active" data-tab="signupSettings">Signup Settings</button>
-            <button class="tab-button" data-tab="adminAccess">Admin Access</button>
-          </div>
-          <div class="tab-content active" id="signupSettingsTab">
-            <div class="settings-controls">
-              <div class="settings-column">
-                <h3 class="setting-title"><i class="fas fa-star"></i> Manage Ranks</h3>
-                <div id="ranksList"></div>
-                <div class="add-item-input">
-                  <input type="text" id="newRankInput" placeholder="Enter new rank">
-                  <button onclick="addRank()">Add Rank</button>
-                </div>
-                <div id="rankMessage" class="operation-message" style="display: none;"></div>
-              </div>
-              <div class="settings-column">
-                <h3 class="setting-title"><i class="fas fa-book"></i> Manage Courses</h3>
-                <div id="coursesList"></div>
-                <div class="add-item-input">
-                  <input type="text" id="newCourseInput" placeholder="Enter new course">
-                  <button onclick="addCourse()">Add Course</button>
-                </div>
-                <div id="courseMessage" class="operation-message" style="display: none;"></div>
-              </div>
-            </div>
-          </div>
-          <div class="tab-content" id="adminAccessTab">
-            <h3 class="setting-title"><i class="fas fa-user-shield"></i> Admin Access Management</h3>
+     <!-- Login Popup -->
+    <div class="login-popup" id="loginPopup">
+        <div class="login-box">
+            <span class="close-btn" onclick="closeLoginPopup()">&times;</span>
+            <h2>Login</h2>
+            
             <div class="form-group">
-              <label for="admin-email">Grant Admin Access (Enter Email)</label>
-              <input type="email" id="admin-email" placeholder="user@example.com">
-              <button onclick="grantAdminAccess()">Grant Access</button>
+                <label for="loginEmail">Email:</label>
+                <input type="email" id="loginEmail" placeholder="Enter your email">
             </div>
-            <div id="adminList">
-              <!-- Admin list will be loaded here -->
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Edit Skill Form -->
-        <div id="edit-skill-form" class="edit-form">
-          <div class="section-title">Edit Skill</div>
-          <!-- Tabs -->
-          <div class="tabs">
-            <button class="tab-btn active" data-tab="info">📌 Skill Info</button>
-            <button class="tab-btn" data-tab="tools">🛠️ Tools</button>
-            <button class="tab-btn" data-tab="steps">📋 Steps</button>
-            <button class="tab-btn" data-tab="quiz">❓ Quiz</button>
-            <button class="tab-btn" data-tab="theory">📖 Theory</button>
-          </div>
-          <!-- Tab Content -->
-          <div id="tab-info" class="tab-content active">
-            <div class="form-row">
-              <div class="form-col">
-                <div class="form-group">
-                  <label for="skill-name">Skill Name</label>
-                  <input type="text" id="skill-name" onchange="updateSkillField('name', this.value)">
-                </div>
-                <div class="form-group">
-                  <label for="skill-description">Description</label>
-                  <textarea id="skill-description" rows="3" onchange="updateSkillField('description', this.value)"></textarea>
-                </div>
-              </div>
-              <div class="form-col">
-                <div class="form-group">
-                  <label for="skill-image">Upload Image</label>
-                  <input type="file" id="skill-image" accept="image/*" onchange="previewSkillImage(this)">
-                </div>
-                <div class="image-upload-preview" id="skill-image-preview"></div>
-              </div>
-            </div>
-          </div>
-          <div id="tab-tools" class="tab-content">
-            <div id="tools-container"></div>
-            <button class="btn add-step-btn" onclick="addToolInput()">Add Tool</button>
-          </div>
-          <div id="tab-steps" class="tab-content">
-            <div id="steps-container"></div>
-            <button class="btn add-step-btn" onclick="addStep()">Add Step</button>
-          </div>
-          <div id="tab-theory" class="tab-content">
+            
             <div class="form-group">
-              <label for="skill-theory">Theory</label>
-              <textarea id="skill-theory" rows="6" onchange="updateSkillField('theory', this.value)"></textarea>
+                <label for="loginPassword">Password:</label>
+                <input type="password" id="loginPassword" placeholder="Enter your password">
             </div>
-          </div>
-          <div id="tab-quiz" class="tab-content">
-            <div id="quiz-container"></div>
-            <button class="btn add-quiz-btn" onclick="addQuizQuestion()">Add Question</button>
-          </div>
-          <!-- Action Buttons -->
-          <div style="margin-top: 2rem; display: flex; gap: 1rem;">
-            <button class="btn btn-primary" onclick="saveSkill()">Save Changes</button>
-            <button class="btn btn-secondary" onclick="cancelEdit()">Cancel</button>
-          </div>
+            
+            <button class="btn primary-btn" onclick="login()">Login</button>
+            
+            <div style="margin: 1rem 0;">
+                <button class="btn google-btn" onclick="googleLogin()">
+                    <i class="fab fa-google"></i> Sign in with Google
+                </button>
+            </div>
+            
+            <button class="btn secondary-btn" onclick="showSignupForm()">
+                Create New Account
+            </button>
+            
+            <hr>
+            
+            <button class="btn secondary-btn" onclick="forgotPassword()">
+                Forgot Password?
+            </button>
+            
+            <div id="loginError" class="error-message" style="display: none;"></div>
         </div>
-      </div>
     </div>
-  </div>
 
-  <!-- Edit User Modal -->
-  <div class="edit-user-modal" id="editUserModal">
-    <div class="edit-user-box">
-      <span class="close-btn" onclick="closeEditUserModal()">&times;</span>
-      <h3>Edit User</h3>
-      <div class="form-group">
-        <label for="edit-user-name">Name</label>
-        <input type="text" id="edit-user-name">
-      </div>
-      <div class="form-group">
-        <label for="edit-user-rank">Rank</label>
-        <select id="edit-user-rank">
-          <!-- Populated dynamically -->
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="edit-user-course">Course</label>
-        <select id="edit-user-course">
-          <!-- Populated dynamically -->
-        </select>
-      </div>
-      <button class="btn primary-btn" onclick="saveEditedUser()">Save Changes</button> <!-- Added class -->
+    <!-- Signup Form -->
+    <div class="login-popup" id="signupForm" style="display: none;">
+        <div class="login-box">
+            <span class="close-btn" onclick="closeSignupForm()">&times;</span>
+            <h2>Sign Up</h2>
+            
+            <div class="form-group">
+                <label for="signupName">Full Name:</label>
+                <input type="text" id="signupName" placeholder="Enter your full name">
+            </div>
+            
+            <div class="form-group">
+                <label for="signupEmail">Email:</label>
+                <input type="email" id="signupEmail" placeholder="Enter your email">
+            </div>
+            
+            <div class="form-group">
+                <label for="signupPassword">Password:</label>
+                <input type="password" id="signupPassword" placeholder="Create a password">
+            </div>
+            
+            <div class="form-group">
+                <label for="rankSelect">Rank:</label>
+                <select id="rankSelect">
+                    <option value="">Select Rank</option>
+                    <option value="ME1T">ME1T</option>
+                    <option value="ME2">ME2</option>
+                    <option value="ME3">ME3</option>
+                    <option value="ME4">ME4</option>
+                    <option value="ME5">ME5</option>
+                    <option value="ME6">ME6</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="courseSelect">Course Group:</label>
+                <select id="courseSelect">
+                    <option value="">Select Course</option>
+                    <option value="56th Mech">56th Mech</option>
+                    <option value="56th Avionics">56th Avionics</option>
+                </select>
+            </div>
+            
+            <button class="btn primary-btn" onclick="signup()">Sign Up</button>
+            
+            <div style="margin: 1rem 0;">
+                <button class="btn google-btn" onclick="googleSignup()">
+                    <i class="fab fa-google"></i> Sign up with Google
+                </button>
+            </div>
+            
+            <button class="btn secondary-btn" onclick="showLoginForm()">
+                Already have an account? Login
+            </button>
+            
+            <div id="signupError" class="error-message" style="display: none;"></div>
+        </div>
     </div>
-  </div>
 
-  <!-- User Interface -->
-  <div class="user-interface" id="userInterface">
-    <header>
-      <div class="container">
-        <h1><i class="fas fa-graduation-cap"></i> Hand Skills Learning Platform</h1>
-        <p>Master Essential Hands-On Skills</p>
-        <!-- CHANGED: Profile button now uses the correct ID and function -->
-        <button class="profile-btn" id="profileBtn" onclick="toggleProfilePopup()">
-          <i class="fas fa-user"></i> <span id="userDisplayName">Guest</span>
-        </button>
-        <div class="admin-switch">
-          <!-- CHANGED: Swapped button visibility logic -->
-          <!-- This button shows "Admin View" and switches TO admin if user is admin -->
-          <button class="admin-switch-btn" id="adminSwitchBtn" onclick="switchToAdminInterface()">Admin View</button>
-          <!-- This button shows "User View" and switches BACK from admin -->
-          <button class="admin-switch-btn" id="adminBackBtn" onclick="switchToUserInterface()" style="display: none;">User View</button>
+    <!-- Admin Dashboard -->
+    <div class="admin-dashboard" id="adminDashboard">
+        <header class="admin-header">
+            <div class="container">
+                <h1><i class="fas fa-cogs"></i> Admin Dashboard</h1>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </header>
+        
+        <div class="admin-content">
+            <!-- Navigation Panel -->
+            <nav class="nav-panel">
+                <h3>Navigation</h3>
+                <div class="nav-item active" onclick="switchTab('dashboard')" id="dashboardNav">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </div>
+                <div class="nav-item" onclick="switchTab('skills')" id="skillsNav">
+                    <i class="fas fa-graduation-cap"></i> Skills Management
+                </div>
+                <div class="nav-item" onclick="switchTab('users')" id="usersNav">
+                    <i class="fas fa-users"></i> User Management
+                </div>
+                <div class="nav-item" onclick="switchTab('settings')" id="settingsNav">
+                    <i class="fas fa-cog"></i> Settings
+                </div>
+            </nav>
+            
+            <!-- Main Content Area -->
+            <main class="main-content-area">
+                <!-- Dashboard Section -->
+                <div id="dashboard-section" class="tab-content active">
+                    <h2 class="section-title"><i class="fas fa-chart-bar"></i> Dashboard Overview</h2>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <i class="fas fa-users"></i>
+                            <h3 id="totalUsers">0</h3>
+                            <p>Total Users</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-graduation-cap"></i>
+                            <h3 id="totalSkills">0</h3>
+                            <p>Total Skills</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-user-shield"></i>
+                            <h3 id="totalAdmins">0</h3>
+                            <p>Admin Users</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-percentage"></i>
+                            <h3 id="completionRate">0%</h3>
+                            <p>Avg. Completion</p>
+                        </div>
+                    </div>
+                    
+                    <div class="recent-activity">
+                        <h3><i class="fas fa-history"></i> Recent Activity</h3>
+                        <div id="recentActivityList">
+                            <!-- Recent activity will be populated here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Skills Management Section -->
+                <div id="skills-section" class="tab-content">
+                    <h2 class="section-title"><i class="fas fa-graduation-cap"></i> Skills Management</h2>
+                    
+                    <button class="btn primary-btn" onclick="openNewSkillForm()">
+                        <i class="fas fa-plus"></i> Add New Skill
+                    </button>
+                    
+                    <div class="skill-list" id="skillList">
+                        <!-- Skills will be populated here -->
+                    </div>
+                    
+                    <!-- Edit Skill Form -->
+                    <div class="edit-form" id="editSkillForm">
+                        <h3 class="section-title"><i class="fas fa-edit"></i> Edit Skill</h3>
+                        
+                        <div class="tabs">
+                            <button class="tab-btn active" data-tab="general">General</button>
+                            <button class="tab-btn" data-tab="steps">Steps</button>
+                            <button class="tab-btn" data-tab="quiz">Quiz</button>
+                        </div>
+                        
+                        <div class="tab-content active" id="general-tab">
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="skillName">Skill Name:</label>
+                                        <input type="text" id="skillName">
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="skillCategory">Category:</label>
+                                        <input type="text" id="skillCategory">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="skillDescription">Description:</label>
+                                <textarea id="skillDescription" rows="4"></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="skillIcon">Icon URL:</label>
+                                <input type="url" id="skillIcon">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="skillImage">Upload Image:</label>
+                                <input type="file" id="skillImage" accept="image/*">
+                                <div class="image-upload-preview" id="imagePreview">
+                                    <img id="previewImg" src="" alt="Preview" style="display: none;">
+                                    <span id="previewText">No image selected</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tab-content" id="steps-tab">
+                            <div class="steps-editor" id="stepsEditor">
+                                <!-- Steps will be added here -->
+                            </div>
+                            <button class="btn primary-btn add-step-btn" onclick="addStep()">
+                                <i class="fas fa-plus"></i> Add Step
+                            </button>
+                        </div>
+                        
+                        <div class="tab-content" id="quiz-tab">
+                            <div class="quiz-editor" id="quizEditor">
+                                <!-- Quiz questions will be added here -->
+                            </div>
+                            <button class="btn primary-btn add-quiz-btn" onclick="addQuizQuestion()">
+                                <i class="fas fa-plus"></i> Add Question
+                            </button>
+                        </div>
+                        
+                        <div style="margin-top: 2rem;">
+                            <button class="btn primary-btn" onclick="saveSkill()">Save Skill</button>
+                            <button class="btn secondary-btn" onclick="cancelEdit()">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- User Management Section -->
+                <div id="users-section" class="tab-content">
+                    <h2 class="section-title"><i class="fas fa-users"></i> User Management</h2>
+                    
+                    <div class="course-groups" id="userManagementContent">
+                        <!-- Users will be grouped by course -->
+                    </div>
+                    
+                    <!-- Edit User Modal -->
+                    <div class="edit-user-modal" id="editUserModal">
+                        <div class="edit-user-box">
+                            <h3>Edit User Details</h3>
+                            
+                            <div class="form-group">
+                                <label for="editUserName">Name:</label>
+                                <input type="text" id="editUserName">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="editUserRank">Rank:</label>
+                                <select id="editUserRank">
+                                    <option value="ME1T">ME1T</option>
+                                    <option value="ME2">ME2</option>
+                                    <option value="ME3">ME3</option>
+                                    <option value="ME4">ME4</option>
+                                    <option value="ME5">ME5</option>
+                                    <option value="ME6">ME6</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="editUserCourse">Course Group:</label>
+                                <select id="editUserCourse">
+                                    <option value="56th Mech">56th Mech</option>
+                                    <option value="56th Avionics">56th Avionics</option>
+                                </select>
+                            </div>
+                            
+                            <div style="margin-top: 1.5rem;">
+                                <button class="btn primary-btn" onclick="saveUserChanges()">Save Changes</button>
+                                <button class="btn secondary-btn" onclick="closeEditUserModal()">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Settings Section -->
+                <div id="settings-section" class="tab-content">
+                    <h2 class="section-title"><i class="fas fa-cog"></i> System Settings</h2>
+                    
+                    <div class="settings-tabs">
+                        <button class="tab-button active" data-tab="general">General</button>
+                        <button class="tab-button" data-tab="signup">Signup Settings</button>
+                        <button class="tab-button" data-tab="admin">Admin Access</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="general-tab-settings">
+                        <div class="settings-controls">
+                            <div class="settings-column">
+                                <h4 class="setting-title"><i class="fas fa-sliders-h"></i> General Settings</h4>
+                                <div class="setting-item">
+                                    <span>System Maintenance Mode</span>
+                                    <label class="switch">
+                                        <input type="checkbox" id="maintenanceMode">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item">
+                                    <span>Enable Email Notifications</span>
+                                    <label class="switch">
+                                        <input type="checkbox" id="emailNotifications" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="signup-tab-settings">
+                        <div class="settings-controls">
+                            <div class="settings-column">
+                                <h4 class="setting-title"><i class="fas fa-user-plus"></i> Rank Options</h4>
+                                <div id="ranksList">
+                                    <!-- Ranks will be populated here -->
+                                </div>
+                                <div class="add-item-input">
+                                    <input type="text" id="newRankInput" placeholder="Add new rank">
+                                    <button class="btn success-btn" onclick="addRank()">Add</button>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-column">
+                                <h4 class="setting-title"><i class="fas fa-users"></i> Course Groups</h4>
+                                <div id="coursesList">
+                                    <!-- Courses will be populated here -->
+                                </div>
+                                <div class="add-item-input">
+                                    <input type="text" id="newCourseInput" placeholder="Add new course">
+                                    <button class="btn success-btn" onclick="addCourse()">Add</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="admin-tab-settings">
+                        <div class="admin-access-form">
+                            <h4 class="setting-title"><i class="fas fa-user-shield"></i> Grant Admin Access</h4>
+                            <div class="form-group">
+                                <label for="adminEmail">Email Address:</label>
+                                <input type="email" id="adminEmail" placeholder="Enter email to grant admin access">
+                            </div>
+                            <button class="btn primary-btn" onclick="grantAdminAccess()">Grant Admin Access</button>
+                        </div>
+                        
+                        <div style="margin: 2rem 0;">
+                            <h4 class="setting-title"><i class="fas fa-user-times"></i> Current Admins</h4>
+                            <div id="adminList">
+                                <!-- Admins will be listed here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
         </div>
-      </div>
-    </header>
-
-    <main class="container">
-      <div id="main-content">
-        <div class="skill-grid" id="skill-grid"><!-- Skills will be loaded here --></div>
-        <div id="skill-detail" class="skill-detail"><!-- Skill details will be loaded here --></div>
-      </div>
-    </main>
-
-    <footer>
-      <div class="container">
-        <p>&copy; 2026 Hand Skills Learning Platform | Master Essential Hands-On Skills</p>
-      </div>
-    </footer>
-  </div>
-
-  <!-- Profile Popup -->
-  <!-- CHANGED: Moved profile popup outside header and added proper structure -->
-  <div class="profile-popup" id="profilePopup">
-    <div class="profile-header">
-      <i class="fas fa-user-circle"></i>
-      <h3>User Profile</h3>
     </div>
-    <div class="profile-content">
-      <div class="profile-info">
-        <div class="info-item">
-          <span class="info-label">Name:</span>
-          <span class="info-value" id="popup-name-display">N/A</span>
+
+    <!-- User Interface -->
+    <div class="user-interface" id="userInterface">
+        <header>
+            <div class="container">
+                <h1>Skill Training Platform</h1>
+                <p>Master your technical skills with our interactive learning modules</p>
+                
+                <button class="profile-btn" onclick="toggleProfilePopup()">
+                    <i class="fas fa-user"></i> Profile
+                </button>
+                
+                <button class="admin-switch-btn" onclick="switchToAdmin()">
+                    <i class="fas fa-cogs"></i> Admin Panel
+                </button>
+            </div>
+        </header>
+        
+        <div class="container">
+            <!-- Profile Popup -->
+            <div class="profile-popup" id="profilePopup">
+                <div class="profile-header">
+                    <i class="fas fa-user-circle"></i>
+                    <h3>User Profile</h3>
+                </div>
+                
+                <div class="profile-content">
+                    <div class="profile-info">
+                        <div class="info-item">
+                            <span class="info-label">Name:</span>
+                            <span class="info-value" id="profileName">Loading...</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Email:</span>
+                            <span class="info-value" id="profileEmail">Loading...</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Rank:</span>
+                            <span class="info-value" id="profileRank">Loading...</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Course:</span>
+                            <span class="info-value" id="profileCourse">Loading...</span>
+                        </div>
+                    </div>
+                    
+                    <select class="change-rank-select" id="changeRankSelect">
+                        <option value="ME1T">ME1T</option>
+                        <option value="ME2">ME2</option>
+                        <option value="ME3">ME3</option>
+                        <option value="ME4">ME4</option>
+                        <option value="ME5">ME5</option>
+                        <option value="ME6">ME6</option>
+                    </select>
+                    
+                    <button class="update-rank-btn" onclick="updateUserRank()">
+                        Update Rank
+                    </button>
+                    
+                    <button class="logout-btn-popup" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Skills Grid -->
+            <div class="skill-grid" id="skillGrid">
+                <!-- Skills will be populated here -->
+            </div>
+            
+            <!-- Skill Detail View -->
+            <div class="skill-detail" id="skillDetail">
+                <div class="skill-header">
+                    <img id="detailSkillIcon" src="" alt="Skill Icon">
+                    <h2 id="detailSkillName">Skill Name</h2>
+                </div>
+                
+                <div class="skill-section">
+                    <h3 class="section-title-ui">Description</h3>
+                    <p id="detailSkillDesc">Skill description will appear here...</p>
+                </div>
+                
+                <div class="skill-section">
+                    <h3 class="section-title-ui">Learning Steps</h3>
+                    <div class="steps-container" id="stepsContainer">
+                        <!-- Steps will be populated here -->
+                    </div>
+                </div>
+                
+                <div class="skill-section">
+                    <h3 class="section-title-ui">Practice Quiz</h3>
+                    <div class="quiz-container" id="quizContainer">
+                        <!-- Quiz will be populated here -->
+                    </div>
+                    
+                    <div class="quiz-nav" id="quizNav" style="display: none;">
+                        <button class="back-btn" onclick="previousQuestion()">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </button>
+                        <button class="btn primary-btn" onclick="nextQuestion()">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <button class="back-btn" onclick="closeSkillDetail()">
+                    <i class="fas fa-arrow-left"></i> Back to Skills
+                </button>
+            </div>
         </div>
-        <div class="info-item">
-          <span class="info-label">Rank:</span>
-          <span class="info-value" id="popup-rank-display">N/A</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Course:</span>
-          <span class="info-value" id="popup-course-display">N/A</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Email:</span>
-          <span class="info-value" id="popup-email-display">N/A</span>
-        </div>
-      </div>
-      <div style="margin-top: 1rem;">
-        <!-- Optional: Add a button to change rank directly from the popup -->
-        <!-- Example: <button class="update-rank-btn" onclick="updateProfileRank()">Change Rank</button> -->
-        <button class="logout-btn-popup" onclick="logout()">Logout</button>
-      </div>
     </div>
-  </div>
+
+    <!-- Confirmation Modal -->
+    <div class="login-popup confirmation-modal" id="confirmationModal" style="display: none;">
+        <div class="login-box">
+            <span class="close-btn" onclick="closeConfirmationModal()">&times;</span>
+            <h2>Confirm Action</h2>
+            <p id="confirmationMessage">Are you sure you want to perform this action?</p>
+            <div style="margin-top: 1.5rem;">
+                <button class="btn danger-btn" id="confirmActionBtn">Yes, Confirm</button>
+                <button class="btn secondary-btn" onclick="closeConfirmationModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
 
   <script>
     // Initialize Firebase
@@ -2024,3 +2196,4 @@
   </script>
 </body>
 </html>
+
