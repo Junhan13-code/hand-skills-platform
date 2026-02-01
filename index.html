@@ -12,530 +12,976 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script> <!-- Add Storage SDK -->
 <style>
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 :root {
-  --primary: #4361ee;
-  --secondary: #3f37c9;
-  --accent: #4cc9f0;
-  --light: #f8f9fa;
-  --dark: #212529;
-  --gray: #6c757d;
-  --success: #4ade80;
-  --warning: #facc15;
-  --danger: #f87171;
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-  --transition: all 0.3s ease;
+--primary: #4361ee;
+--secondary: #3f37c9;
+--accent: #4cc9f0;
+--light: #f8f9fa;
+--dark: #212529;
+--gray: #6c757d;
+--success: #4ade80;
+--warning: #facc15;
+--danger: #f87171;
+--shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+--transition: all 0.3s ease;
 }
 body {
-  background-color: #f5f7fb;
-  color: var(--dark);
-  line-height: 1.6;
+background-color: #f5f7fb;
+color: var(--dark);
+line-height: 1.6;
 }
 .container {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
+width: 100%;
+max-width: 1200px;
+margin: 0 auto;
+padding: 0 20px;
 }
-
-/* === Login & Profile Popups (Unchanged) === */
+/* Login Popup */
 .login-popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-  display: none;
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0,0,0,0.7);
+display: flex;
+justify-content: center;
+align-items: center;
+z-index: 2000;
+display: none;
 }
 .login-box {
-  background: white;
-  padding: 2.5rem;
-  border-radius: 10px;
-  box-shadow: var(--shadow);
-  width: 100%;
-  max-width: 450px;
-  text-align: center;
-  position: relative;
+background: white;
+padding: 2.5rem;
+border-radius: 10px;
+box-shadow: var(--shadow);
+width: 100%;
+max-width: 450px;
+text-align: center;
+position: relative;
 }
 .login-box h2 {
-  margin-bottom: 1.5rem;
-  color: var(--primary);
+margin-bottom: 1.5rem;
+color: var(--primary);
 }
 .close-btn {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: var(--gray);
+position: absolute;
+top: 15px;
+right: 15px;
+font-size: 1.5rem;
+cursor: pointer;
+color: var(--gray);
 }
 .close-btn:hover {
-  color: var(--dark);
+color: var(--dark);
 }
 .form-group {
-  margin-bottom: 1.2rem;
-  text-align: left;
+margin-bottom: 1.2rem;
+text-align: left;
 }
 .form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
+display: block;
+margin-bottom: 0.5rem;
+font-weight: 500;
 }
-.form-group input,
-.form-group select,
-.form-group textarea {
-  width: 100%;
-  padding: 0.8rem;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 1rem;
+.form-group input, .form-group select, .form-group textarea {
+width: 100%;
+padding: 0.8rem;
+border: 1px solid #ddd;
+border-radius: 5px;
+font-size: 1rem;
 }
+/* New styles for image upload previews */
 .image-upload-preview {
-  width: 100px;
-  height: 100px;
-  border: 1px dashed #ccc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 0.5rem;
-  overflow: hidden;
+width: 100px; /* Adjust size as needed */
+height: 100px;
+border: 1px dashed #ccc;
+display: flex;
+align-items: center;
+justify-content: center;
+margin-top: 0.5rem;
+overflow: hidden;
 }
 .image-upload-preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+width: 100%;
+height: 100%;
+object-fit: cover;
 }
-
-/* === Admin Dashboard (Modernized) === */
+/* Admin Dashboard - NEW MODERN STYLING */
 .admin-dashboard {
-  display: none;
-  padding: 2rem 0;
+display: none;
+padding: 2rem 0;
+background-color: #f0f4f8;
 }
 .admin-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid #eef2f7;
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 2rem;
+padding-bottom: 1rem;
+border-bottom: 1px solid #e2e8f0;
+background: white;
+border-radius: 10px;
+padding: 1rem 2rem;
+box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 .admin-header h1 {
-  color: var(--primary);
-  font-weight: 700;
-  font-size: 1.8rem;
+color: var(--primary);
+font-size: 1.8rem;
 }
 .logout-btn {
-  background: var(--danger);
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: var(--transition);
-}
-.logout-btn:hover {
-  background: #e53e3e;
-  transform: translateY(-2px);
+background: var(--danger);
+color: white;
+border: none;
+padding: 0.5rem 1rem;
+border-radius: 5px;
+cursor: pointer;
 }
 .admin-content {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 2rem;
+display: grid;
+grid-template-columns: 250px 1fr;
+gap: 2rem;
 }
-
-/* Navigation Panel */
+/* Navigation Panel - NEW MODERN STYLING */
 .nav-panel {
-  background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: var(--shadow);
-  height: fit-content;
+background: white;
+border-radius: 10px;
+padding: 1.5rem;
+box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+height: fit-content;
+position: sticky;
+top: 2rem;
 }
 .nav-panel h3 {
-  margin-bottom: 1.2rem;
-  padding-bottom: 0.6rem;
-  border-bottom: 1px solid #eee;
-  color: var(--dark);
-  font-weight: 600;
+margin-bottom: 1.2rem;
+padding-bottom: 0.5rem;
+border-bottom: 1px solid #e2e8f0;
+color: var(--primary);
+font-size: 1.2rem;
 }
 .nav-item {
-  padding: 0.9rem 1rem;
-  margin-bottom: 0.6rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: var(--transition);
-  font-weight: 500;
-  color: var(--gray);
+padding: 0.8rem;
+margin-bottom: 0.5rem;
+border-radius: 8px;
+cursor: pointer;
+transition: var(--transition);
+display: flex;
+align-items: center;
+font-weight: 500;
 }
-.nav-item:hover,
-.nav-item.active {
-  background: var(--primary);
-  color: white;
-  box-shadow: 0 2px 6px rgba(67, 97, 238, 0.25);
+.nav-item i {
+margin-right: 0.75rem;
+width: 20px;
+text-align: center;
 }
-
-/* Main Content Area */
+.nav-item:hover, .nav-item.active {
+background: var(--primary);
+color: white;
+}
+/* Main Content Area - NEW MODERN STYLING */
 .main-content-area {
-  background: white;
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: var(--shadow);
+background: white;
+border-radius: 10px;
+padding: 2rem;
+box-shadow: 0 4px 6px rgba(0,0,0,0.05);
 }
 .section-title {
-  font-size: 1.6rem;
-  color: var(--primary);
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.6rem;
-  border-bottom: 2px solid #f0f4fc;
-  font-weight: 700;
+font-size: 1.5rem;
+color: var(--primary);
+margin-bottom: 1.5rem;
+padding-bottom: 0.5rem;
+border-bottom: 1px solid #e2e8f0;
 }
-
-/* Skills Section Grid */
-.skill-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1.5rem;
+.skill-list {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+gap: 1.5rem;
 }
-.skill-card-ui {
-  background: white;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: var(--shadow);
-  transition: var(--transition);
-  cursor: pointer;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+.skill-card {
+border: 1px solid #e2e8f0;
+border-radius: 8px;
+padding: 1.2rem;
+cursor: pointer;
+transition: var(--transition);
+background: #f8fafc;
 }
-.skill-card-ui:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+.skill-card:hover {
+border-color: var(--primary);
+transform: translateY(-3px);
+box-shadow: 0 5px 15px rgba(0,0,0,0.05);
 }
-.skill-icon {
-  height: 150px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.skill-card h4 {
+margin-bottom: 0.5rem;
+color: var(--primary);
 }
-.skill-icon img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.skill-actions {
+margin-top: 1rem;
+display: flex;
+gap: 0.5rem;
 }
-.skill-content {
-  padding: 1.5rem;
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
+/* CORRECTED SELECTORS: Define specific styles for buttons in different contexts */
+/* Buttons inside the Edit Skill Form */
+#edit-skill-form .btn,
+#edit-skill-form .action-btn { /* Include action buttons inside steps/quiz editors */
+padding: 0.4rem 0.8rem;
+border-radius: 4px;
+border: none;
+cursor: pointer;
+font-size: 0.9rem;
 }
-.skill-name {
-  font-size: 1.3rem;
-  margin-bottom: 0.75rem;
-  color: var(--primary);
+/* Specific background colors for edit form buttons (can be inline) */
+#edit-skill-form .btn.add-step-btn,
+#edit-skill-form .btn.add-quiz-btn {
+background: var(--success);
+color: white;
 }
-.skill-desc {
-  color: var(--gray);
-  flex-grow: 1;
-  font-size: 0.95rem;
+#edit-skill-form .btn.btn-secondary {
+background: var(--gray);
+color: white;
 }
-
-/* Primary Action Buttons in Admin Sections */
-#skills-section .btn,
-#users-section .btn,
-#settings-section .btn,
-.admin-access-form .btn {
-  background: var(--success);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 0.65rem 1.2rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition);
-  font-size: 1rem;
-  box-shadow: 0 2px 5px rgba(76, 201, 240, 0.2);
+#edit-skill-form .btn.btn-primary {
+background: var(--primary);
+color: white;
 }
-#skills-section .btn:hover {
-  background: #3cbf70;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(76, 201, 240, 0.3);
+/* Buttons inside the Profile Popup */
+.profile-content .update-rank-btn,
+.profile-content .close-profile-btn,
+.profile-content .logout-btn-popup {
+padding: 0.5rem 1rem; /* Example padding */
+border-radius: 5px;   /* Example radius */
+border: none;         /* Example border */
+cursor: pointer;      /* Example cursor */
+font-size: 1rem;      /* Example size */
+width: 100%;          /* Full width for consistency */
+margin-bottom: 0.5rem; /* Space between buttons */
+color: white;         /* Ensure text contrast */
 }
-
-/* Skill Card Buttons (Edit/Delete/Move) */
-.skill-card-ui .skill-content .skill-btn {
-  padding: 0.5rem 0.8rem;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  font-size: 0.9rem;
-  color: white;
-  font-weight: 600;
-  margin-top: 0.5rem;
-  transition: var(--transition);
+.profile-content .update-rank-btn {
+background: var(--primary); /* Example color */
 }
-.skill-card-ui .skill-content .skill-btn[style*="var(--warning)"] {
-  background: var(--warning);
+.profile-content .close-profile-btn {
+background: var(--gray); /* Example color */
 }
-.skill-card-ui .skill-content .skill-btn[style*="var(--danger)"] {
-  background: var(--danger);
+.profile-content .close-profile-btn:hover {
+background: #5a6268;
 }
-.skill-card-ui .skill-content .skill-btn[style*="var(--primary)"] {
-  background: var(--primary);
+.profile-content .logout-btn-popup {
+background: var(--danger); /* Example color */
 }
-.skill-card-ui .skill-content .skill-btn:hover {
-  opacity: 0.9;
-  transform: translateY(-2px);
+.profile-content .logout-btn-popup:hover {
+background: #e53e3e;
 }
-
-/* User Management Cards */
-.user-card {
-  background: #fafbff;
-  border-radius: 10px;
-  padding: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-  transition: var(--transition);
+/* Buttons in the Admin Skills List Header and Skill Cards */
+#skills-section .section-title ~ div button.btn, /* Target the "Add New Skill" button */
+.skill-card-ui .skill-content .skill-btn { /* Target buttons in skill cards (Edit, Delete, Move Up/Down) */
+padding: 0.4rem 0.8rem;
+border-radius: 4px;
+border: none;
+cursor: pointer;
+font-size: 0.9rem;
+color: white; /* Ensure text contrast */
 }
-.user-card:hover {
-  background: #f0f4ff;
+/* Specific colors for skill card buttons (inline styles in HTML take precedence) */
+.skill-card-ui .skill-content .skill-btn[style*="var(--warning)"] { /* Example: Edit button */
+background: var(--warning);
 }
-.user-details {
-  flex-grow: 1;
+.skill-card-ui .skill-content .skill-btn[style*="var(--danger)"] { /* Example: Delete button */
+background: var(--danger);
 }
-.user-name {
-  font-weight: 600;
-  margin-bottom: 0.25rem;
+.skill-card-ui .skill-content .skill-btn[style*="var(--primary)"] { /* Example: Move Up/Down buttons */
+background: var(--primary);
 }
-.user-rank,
-.user-course,
-.user-email {
-  font-size: 0.9rem;
-  color: var(--gray);
-}
-.user-course {
-  color: var(--primary);
-}
+/* Buttons in the User Management Section (User Cards) */
 .user-card .edit-user-btn,
-.user-card .action-btn.delete-btn {
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  font-size: 0.9rem;
-  color: white;
-  font-weight: 600;
+.user-card .action-btn.delete-btn { /* Target the Edit and Delete buttons in user cards */
+padding: 0.5rem 1rem;
+border-radius: 4px;
+border: none;
+cursor: pointer;
+font-size: 0.9rem;
+color: white; /* Ensure text contrast */
 }
 .user-card .edit-user-btn {
-  background: var(--warning);
+background: var(--warning);
+}
+.user-card .edit-user-btn:hover {
+background: #e4bb0b;
 }
 .user-card .action-btn.delete-btn {
-  background: var(--danger);
+background: var(--danger);
 }
-
-/* Settings Controls */
-.setting-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.8rem 0;
-  border-bottom: 1px solid #f1f3f9;
-}
-.setting-actions {
-  display: flex;
-  gap: 0.5rem;
-}
+/* Buttons in the Settings Section (Signup Settings) */
 .setting-actions .delete-btn-setting,
 .setting-actions .move-up-btn,
 .setting-actions .move-down-btn {
-  padding: 0.35rem 0.6rem;
-  border-radius: 5px;
-  border: none;
-  cursor: pointer;
-  font-size: 0.85rem;
-  color: white;
+padding: 0.25rem 0.5rem; /* Smaller padding for inline actions */
+border-radius: 4px;
+border: none;
+cursor: pointer;
+font-size: 0.8rem; /* Smaller font */
+color: white; /* Ensure text contrast */
 }
 .setting-actions .delete-btn-setting {
-  background: var(--danger);
+background: var(--danger);
 }
 .setting-actions .move-up-btn,
 .setting-actions .move-down-btn {
-  background: var(--primary);
+background: var(--primary);
 }
-
-/* Tabs */
+/* Buttons in the Settings Section (Admin Access) */
+.admin-access-form button.btn,
+#adminList button.btn { /* Target buttons in admin access section */
+padding: 0.5rem 1rem;
+border-radius: 5px;
+border: none;
+cursor: pointer;
+font-size: 1rem;
+color: white; /* Ensure text contrast */
+background: var(--primary);
+}
+#adminList button.btn { /* Revoke button */
+background: var(--danger);
+}
+/* Edit Form */
+.edit-form {
+display: none;
+}
+.form-row {
+display: flex;
+gap: 1rem;
+margin-bottom: 1.2rem;
+}
+.form-col {
+flex: 1;
+}
+textarea {
+width: 100%;
+padding: 0.8rem;
+border: 1px solid #ddd;
+border-radius: 5px;
+resize: vertical;
+min-height: 100px;
+}
+.form-actions {
+display: flex;
+justify-content: flex-end;
+gap: 1rem;
+margin-top: 1.5rem;
+}
+/* Steps Editor */
+.steps-editor {
+margin-top: 1.5rem;
+}
+.step-item {
+border: 1px solid var(--light);
+border-radius: 5px;
+padding: 1rem;
+margin-bottom: 1rem;
+position: relative;
+}
+.step-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 0.8rem;
+}
+.step-content {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 1rem;
+}
+/* Quiz Editor */
+.quiz-editor {
+margin-top: 1.5rem;
+}
+.quiz-question {
+border: 1px solid var(--light);
+border-radius: 5px;
+padding: 1rem;
+margin-bottom: 1rem;
+position: relative;
+}
+.quiz-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 0.8rem;
+}
+.quiz-content {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 1rem;
+}
+.quiz-options {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+gap: 1rem;
+}
+/* Settings Tabs */
 .settings-tabs {
-  display: flex;
-  border-bottom: 1px solid var(--light);
-  margin-bottom: 1.5rem;
+display: flex;
+border-bottom: 1px solid var(--light);
+margin-bottom: 1.5rem;
 }
 .tab-button {
-  padding: 0.75rem 1.5rem;
-  background: none;
-  border: none;
-  border-bottom: 3px solid transparent;
-  cursor: pointer;
-  font-weight: 600;
-  color: var(--gray);
+padding: 0.75rem 1.5rem;
+background: none;
+border: none;
+border-bottom: 3px solid transparent;
+cursor: pointer;
+font-weight: 600;
+color: var(--gray);
 }
 .tab-button.active {
-  border-bottom: 3px solid var(--primary);
-  color: var(--primary);
+border-bottom: 3px solid var(--primary);
+color: var(--primary);
 }
 .tab-content {
-  display: none;
+display: none;
 }
 .tab-content.active {
-  display: block;
+display: block;
 }
-
-/* === User Interface (UNCHANGED – preserved exactly as before) === */
+/* User Interface */
 .user-interface {
-  display: none;
-  padding: 2rem 0;
+display: none;
+padding: 2rem 0;
 }
+/* Header Styles */
 header {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  color: white;
-  padding: 2rem 0;
-  text-align: center;
-  margin-bottom: 2rem;
+background: linear-gradient(135deg, var(--primary), var(--secondary));
+color: white;
+padding: 2rem 0;
+text-align: center;
+margin-bottom: 2rem;
 }
 header h1 {
-  font-size: 2.5rem;
-  margin-bottom: 0.5rem;
+font-size: 2.5rem;
+margin-bottom: 0.5rem;
 }
 header p {
-  font-size: 1.1rem;
-  opacity: 0.9;
+font-size: 1.1rem;
+opacity: 0.9;
 }
-.profile-btn,
-.admin-switch-btn {
-  position: absolute;
-  top: 20px;
-  background: rgba(0,0,0,0.3);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: var(--transition);
-}
-.profile-btn:hover,
-.admin-switch-btn:hover {
-  background: rgba(0,0,0,0.5);
-}
+/* Profile Button */
 .profile-btn {
-  right: 120px;
+position: absolute;
+top: 20px;
+right: 120px;
+background: rgba(0,0,0,0.3);
+color: white;
+border: none;
+padding: 0.75rem 1.5rem;
+border-radius: 5px;
+cursor: pointer;
+font-weight: 600;
+transition: var(--transition);
+}
+.profile-btn:hover {
+background: rgba(0,0,0,0.5);
+}
+/* Admin Switch Button */
+.admin-switch {
+position: absolute;
+top: 20px;
+right: 20px;
+z-index: 100;
 }
 .admin-switch-btn {
-  right: 20px;
+background: rgba(0,0,0,0.3);
+color: white;
+border: none;
+padding: 0.75rem 1.5rem;
+border-radius: 5px;
+cursor: pointer;
+font-weight: 600;
+transition: var(--transition);
 }
+.admin-switch-btn:hover {
+background: rgba(0,0,0,0.5);
+}
+/* Profile Popup */
 .profile-popup {
-  position: fixed;
-  top: 70px;
-  right: 20px;
-  width: 300px;
-  background: white;
-  border-radius: 10px;
-  box-shadow: var(--shadow);
-  z-index: 1000;
-  display: none;
+position: fixed;
+top: 70px;
+right: 20px;
+width: 300px;
+background: white;
+border-radius: 10px;
+box-shadow: var(--shadow);
+z-index: 1000;
+display: none;
 }
 .profile-header {
-  display: flex;
-  align-items: center;
-  padding: 1rem;
-  border-bottom: 1px solid var(--light);
+display: flex;
+align-items: center;
+padding: 1rem;
+border-bottom: 1px solid var(--light);
 }
 .profile-header i {
-  font-size: 1.5rem;
-  margin-right: 0.5rem;
-  color: var(--primary);
+font-size: 1.5rem;
+margin-right: 0.5rem;
+color: var(--primary);
 }
 .profile-header h3 {
-  font-size: 1.2rem;
-  margin: 0;
+font-size: 1.2rem;
+margin: 0;
 }
 .profile-content {
-  padding: 1rem;
+padding: 1rem;
+}
+.profile-info {
+margin-bottom: 1rem;
+}
+.info-item {
+margin-bottom: 0.5rem;
 }
 .info-label {
-  font-weight: 600;
-  color: var(--gray);
-  font-size: 0.9rem;
+font-weight: 600;
+color: var(--gray);
+font-size: 0.9rem;
 }
 .info-value {
-  font-size: 1rem;
+font-size: 1rem;
 }
 .change-rank-select {
-  width: 100%;
-  margin-bottom: 1rem;
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+width: 100%;
+margin-bottom: 1rem;
+padding: 0.5rem;
+border: 1px solid #ddd;
+border-radius: 5px;
 }
-.skill-btn {
-  background: var(--primary);
-  color: white;
-  border: none;
-  padding: 0.75rem;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: 600;
-  margin-top: 1rem;
-  transition: var(--transition);
+/* User Management Section */
+.users-section {
+display: none;
+}
+.course-group {
+margin-bottom: 2rem;
+}
+.course-title {
+font-size: 1.3rem;
+color: var(--secondary);
+margin-bottom: 1rem;
+padding-bottom: 0.5rem;
+border-bottom: 1px solid var(--light);
+}
+.user-list {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+gap: 1rem;
+}
+.user-card {
+background: var(--light);
+border-radius: 8px;
+padding: 1rem;
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+.user-details {
+flex-grow: 1;
+}
+.user-name {
+font-weight: 600;
+margin-bottom: 0.25rem;
+}
+.user-rank {
+font-size: 0.9rem;
+color: var(--gray);
+}
+.user-course {
+font-size: 0.9rem;
+color: var(--primary);
+}
+/* Edit User Modal */
+.edit-user-modal {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0,0,0,0.7);
+display: flex;
+justify-content: center;
+align-items: center;
+z-index: 3000;
+display: none;
+}
+.edit-user-box {
+background: white;
+padding: 2rem;
+border-radius: 10px;
+box-shadow: var(--shadow);
+width: 100%;
+max-width: 500px;
+text-align: center;
+position: relative;
+}
+.edit-user-box h3 {
+margin-bottom: 1.5rem;
+color: var(--primary);
+}
+/* Settings Sections */
+.signup-settings-section {
+display: none;
+}
+.settings-controls {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 2rem;
+}
+.settings-column {
+background: var(--light);
+padding: 1.5rem;
+border-radius: 8px;
+}
+.setting-title {
+font-size: 1.2rem;
+margin-bottom: 1rem;
+color: var(--primary);
+}
+.setting-item {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 0.5rem;
+padding: 0.5rem 0;
+border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+.setting-actions {
+display: flex;
+gap: 0.5rem;
+}
+.add-item-input {
+display: flex;
+margin-top: 1rem;
+}
+.add-item-input input {
+flex: 1;
+margin-right: 0.5rem;
+}
+.add-item-input button {
+background: var(--success);
+color: white;
+border: none;
+padding: 0.5rem;
+border-radius: 4px;
+cursor: pointer;
+}
+/* Skill Grid */
+.skill-grid {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+gap: 1.5rem;
+margin-top: 2rem;
+}
+.skill-card-ui {
+background: white;
+border-radius: 10px;
+overflow: hidden;
+box-shadow: var(--shadow);
+transition: var(--transition);
+cursor: pointer;
+height: 100%;
+display: flex;
+flex-direction: column;
+}
+.skill-card-ui:hover {
+transform: translateY(-5px);
+box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+.skill-icon {
+/* background: linear-gradient(135deg, var(--primary), var(--accent)); */
+/* color: white; */
+font-size: 3rem;
+height: 150px;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+.skill-icon img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+}
+.skill-content {
+padding: 1.5rem;
+flex-grow: 1;
+display: flex;
+flex-direction: column;
+}
+.skill-name {
+font-size: 1.5rem;
+margin-bottom: 0.75rem;
+color: var(--primary);
+}
+.skill-desc {
+color: var(--gray);
+flex-grow: 1;
+}
+.skill-btn { /* This is the original class for buttons inside skill cards in the grid */
+background: var(--primary);
+color: white;
+border: none;
+padding: 0.75rem;
+border-radius: 5px;
+cursor: pointer;
+font-weight: 600;
+margin-top: 1rem;
+transition: var(--transition);
 }
 .skill-btn:hover {
-  background: var(--secondary);
+background: var(--secondary);
 }
+/* Skill Detail */
+.skill-detail {
+background: white;
+border-radius: 10px;
+padding: 2rem;
+box-shadow: var(--shadow);
+margin-top: 1.5rem;
+display: none;
+}
+.skill-header {
+display: flex;
+align-items: center;
+margin-bottom: 2rem;
+padding-bottom: 1rem;
+border-bottom: 2px solid var(--light);
+}
+.skill-header img { /* Changed selector for skill detail header */
+width: 50px; /* Adjust size as needed */
+height: 50px;
+margin-right: 1rem;
+object-fit: cover;
+}
+.skill-header h2 {
+font-size: 2rem;
+color: var(--dark);
+}
+.skill-section {
+margin-bottom: 2.5rem;
+}
+.section-title-ui {
+font-size: 1.5rem;
+color: var(--primary);
+margin-bottom: 1rem;
+padding-bottom: 0.5rem;
+border-bottom: 1px solid var(--light);
+}
+/* Tools Section */
+.tools-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+gap: 1rem;
+}
+.tool-item {
+background: var(--light);
+border-radius: 8px;
+padding: 1rem;
+text-align: center;
+transition: var(--transition);
+}
+.tool-item:hover {
+background: var(--primary);
+color: white;
+}
+.tool-item img { /* New selector for tool image in detail view */
+width: 50px; /* Adjust size as needed */
+height: 50px;
+object-fit: cover;
+margin-bottom: 0.5rem;
+}
+.tool-item:hover img { /* Adjust hover color if needed */
+opacity: 0.8; /* Example hover effect */
+}
+.tool-item span {
+display: block;
+}
+/* Steps Section */
+.steps-container {
+display: flex;
+flex-direction: column;
+gap: 1.5rem;
+}
+.step-card {
+display: flex;
+gap: 1.5rem;
+background: var(--light);
+border-radius: 8px;
+overflow: hidden;
+}
+.step-image {
+width: 200px;
+height: 150px;
+object-fit: cover;
+}
+.step-content {
+padding: 1.2rem;
+flex-grow: 1;
+}
+.step-title {
+font-size: 1.2rem;
+margin-bottom: 0.5rem;
+color: var(--primary);
+}
+/* Theory Section */
+.theory-content {
+background: var(--light);
+padding: 1.5rem;
+border-radius: 8px;
+line-height: 1.8;
+}
+/* Quiz Section */
+.quiz-container {
+background: var(--light);
+padding: 1.5rem;
+border-radius: 8px;
+}
+.question {
+margin-bottom: 1.5rem;
+}
+.question-text {
+font-weight: 600;
+margin-bottom: 0.75rem;
+}
+.options {
+display: flex;
+flex-direction: column;
+gap: 0.5rem;
+}
+.option {
+display: flex;
+align-items: center;
+padding: 0.75rem;
+background: white;
+border-radius: 5px;
+cursor: pointer;
+transition: var(--transition);
+}
+.option:hover {
+background: #e9ecef;
+}
+.option.selected {
+background: var(--primary);
+color: white;
+}
+.quiz-result {
+margin-top: 1.5rem;
+padding: 1rem;
+border-radius: 5px;
+text-align: center;
+font-weight: 600;
+}
+.quiz-result.correct {
+background: var(--success);
+color: white;
+}
+.quiz-result.incorrect {
+background: var(--danger);
+color: white;
+}
+.quiz-nav {
+display: flex;
+justify-content: space-between;
+margin-top: 1.5rem;
+}
+.back-btn {
+background: var(--gray);
+color: white;
+border: none;
+padding: 0.75rem 1.5rem;
+border-radius: 5px;
+cursor: pointer;
+font-weight: 600;
+}
+/* Footer */
 footer {
-  background: var(--dark);
-  color: white;
-  text-align: center;
-  padding: 1.5rem 0;
-  margin-top: 3rem;
+background: var(--dark);
+color: white;
+text-align: center;
+padding: 1.5rem 0;
+margin-top: 3rem;
 }
-
-/* Responsive */
+/* Responsive Design */
 @media (max-width: 992px) {
-  .admin-content {
-    grid-template-columns: 1fr;
-  }
-  .nav-panel {
-    margin-bottom: 2rem;
-  }
-  .settings-controls {
-    grid-template-columns: 1fr;
-  }
+.admin-content {
+grid-template-columns: 1fr;
+}
+.nav-panel {
+margin-bottom: 2rem;
+}
+.settings-controls {
+grid-template-columns: 1fr;
+}
+.settings-tabs {
+flex-wrap: wrap;
+}
+.tab-button {
+padding: 0.5rem;
+}
 }
 @media (max-width: 768px) {
-  .profile-btn,
-  .admin-switch-btn {
-    position: static;
-    margin-top: 1rem;
-    text-align: center;
-  }
-  .profile-btn {
-    margin-right: 1rem;
-  }
-  .profile-popup {
-    top: 50px;
-    right: 10px;
-  }
+.step-card {
+flex-direction: column;
 }
+.step-image {
+width: 100%;
+height: 200px;
+}
+.skill-header {
+flex-direction: column;
+text-align: center;
+}
+.skill-header img { /* Adjust selector for mobile */
+margin-right: 0;
+margin-bottom: 1rem;
+}
+.form-row {
+flex-direction: column;
+gap: 0;
+}
+.profile-btn, .admin-switch {
+position: static;
+text-align: center;
+margin-top: 1rem;
+}
+.profile-btn {
+margin-right: 1rem;
+}
+.profile-popup {
+position: absolute;
+top: 50px;
+right: 10px;
+}
+}
+/* Confirmation Modal */
+.login-popup.confirmation-modal {
+/* Inherits basic styles from .login-popup */
+z-index: 3001; /* Ensure it's above other modals */
+}
+/* Primary action buttons in admin sections */
+#skills-section .btn,
+#users-section .btn,
+#settings-section .btn {
+background: var(--success);
+color: white;
+border: none;
+border-radius: 5px;
+padding: 0.5rem 1rem;
+font-weight: 600;
+cursor: pointer;
+transition: var(--transition);
+}
+#skills-section .btn:hover {
+background: #38c172; /* Slightly darker green on hover */
+}
+/* No specific additional styling needed unless customization is desired */
 </style>
 </head>
 <body>
@@ -711,10 +1157,10 @@ footer {
 <div class="admin-content">
 <div class="nav-panel">
 <h3>Navigation</h3>
-<div class="nav-item active" onclick="showSection('dashboard')">Dashboard</div>
-<div class="nav-item" onclick="showSection('skills')">Manage Skills</div>
-<div class="nav-item" onclick="showSection('users')">Manage Users</div>
-<div class="nav-item" onclick="showSection('settings')">Settings</div>
+<div class="nav-item active" onclick="showSection('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</div>
+<div class="nav-item" onclick="showSection('skills')"><i class="fas fa-tools"></i> Manage Skills</div>
+<div class="nav-item" onclick="showSection('users')"><i class="fas fa-users"></i> Manage Users</div>
+<div class="nav-item" onclick="showSection('settings')"><i class="fas fa-cog"></i> Settings</div>
 </div>
 <div class="main-content-area">
 <!-- Dashboard Section -->
@@ -1887,9 +2333,7 @@ document.getElementById('courseMessage').textContent = '';
 }, 3000);
 }
 }
-
 // --- NEW FUNCTIONS FOR IMAGE UPLOAD AND TOOL MANAGEMENT ---
-
 // Function to handle skill image upload
 async function uploadSkillImage(file) {
 if (!file) return null;
@@ -1904,7 +2348,6 @@ console.error("Error uploading skill image: ", error);
 return null;
 }
 }
-
 // Function to handle tool image upload
 async function uploadToolImage(file) {
 if (!file) return null;
@@ -1919,7 +2362,6 @@ console.error("Error uploading tool image: ", error);
 return null;
 }
 }
-
 // Function to preview skill image
 function previewSkillImage(input) {
 const preview = document.getElementById('skill-image-preview');
@@ -1933,7 +2375,6 @@ reader.readAsDataURL(input.files[0]);
 preview.innerHTML = '';
 }
 }
-
 // Function to preview tool image
 function previewToolImage(input, index) {
 const previewId = `tool-image-preview-${index}`;
@@ -1948,16 +2389,13 @@ reader.readAsDataURL(input.files[0]);
 preview.innerHTML = '';
 }
 }
-
 // Function to add a new tool input field
 function addTool(index = null) {
 const container = document.getElementById('tools-container');
 const toolIndex = index !== null ? index : container.children.length; // Use provided index or next available
-
 const toolDiv = document.createElement('div');
 toolDiv.className = 'form-group';
 toolDiv.id = `tool-item-${toolIndex}`;
-
 toolDiv.innerHTML = `
 <label>Tool ${toolIndex + 1}</label>
 <input type="text" id="tool-name-${toolIndex}" placeholder="Tool name">
@@ -1968,9 +2406,7 @@ toolDiv.innerHTML = `
 <input type="hidden" id="tool-image-url-${toolIndex}"> <!-- Hidden input for URL -->
 <button type="button" class="btn btn-secondary" onclick="removeTool(${toolIndex})">Remove Tool</button>
 `;
-
 container.appendChild(toolDiv);
-
 // Pre-populate fields if editing existing tool data
 if (currentEditingSkill && Array.isArray(currentEditingSkill.tools) && currentEditingSkill.tools[toolIndex]) {
 const existingTool = currentEditingSkill.tools[toolIndex];
@@ -1981,7 +2417,6 @@ document.getElementById(`tool-image-preview-${toolIndex}`).innerHTML = `<img src
 }
 }
 }
-
 // Function to remove a tool input field
 function removeTool(index) {
 const toolElement = document.getElementById(`tool-item-${index}`);
@@ -1989,9 +2424,7 @@ if (toolElement) {
 toolElement.remove();
 }
 }
-
 // --- END NEW FUNCTIONS ---
-
 // Logout function
 function logout() {
 auth.signOut().then(() => {
@@ -2444,96 +2877,86 @@ addQuizQuestionToForm(idx, question);
 // Save skill
 // Save skill
 async function saveSkill() {
-    // Update current skill with form values
-    currentEditingSkill.name = document.getElementById('edit-skill-name').value;
-
-    // --- HANDLE SKILL IMAGE UPLOAD ---
-    const skillImageFile = document.getElementById('edit-skill-image').files[0]; // This gets the file object
-    let skillImageUrl = document.getElementById('edit-skill-image-url').value; // Get existing URL
-    if (skillImageFile) { // If a new file is selected
-        console.log("Uploading new skill image..."); // Debug log
-        skillImageUrl = await uploadSkillImage(skillImageFile); // Upload new file if selected
-        if (!skillImageUrl) {
-            alert("Error uploading skill image. Skill not saved.");
-            console.error("Failed to get skill image URL from uploadSkillImage"); // Debug log
-            return; // Stop saving if upload fails
-        }
-    } else {
-        // If no new file selected, keep the existing URL stored in the hidden field
-        console.log("No new skill image selected, keeping existing URL:", skillImageUrl); // Debug log
-    }
-    currentEditingSkill.imageUrl = skillImageUrl; // Store the final URL (existing or new)
-
-    // --- HANDLE TOOLS UPLOAD ---
-    const toolsContainer = document.getElementById('tools-container');
-    currentEditingSkill.tools = []; // Reset tools array
-    let toolIndex = 0;
-    while (true) { // Loop through potential tool inputs until one doesn't exist
-        const toolNameInput = document.getElementById(`tool-name-${toolIndex}`);
-        const toolImageFileInput = document.getElementById(`tool-image-${toolIndex}`);
-        const toolImageUrlHidden = document.getElementById(`tool-image-url-${toolIndex}`); // Get the hidden input for existing URL
-
-        if (!toolNameInput) break; // No more tool inputs found
-
-        let toolImageUrl = toolImageUrlHidden ? toolImageUrlHidden.value : ''; // Get existing URL from hidden input
-        const toolImageFile = toolImageFileInput ? toolImageFileInput.files[0] : null; // Get the file object if input exists
-
-        if (toolImageFile) { // If a new file is selected for this tool
-            console.log(`Uploading new image for tool ${toolIndex + 1}...`); // Debug log
-            toolImageUrl = await uploadToolImage(toolImageFile); // Upload new file if selected
-            if (!toolImageUrl) {
-                alert(`Error uploading image for tool ${toolIndex + 1}. Skill not saved.`);
-                console.error(`Failed to get tool image URL for tool ${toolIndex + 1}`); // Debug log
-                return; // Stop saving if upload fails
-            }
-        } else {
-             // If no new file selected for this tool, keep the existing URL from the hidden input
-             console.log(`No new image for tool ${toolIndex + 1}, keeping existing URL:`, toolImageUrl); // Debug log
-        }
-
-        currentEditingSkill.tools.push({
-            name: toolNameInput.value,
-            imageUrl: toolImageUrl
-        });
-
-        toolIndex++;
-    }
-
-    currentEditingSkill.description = document.getElementById('edit-skill-description').value;
-    // currentEditingSkill.tools handled above
-    currentEditingSkill.theory = document.getElementById('edit-theory').value;
-
-    console.log("Attempting to save skill to Firestore:", currentEditingSkill); // Debug log
-
-    // If it's a new skill, add to Firestore
-    if (!currentEditingSkill.id) {
-        db.collection("skills").add(currentEditingSkill)
-            .then((docRef) => {
-                console.log("Skill added with ID: ", docRef.id); // Debug log
-                alert('Skill saved successfully!');
-                document.getElementById('edit-skill-form').style.display = 'none';
-                document.getElementById('skills-section').style.display = 'block';
-                showSection('skills'); // This will trigger loadSkillsList
-            })
-            .catch((error) => {
-                console.error("Error adding skill to Firestore: ", error); // More specific error log
-                alert('Error saving skill to database: ' + error.message);
-            });
-    } else {
-        // Update existing skill in Firestore
-        db.collection("skills").doc(currentEditingSkill.id).set(currentEditingSkill)
-            .then(() => {
-                console.log("Skill updated with ID: ", currentEditingSkill.id); // Debug log
-                alert('Skill updated successfully!');
-                document.getElementById('edit-skill-form').style.display = 'none';
-                document.getElementById('skills-section').style.display = 'block';
-                showSection('skills'); // This will trigger loadSkillsList
-            })
-            .catch((error) => {
-                console.error("Error updating skill in Firestore: ", error); // More specific error log
-                alert('Error saving skill to database: ' + error.message);
-            });
-    }
+// Update current skill with form values
+currentEditingSkill.name = document.getElementById('edit-skill-name').value;
+// --- HANDLE SKILL IMAGE UPLOAD ---
+const skillImageFile = document.getElementById('edit-skill-image').files[0]; // This gets the file object
+let skillImageUrl = document.getElementById('edit-skill-image-url').value; // Get existing URL
+if (skillImageFile) { // If a new file is selected
+console.log("Uploading new skill image..."); // Debug log
+skillImageUrl = await uploadSkillImage(skillImageFile); // Upload new file if selected
+if (!skillImageUrl) {
+alert("Error uploading skill image. Skill not saved.");
+console.error("Failed to get skill image URL from uploadSkillImage"); // Debug log
+return; // Stop saving if upload fails
+}
+} else {
+// If no new file selected, keep the existing URL stored in the hidden field
+console.log("No new skill image selected, keeping existing URL:", skillImageUrl); // Debug log
+}
+currentEditingSkill.imageUrl = skillImageUrl; // Store the final URL (existing or new)
+// --- HANDLE TOOLS UPLOAD ---
+const toolsContainer = document.getElementById('tools-container');
+currentEditingSkill.tools = []; // Reset tools array
+let toolIndex = 0;
+while (true) { // Loop through potential tool inputs until one doesn't exist
+const toolNameInput = document.getElementById(`tool-name-${toolIndex}`);
+const toolImageFileInput = document.getElementById(`tool-image-${toolIndex}`);
+const toolImageUrlHidden = document.getElementById(`tool-image-url-${toolIndex}`); // Get the hidden input for existing URL
+if (!toolNameInput) break; // No more tool inputs found
+let toolImageUrl = toolImageUrlHidden ? toolImageUrlHidden.value : ''; // Get existing URL from hidden input
+const toolImageFile = toolImageFileInput ? toolImageFileInput.files[0] : null; // Get the file object if input exists
+if (toolImageFile) { // If a new file is selected for this tool
+console.log(`Uploading new image for tool ${toolIndex + 1}...`); // Debug log
+toolImageUrl = await uploadToolImage(toolImageFile); // Upload new file if selected
+if (!toolImageUrl) {
+alert(`Error uploading image for tool ${toolIndex + 1}. Skill not saved.`);
+console.error(`Failed to get tool image URL for tool ${toolIndex + 1}`); // Debug log
+return; // Stop saving if upload fails
+}
+} else {
+// If no new file selected for this tool, keep the existing URL from the hidden input
+console.log(`No new image for tool ${toolIndex + 1}, keeping existing URL:`, toolImageUrl); // Debug log
+}
+currentEditingSkill.tools.push({
+name: toolNameInput.value,
+imageUrl: toolImageUrl
+});
+toolIndex++;
+}
+currentEditingSkill.description = document.getElementById('edit-skill-description').value;
+// currentEditingSkill.tools handled above
+currentEditingSkill.theory = document.getElementById('edit-theory').value;
+console.log("Attempting to save skill to Firestore:", currentEditingSkill); // Debug log
+// If it's a new skill, add to Firestore
+if (!currentEditingSkill.id) {
+db.collection("skills").add(currentEditingSkill)
+.then((docRef) => {
+console.log("Skill added with ID: ", docRef.id); // Debug log
+alert('Skill saved successfully!');
+document.getElementById('edit-skill-form').style.display = 'none';
+document.getElementById('skills-section').style.display = 'block';
+showSection('skills'); // This will trigger loadSkillsList
+})
+.catch((error) => {
+console.error("Error adding skill to Firestore: ", error); // More specific error log
+alert('Error saving skill to database: ' + error.message);
+});
+} else {
+// Update existing skill in Firestore
+db.collection("skills").doc(currentEditingSkill.id).set(currentEditingSkill)
+.then(() => {
+console.log("Skill updated with ID: ", currentEditingSkill.id); // Debug log
+alert('Skill updated successfully!');
+document.getElementById('edit-skill-form').style.display = 'none';
+document.getElementById('skills-section').style.display = 'block';
+showSection('skills'); // This will trigger loadSkillsList
+})
+.catch((error) => {
+console.error("Error updating skill in Firestore: ", error); // More specific error log
+alert('Error saving skill to database: ' + error.message);
+});
+}
 }
 // Delete skill
 function deleteSkill(skillId) {
@@ -2773,7 +3196,3 @@ loadAdminList(); // Load admin list specifically when the Admin Access tab is cl
 </script>
 </body>
 </html>
-
-
-
-
